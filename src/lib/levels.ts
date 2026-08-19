@@ -2,15 +2,17 @@ import type { Level } from "./types";
 
 export const LEVELS: Level[] = [
   { n: 1, title: "Token", minXP: 0 },
-  { n: 2, title: "Embedding", minXP: 120 },
-  { n: 3, title: "Attention Head", minXP: 300 },
-  { n: 4, title: "KV Cache", minXP: 600 },
-  { n: 5, title: "Kernel Smith", minXP: 1000 },
-  { n: 6, title: "Batch Scheduler", minXP: 1500 },
-  { n: 7, title: "Quantizer", minXP: 2200 },
-  { n: 8, title: "Tensor Parallelist", minXP: 3000 },
-  { n: 9, title: "Speculative Decoder", minXP: 3900 },
-  { n: 10, title: "Inference Engineer", minXP: 4800 },
+  { n: 2, title: "Embedding", minXP: 250 },
+  { n: 3, title: "Attention Head", minXP: 700 },
+  { n: 4, title: "KV Cache", minXP: 1400 },
+  { n: 5, title: "Sampler", minXP: 2300 },
+  { n: 6, title: "Kernel Smith", minXP: 3400 },
+  { n: 7, title: "Batch Scheduler", minXP: 4700 },
+  { n: 8, title: "Quantizer", minXP: 6100 },
+  { n: 9, title: "Tensor Parallelist", minXP: 7600 },
+  { n: 10, title: "Speculative Decoder", minXP: 9200 },
+  { n: 11, title: "Goodput Guardian", minXP: 10800 },
+  { n: 12, title: "Inference Engineer", minXP: 12000 },
 ];
 
 export function levelForXP(xp: number): Level {

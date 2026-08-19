@@ -74,6 +74,7 @@ export const KIND_META: Record<TaskKind, { label: string; dot: string }> = {
   bench: { label: "Benchmark", dot: "#eda100" },
   oss: { label: "Open source", dot: "#008300" },
   write: { label: "Write", dot: "#e34948" },
+  quiz: { label: "Drill", dot: "#898781" },
 };
 
 export function KindChip({ kind }: { kind: TaskKind }) {

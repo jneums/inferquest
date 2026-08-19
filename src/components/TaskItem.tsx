@@ -1,25 +1,36 @@
 "use client";
 
+import { useState } from "react";
 import { useProgress } from "@/lib/progress";
 import type { Task } from "@/lib/types";
+import { VerifyPanel } from "./VerifyPanel";
 import { KindChip, XPPill } from "./ui";
 
 export function TaskItem({ task }: { task: Task }) {
   const { doneTaskIds, toggleTask } = useProgress();
   const done = doneTaskIds.has(task.id);
+  const verified = Boolean(task.verifier);
+  const [open, setOpen] = useState(false);
 
   return (
     <li className="flex gap-3 border-b border-[var(--hairline)] py-3 last:border-b-0">
-      <input
-        type="checkbox"
-        id={`task-${task.id}`}
-        checked={done}
-        onChange={() => toggleTask(task.id)}
-        className="mt-1 h-4 w-4 shrink-0 accent-[var(--accent)]"
-      />
+      {verified ? (
+        <span className="mt-0.5 w-4 shrink-0 text-center" title="Completed by automated verification" aria-hidden>
+          {done ? "✅" : "🛡️"}
+        </span>
+      ) : (
+        <input
+          type="checkbox"
+          id={`task-${task.id}`}
+          checked={done}
+          onChange={() => toggleTask(task.id)}
+          className="mt-1 h-4 w-4 shrink-0 accent-[var(--accent)]"
+        />
+      )}
       <div className="min-w-0 flex-1">
         <label
-          htmlFor={`task-${task.id}`}
+          htmlFor={verified ? undefined : `task-${task.id}`}
+          onClick={verified ? () => setOpen((o) => !o) : undefined}
           className={`cursor-pointer font-medium ${
             done ? "text-[var(--text-muted)] line-through" : ""
           }`}
@@ -34,6 +45,14 @@ export function TaskItem({ task }: { task: Task }) {
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
           <KindChip kind={task.kind} />
           <XPPill xp={task.xp} />
+          {verified && !done && (
+            <button
+              onClick={() => setOpen((o) => !o)}
+              className="rounded-full border border-[var(--accent)] px-2 py-0.5 text-xs font-medium text-[var(--accent-strong)]"
+            >
+              {open ? "Hide verifier" : "🛡️ Verify"}
+            </button>
+          )}
           {task.link && (
             <a
               href={task.link}
@@ -45,6 +64,7 @@ export function TaskItem({ task }: { task: Task }) {
             </a>
           )}
         </div>
+        {verified && (open || done) && <VerifyPanel task={task} />}
       </div>
     </li>
   );

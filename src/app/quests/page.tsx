@@ -10,8 +10,9 @@ export default function QuestsPage() {
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Quest map</h1>
         <p className="mt-1 text-[var(--text-secondary)]">
-          Four phases from “what’s a KV cache” to a signed offer. Quests unlock
-          when their prerequisites are at least half done.
+          Ten phases from “what’s a KV cache” to a signed offer, with
+          automatically verified milestones along the way. Quests unlock when
+          their prerequisites are at least half done.
         </p>
       </div>
 

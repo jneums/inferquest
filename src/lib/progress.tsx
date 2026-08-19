@@ -4,15 +4,21 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
+  useState,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import { useUser } from "@clerk/nextjs";
 import { QUESTS, QUESTS_BY_ID, TASKS_BY_ID } from "@/data/curriculum";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import type { ProgressState, Quest, XPEvent } from "./types";
+import type { CheckResult } from "@/server/verifiers/net";
 
 const STORAGE_KEY = "inference-engineer-progress-v1";
+const MERGED_FLAG = "inferquest-merged-v1";
 
 export function todayKey(d = new Date()): string {
   const y = d.getFullYear();
@@ -50,7 +56,7 @@ function computeStreaks(dates: Set<string>): {
   return { current, longest };
 }
 
-// ── localStorage-backed external store ──────────────────────────────────────
+// ── localStorage store (anonymous visitors) ─────────────────────────────────
 
 const DEFAULT_STATE: ProgressState = { version: 1, events: [] };
 
@@ -59,7 +65,6 @@ function parseState(raw: string | null): ProgressState {
     try {
       const parsed = JSON.parse(raw) as ProgressState;
       if (parsed.version === 1 && Array.isArray(parsed.events)) {
-        // Drop events for tasks that no longer exist in the curriculum.
         parsed.events = parsed.events.filter((e) => TASKS_BY_ID.has(e.taskId));
         return parsed;
       }
@@ -89,7 +94,6 @@ function getServerSnapshot(): ProgressState {
 
 function subscribe(onChange: () => void): () => void {
   listeners.add(onChange);
-  // Sync across tabs too — 'storage' fires when another tab writes the key.
   window.addEventListener("storage", onChange);
   return () => {
     listeners.delete(onChange);
@@ -97,7 +101,7 @@ function subscribe(onChange: () => void): () => void {
   };
 }
 
-function updateState(updater: (prev: ProgressState) => ProgressState): void {
+function updateLocalState(updater: (prev: ProgressState) => ProgressState): void {
   const next = updater(getSnapshot());
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -109,57 +113,169 @@ function updateState(updater: (prev: ProgressState) => ProgressState): void {
   listeners.forEach((l) => l());
 }
 
-// ── React context over the store ────────────────────────────────────────────
+// ── React context ───────────────────────────────────────────────────────────
+
+export interface VerifyOutcome {
+  passed: boolean;
+  checks: CheckResult[];
+  error?: string;
+}
 
 export interface Progress {
-  /** False during SSR/hydration — render zero-state until then. */
+  /** False until the active source (localStorage or API) has loaded. */
   ready: boolean;
+  /** True when progress is backed by the server (signed in). */
+  synced: boolean;
   events: XPEvent[];
   doneTaskIds: Set<string>;
   xp: number;
   streak: number;
   longestStreak: number;
-  /** XP earned per local day, for the heatmap. */
   xpByDay: Map<string, number>;
   earnedAchievementIds: Set<string>;
   toggleTask: (taskId: string) => void;
+  /** Runs a task's verifier server-side. Requires sign-in. */
+  submitVerification: (taskId: string, submission: unknown) => Promise<VerifyOutcome>;
   isQuestUnlocked: (questId: string) => boolean;
   questCompletion: (questId: string) => { done: number; total: number };
-  exportJSON: () => string;
-  importJSON: (json: string) => boolean;
   resetAll: () => void;
 }
 
 const ProgressContext = createContext<Progress | null>(null);
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
-  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const ready = useSyncExternalStore(
+  const { isSignedIn, isLoaded, user } = useUser();
+  const localState = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const hydrated = useSyncExternalStore(
     subscribe,
     () => true,
     () => false,
   );
 
-  const toggleTask = useCallback((taskId: string) => {
-    const task = TASKS_BY_ID.get(taskId);
-    if (!task) return;
-    updateState((prev) => {
-      const exists = prev.events.some((e) => e.taskId === taskId);
-      const events = exists
-        ? prev.events.filter((e) => e.taskId !== taskId)
-        : [
-            ...prev.events,
-            { taskId, xp: task.xp, date: todayKey(), at: Date.now() },
-          ];
-      return { ...prev, events };
-    });
+  // Server progress is keyed by user id, so a signed-out render (or a
+  // different user) simply doesn't match — no reset-on-signout state writes.
+  const [serverState, setServerState] = useState<{
+    forUser: string;
+    events: XPEvent[];
+  } | null>(null);
+  const mergeStarted = useRef(false);
+
+  const loadServer = useCallback(async (uid: string) => {
+    const res = await fetch("/api/progress");
+    if (res.ok) {
+      const data = (await res.json()) as { events: XPEvent[] };
+      setServerState({
+        forUser: uid,
+        events: data.events.filter((e) => TASKS_BY_ID.has(e.taskId)),
+      });
+    }
   }, []);
 
+  // On sign-in: one-time merge of pre-signup localStorage progress, then load.
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !user?.id) {
+      mergeStarted.current = false;
+      return;
+    }
+    const uid = user.id;
+    let cancelled = false;
+    (async () => {
+      const flag = `${MERGED_FLAG}:${uid}`;
+      const local = getSnapshot().events;
+      if (!localStorage.getItem(flag) && local.length > 0 && !mergeStarted.current) {
+        mergeStarted.current = true;
+        try {
+          await fetch("/api/progress/merge", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              events: local.map((e) => ({ taskId: e.taskId, date: e.date })),
+            }),
+          });
+          localStorage.setItem(flag, "1");
+        } catch {
+          // merge is best-effort; the toggle path still works
+        }
+      }
+      if (!cancelled) await loadServer(uid);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn, user?.id, user, loadServer]);
+
+  const synced = Boolean(isSignedIn);
+  const serverReady = synced && serverState?.forUser === user?.id;
+
+  const toggleTask = useCallback(
+    (taskId: string) => {
+      const task = TASKS_BY_ID.get(taskId);
+      if (!task || task.verifier) return;
+      const date = todayKey();
+      if (!synced) {
+        updateLocalState((prev) => {
+          const exists = prev.events.some((e) => e.taskId === taskId);
+          const events = exists
+            ? prev.events.filter((e) => e.taskId !== taskId)
+            : [...prev.events, { taskId, xp: task.xp, date, at: Date.now() }];
+          return { ...prev, events };
+        });
+        return;
+      }
+      if (!serverReady || !serverState) return;
+      const exists = serverState.events.some((e) => e.taskId === taskId);
+      const optimistic = exists
+        ? serverState.events.filter((e) => e.taskId !== taskId)
+        : [...serverState.events, { taskId, xp: task.xp, date, at: Date.now() }];
+      setServerState({ ...serverState, events: optimistic });
+      fetch("/api/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId, done: !exists, date }),
+      }).then((res) => {
+        if (!res.ok) loadServer(serverState.forUser); // revert to server truth
+      });
+    },
+    [synced, serverReady, serverState, loadServer],
+  );
+
+  const submitVerification = useCallback(
+    async (taskId: string, submission: unknown): Promise<VerifyOutcome> => {
+      if (!synced || !user?.id) {
+        return { passed: false, checks: [], error: "Sign in to run verification." };
+      }
+      const res = await fetch("/api/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId, date: todayKey(), submission }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        return { passed: false, checks: [], error: body?.error ?? `HTTP ${res.status}` };
+      }
+      const data = (await res.json()) as { passed: boolean; checks: CheckResult[] };
+      if (data.passed) await loadServer(user.id);
+      return data;
+    },
+    [synced, user, loadServer],
+  );
+
+  const resetAll = useCallback(() => {
+    if (!synced) updateLocalState(() => ({ version: 1, events: [] }));
+    // Server-side reset is deliberately not exposed — completions are earned.
+  }, [synced]);
+
   const value = useMemo<Progress>(() => {
-    const doneTaskIds = new Set(state.events.map((e) => e.taskId));
-    const xp = state.events.reduce((s, e) => s + e.xp, 0);
+    const events = synced
+      ? serverReady
+        ? serverState!.events
+        : []
+      : localState.events;
+    const ready = synced ? serverReady : hydrated;
+    const doneTaskIds = new Set(events.map((e) => e.taskId));
+    const xp = events.reduce((s, e) => s + e.xp, 0);
     const xpByDay = new Map<string, number>();
-    for (const e of state.events) {
+    for (const e of events) {
       xpByDay.set(e.date, (xpByDay.get(e.date) ?? 0) + e.xp);
     }
     const { current: streak, longest: longestStreak } = computeStreaks(
@@ -182,14 +298,15 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       });
     };
 
-    const ctx = { doneTaskIds, events: state.events, xp, streak, longestStreak };
+    const ctx = { doneTaskIds, events, xp, streak, longestStreak };
     const earnedAchievementIds = new Set(
       ACHIEVEMENTS.filter((a) => a.earned(ctx)).map((a) => a.id),
     );
 
     return {
       ready,
-      events: state.events,
+      synced,
+      events,
       doneTaskIds,
       xp,
       streak,
@@ -197,25 +314,21 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       xpByDay,
       earnedAchievementIds,
       toggleTask,
+      submitVerification,
       isQuestUnlocked,
       questCompletion,
-      exportJSON: () => JSON.stringify(state, null, 2),
-      importJSON: (json: string) => {
-        try {
-          const parsed = JSON.parse(json) as ProgressState;
-          if (parsed.version !== 1 || !Array.isArray(parsed.events)) return false;
-          updateState(() => ({
-            version: 1,
-            events: parsed.events.filter((e) => TASKS_BY_ID.has(e.taskId)),
-          }));
-          return true;
-        } catch {
-          return false;
-        }
-      },
-      resetAll: () => updateState(() => ({ version: 1, events: [] })),
+      resetAll,
     };
-  }, [state, ready, toggleTask]);
+  }, [
+    synced,
+    serverReady,
+    serverState,
+    localState,
+    hydrated,
+    toggleTask,
+    submitVerification,
+    resetAll,
+  ]);
 
   return (
     <ProgressContext.Provider value={value}>

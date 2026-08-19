@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# harness
+harness/**/__pycache__/
+harness/solutions/*.py
+
+# clerk configuration (can include secrets)
+/.clerk/

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { useProgress } from "@/lib/progress";
 import { levelForXP } from "@/lib/levels";
 
@@ -53,6 +54,16 @@ export function Nav() {
               </span>
             </>
           )}
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button className="rounded-md bg-[var(--accent)] px-3 py-1 text-sm font-medium text-white hover:bg-[var(--accent-strong)]">
+                Sign in
+              </button>
+            </SignInButton>
+          </Show>
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
         </div>
       </div>
     </header>
