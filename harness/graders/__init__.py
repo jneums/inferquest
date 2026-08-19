@@ -3,7 +3,10 @@
 SCRIPTS = {
     "attention-pytorch": ("fp-attn-harness", "attention_pytorch"),
     "cached-decoder": ("kv-harness", "cached_decoder"),
+    "speculative-decoding": ("spec-harness", "speculative_decoding"),
     "softmax-triton": ("triton-softmax-harness", "softmax_triton"),
     "matmul-tiled": ("cuda-matmul-harness", "matmul_tiled"),
     "flash-attention-triton": ("triton-flash-harness", "flash_attention_triton"),
+    "weight-quantizer": ("quant-scratch-harness", "weight_quantizer"),
+    "ring-allreduce": ("par-allreduce-harness", "ring_allreduce"),
 }

@@ -164,6 +164,15 @@ export const QUESTS: Quest[] = [
         detail:
           "Engine host overhead (scheduler, API server) is Python. Find a real bottleneck in any project you own.",
       },
+      {
+        id: "pt-strides",
+        title: "Implement a strided tensor: reshape/permute/slice as pure stride math",
+        kind: "build",
+        xp: 100,
+        link: "https://github.com/dlsyscourse/hw3",
+        detail:
+          "CMU 10-714 hw3-style: views share one flat buffer (zero copy), plus a compact() that materializes. This indexing math underlies paged-KV layouts, Triton pointer arithmetic, and coalescing analysis.",
+      },
     ],
   },
 
@@ -388,12 +397,64 @@ export const QUESTS: Quest[] = [
           "EAGLE-3 is the shipping default in vLLM/SGLang/TRT-LLM. Also note MTP in DeepSeek-V3 as built-in speculation.",
       },
       {
+        id: "spec-harness",
+        title: "Pass the grader: speculative decoding from scratch",
+        kind: "build",
+        xp: 250,
+        detail:
+          "Implement the greedy draft-verify loop (draft k, verify in ONE target call, accept prefix, rollback, bonus token) against the harness's target + noisy draft. Graded on exact equality with pure target decoding and ≥1.5 tokens per verify call.",
+        verifier: {
+          type: "harness",
+          script: "speculative-decoding",
+          metrics: {
+            tokens_per_verify: { op: ">=", value: 1.5 },
+            acceptance_rate: { op: ">=", value: 0.5 },
+          },
+        },
+      },
+      {
         id: "spec-quiz",
         title: "Pass the speculative decoding drill",
         kind: "quiz",
         xp: 80,
         detail: "Acceptance math, expected tokens/step, when speculation hurts. 75% to pass.",
         verifier: { type: "quiz", quizId: "specdec-drill", passPct: 75 },
+      },
+    ],
+  },
+  {
+    id: "long-context",
+    title: "Long Context & KV Policy",
+    tagline: "When the cache can't hold everything, something has to give.",
+    phaseId: "p2",
+    prereqs: ["kv-cache"],
+    tasks: [
+      {
+        id: "lc-sinks",
+        title: "Read StreamingLLM (attention sinks) and H2O (heavy-hitter eviction)",
+        kind: "paper",
+        xp: 70,
+        link: "https://arxiv.org/abs/2309.17453",
+        detail:
+          "The two poles of KV retention policy: keep the start + a sliding window, or keep what attention actually uses. Both ship as engine features.",
+      },
+      {
+        id: "lc-hybrid",
+        title: "Learn sliding-window and hybrid-model KV management",
+        kind: "read",
+        xp: 60,
+        link: "https://docs.vllm.ai/en/latest/design/hybrid_kv_cache_manager/",
+        detail:
+          "Gemma's sliding window and Mamba/hybrid layers need different block layouts — vLLM's hybrid KV manager is the production answer.",
+      },
+      {
+        id: "lc-family",
+        title: "Survey the KV-management family: eviction, merging, budgets, compression",
+        kind: "read",
+        xp: 60,
+        link: "https://github.com/Zefan-Cai/Awesome-LLM-KV-Cache",
+        detail:
+          "Map the design space beyond quantization. Also skim sparse-attention serving (MInference-class) and prompt compression.",
       },
     ],
   },
@@ -573,6 +634,50 @@ export const QUESTS: Quest[] = [
         link: "https://pytorch.org/blog/accelerating-pytorch-with-cuda-graphs/",
         detail: "Launch-overhead elimination — this is why vLLM/TRT-LLM capture the decode step.",
       },
+      {
+        id: "prof-memsnap",
+        title: "Debug GPU memory with torch.cuda memory snapshots",
+        kind: "bench",
+        xp: 70,
+        link: "https://pytorch.org/blog/understanding-gpu-memory-1/",
+        detail:
+          "Record a snapshot of a real inference run, open it in memory_viz, and explain one allocation spike. Also learn the caching allocator and expandable_segments — fragmentation OOMs are real on-call work.",
+      },
+    ],
+  },
+  {
+    id: "compiler-stack",
+    title: "The Compiler Stack",
+    tagline: "torch.compile is load-bearing in vLLM V1 — stop treating it as magic.",
+    phaseId: "p3",
+    prereqs: ["cuda-foundations"],
+    tasks: [
+      {
+        id: "compile-basics",
+        title: "Learn torch.compile for inference: Dynamo capture, static KV cache, recompile pitfalls",
+        kind: "read",
+        xp: 70,
+        link: "https://huggingface.co/docs/transformers/main/en/llm_optims",
+        detail:
+          "Compile a decode loop with a static KV cache and measure the speedup; then trigger a recompile on purpose (dynamic shape) and watch it in the logs.",
+      },
+      {
+        id: "compile-inductor",
+        title: "Read the Triton that Inductor writes for you",
+        kind: "build",
+        xp: 100,
+        detail:
+          "TORCH_LOGS=output_code on a small fused op. Find the fusion decisions, the tiling, the pointer math — compare with the kernels you'll write in Phase 4.",
+      },
+      {
+        id: "compile-vllm",
+        title: "Read vLLM's torch.compile integration + piecewise CUDA graphs design docs",
+        kind: "read",
+        xp: 70,
+        link: "https://docs.vllm.ai/en/latest/design/torch_compile.html",
+        detail:
+          "Piecewise compilation split at attention ops, captured into CUDA graphs — the concrete architecture your Phase 6 deployment runs on.",
+      },
     ],
   },
 
@@ -633,6 +738,15 @@ export const QUESTS: Quest[] = [
         detail: "The cleanest derivation of the online-softmax trick. Do the algebra yourself.",
       },
       {
+        id: "fa-cpu-rung",
+        title: "Build the CPU middle rung: blocked, fused row-at-a-time attention",
+        kind: "build",
+        xp: 100,
+        link: "https://github.com/stanford-cs149/cs149gpt",
+        detail:
+          "Stanford CS149's ladder: naive → blocked matmul → fused rows (watch the N×N intermediate shrink from MBs to KBs) — the teaching moment between the derivation and the Triton kernel.",
+      },
+      {
         id: "fa-papers",
         title: "Read the FlashAttention lineage: FA1 → FA2 → FA3",
         kind: "paper",
@@ -664,6 +778,23 @@ export const QUESTS: Quest[] = [
         link: "https://github.com/flashinfer-ai/flashinfer",
         detail:
           "FlashInfer (MLSys '25 best paper — the attention library inside vLLM/SGLang), Colfax's CUTLASS tutorials, and the “GPUs Go Brrr” ThunderKittens post.",
+      },
+      {
+        id: "fa-modern-metal",
+        title: "Go modern: Hopper/Blackwell features, CuTe DSL, mixed-input GEMM, AMD",
+        kind: "read",
+        xp: 90,
+        link: "https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/cute_dsl_general/dsl_introduction.html",
+        detail:
+          "TMA + warp specialization (Colfax), CuTe DSL (the GPU MODE leaderboard's NVIDIA competitions are CuTeDSL-shaped now), Marlin/Machete-style W4A16 GEMM, and a taste of ROCm/HIP — three leaderboard comps run on MI300X.",
+      },
+      {
+        id: "fa-integrate",
+        title: "Back-integrate: your flash-attention kernel inside your own engine",
+        kind: "build",
+        xp: 150,
+        detail:
+          "Swap your Triton kernel into the Phase 2 engine's attention path. It isn't done until the OpenAI-conformance probe still passes with YOUR kernel serving the tokens.",
       },
       {
         id: "fa-writeup",
@@ -731,6 +862,15 @@ export const QUESTS: Quest[] = [
         detail: "Why keys quantize per-channel and values per-token. FP8 KV is a near-free 2× cache-capacity win.",
       },
       {
+        id: "quant-sparsity",
+        title: "Survey compression beyond quantization: pruning, 2:4 sparsity, distillation",
+        kind: "read",
+        xp: 60,
+        link: "https://arxiv.org/abs/2306.11695",
+        detail:
+          "Wanda-style pruning, 2:4 semi-structured sparsity on sparse tensor cores (TRT-LLM ships it), and Minitron-style distillation — which also trains spec-decode drafts.",
+      },
+      {
         id: "quant-quiz",
         title: "Pass the quantization drill",
         kind: "quiz",
@@ -747,6 +887,30 @@ export const QUESTS: Quest[] = [
     phaseId: "p5",
     prereqs: ["quant-theory"],
     tasks: [
+      {
+        id: "quant-scratch-harness",
+        title: "Pass the grader: build a group-wise W4 quantizer from scratch",
+        kind: "build",
+        xp: 200,
+        detail:
+          "Scale/zero-point derivation, per-group granularity, dequantize — no quantization libraries. Graded on 4-bit validity, beating the per-tensor baseline ≥3× on outlier-heavy weights, and keeping the reference GPT's predictions intact end-to-end.",
+        verifier: {
+          type: "harness",
+          script: "weight-quantizer",
+          metrics: {
+            improvement_over_per_tensor: { op: ">=", value: 3 },
+            logit_rmse: { op: "<=", value: 1 },
+          },
+        },
+      },
+      {
+        id: "quant-sensitivity",
+        title: "Run a per-layer quantization sensitivity analysis",
+        kind: "bench",
+        xp: 90,
+        detail:
+          "MIT 6.5940-style: quantize one layer (or group) at a time, measure the damage, and let the scan choose where precision goes — before reaching for uniform recipes.",
+      },
       {
         id: "quant-compress",
         title: "Quantize a real model with llm-compressor (FP8 + W4A16)",
@@ -840,10 +1004,10 @@ export const QUESTS: Quest[] = [
       },
       {
         id: "bench-method",
-        title: "Learn benchmark methodology: NVIDIA's series + AIPerf/GenAI-Perf",
+        title: "Learn benchmark methodology: NVIDIA's guide + AIPerf",
         kind: "read",
         xp: 80,
-        link: "https://developer.nvidia.com/blog/llm-inference-benchmarking-fundamental-concepts/",
+        link: "https://docs.nvidia.com/nim/benchmarking/llm/latest/index.html",
         detail: "TTFT, ITL/TPOT, goodput, and the measurement pitfalls. Realistic length distributions or it doesn't count.",
       },
       {
@@ -887,6 +1051,69 @@ export const QUESTS: Quest[] = [
       },
     ],
   },
+  {
+    id: "serving-surface",
+    title: "The Serving Surface",
+    tagline: "Where production bugs actually live: templates, tools, adapters, modalities.",
+    phaseId: "p6",
+    prereqs: ["vllm-deep"],
+    tasks: [
+      {
+        id: "surf-templates",
+        title: "Master chat templates: Jinja, generation prompts, assistant & reasoning prefill",
+        kind: "read",
+        xp: 80,
+        link: "https://huggingface.co/docs/transformers/main/en/chat_templating",
+        detail:
+          "Template mismatch is a top source of silent quality regressions. Render a template by hand for one model and diff it against apply_chat_template.",
+      },
+      {
+        id: "surf-tools",
+        title: "Learn tool/function-calling in servers: parsers, tool_choice, streaming deltas",
+        kind: "read",
+        xp: 70,
+        link: "https://docs.vllm.ai/en/latest/features/tool_calling.html",
+        detail:
+          "How model-emitted markup becomes OpenAI tool_calls JSON — per-model parsers (hermes/llama/mistral), and where they break. Skim MCP as the emerging layer above.",
+      },
+      {
+        id: "surf-reasoning",
+        title: "Serve a reasoning model: thinking parsers, budgets, test-time compute",
+        kind: "build",
+        xp: 90,
+        link: "https://docs.vllm.ai/en/latest/features/reasoning_outputs.html",
+        detail:
+          "Deploy one reasoning model on the fleet: separate reasoning_content, cap thinking budgets, and measure what long decodes do to your ITL and cost math.",
+      },
+      {
+        id: "surf-lora",
+        title: "Deploy multi-LoRA serving: many fine-tunes, one base model",
+        kind: "build",
+        xp: 120,
+        link: "https://docs.vllm.ai/en/latest/features/lora.html",
+        detail:
+          "S-LoRA/LoRAX-lineage batched adapters. Serve ≥2 adapters on one vLLM instance, hot-load a third, and check adapters appear in /v1/models.",
+      },
+      {
+        id: "surf-multimodal",
+        title: "Serve beyond text: a VLM and an embedding/reranker model",
+        kind: "build",
+        xp: 100,
+        link: "https://docs.vllm.ai/en/latest/features/multimodal_inputs.html",
+        detail:
+          "Image inputs via content parts (encoder scheduling + image-token budgets), plus a TEI-style embedding server — a different serving profile: no KV cache, latency-critical.",
+      },
+      {
+        id: "surf-security",
+        title: "Secure the endpoint: auth, cache side channels, prompt injection",
+        kind: "read",
+        xp: 60,
+        link: "https://docs.vllm.ai/en/latest/features/automatic_prefix_caching/",
+        detail:
+          "API keys (and what stays unauthenticated: /health, /metrics), prefix-cache timing side channels + cache salting, and a guardrails/prompt-injection primer for the gateway layer.",
+      },
+    ],
+  },
 
   // ═════════════════════ Phase 7 — Distributed Inference ═════════════════════
   {
@@ -911,6 +1138,35 @@ export const QUESTS: Quest[] = [
         xp: 60,
         link: "https://arxiv.org/abs/1909.08053",
         detail: "Column/row-parallel splits and where the all-reduces land. Pair with GPU MODE lecture 17 (NCCL).",
+      },
+      {
+        id: "par-collectives",
+        title: "Read the collectives crash course + compute/communication overlap math",
+        kind: "read",
+        xp: 60,
+        link: "https://huggingface.co/spaces/nanotron/ultrascale-playbook",
+        detail: "Ultra-Scale Playbook appendices A0 and A3 — the analytical grounding under everything in this phase.",
+      },
+      {
+        id: "par-allreduce-harness",
+        title: "Pass the grader: ring all-reduce from scratch",
+        kind: "build",
+        xp: 200,
+        detail:
+          "Reduce-scatter + all-gather over point-to-point send/recv across 4 processes (CPU, gloo — no fleet needed). Collectives are monkeypatched to raise, so the ring is yours. Three peer courses grade exactly this before letting students near NCCL.",
+        verifier: {
+          type: "harness",
+          script: "ring-allreduce",
+          metrics: { max_abs_err: { op: "<=", value: 1e-4 } },
+        },
+      },
+      {
+        id: "par-megatron-impl",
+        title: "Implement Megatron TP by hand on your toy GPT",
+        kind: "build",
+        xp: 150,
+        detail:
+          "Shard your Phase 1 GPT's attention + MLP column/row-parallel across 2+ processes, placing the f/g all-reduces yourself (torch.distributed, CPU is fine). Logits must match single-process.",
       },
       {
         id: "par-tp-run",
@@ -967,6 +1223,22 @@ export const QUESTS: Quest[] = [
         xp: 80,
         link: "https://lmsys.org/blog/2025-05-05-large-scale-ep/",
         detail: "DeepEP, EPLB, two-batch overlap — the single best writeup of modern MoE serving.",
+      },
+      {
+        id: "dis-moe-impl",
+        title: "Implement TP-MoE and EP-MoE, then benchmark the crossover",
+        kind: "build",
+        xp: 180,
+        detail:
+          "UCSD CSE 234-style: a sharded-linear expert layer both ways — TP (shard every expert) vs EP (all-to-all token routing) — and measure where each wins. CPU processes are fine; the communication pattern is the lesson.",
+      },
+      {
+        id: "dis-ring",
+        title: "Read Ring Attention / context parallelism for long-context inference",
+        kind: "paper",
+        xp: 60,
+        link: "https://arxiv.org/abs/2310.01889",
+        detail: "The fourth parallelism axis — vLLM's decode context parallelism is production-real for long-context agents.",
       },
       {
         id: "dis-k8s",
@@ -1054,6 +1326,49 @@ export const QUESTS: Quest[] = [
           mustContainAny: ["cost", "token", "inference", "gpu"],
           minWords: 800,
         },
+      },
+    ],
+  },
+  {
+    id: "elasticity",
+    title: "Elasticity",
+    tagline: "Cold starts, autoscaling signals, and the build-vs-buy math.",
+    phaseId: "p8",
+    prereqs: ["observability"],
+    tasks: [
+      {
+        id: "elas-coldstart",
+        title: "Measure and attack cold starts: provisioning → image → weights → engine init",
+        kind: "bench",
+        xp: 120,
+        link: "https://modal.com/docs/guide/cold-start",
+        detail:
+          "Time vLLM vs SGLang from process start to first token on the fleet, break it down by stage, then attack the biggest bar (weight loading, compile time, snapshotting techniques).",
+      },
+      {
+        id: "elas-autoscale",
+        title: "Learn autoscaling signals and scale-to-zero for LLM workloads",
+        kind: "read",
+        xp: 70,
+        link: "https://handbook.modular.com/",
+        detail:
+          "Why CPU/GPU-util and QPS are the wrong signals and in-flight concurrency is the right one; queueing intuition via Little's Law; when scale-to-zero pays.",
+      },
+      {
+        id: "elas-decide",
+        title: "Master the deployment decision layer: serverless vs self-hosted vs BYOC, GPU selection",
+        kind: "read",
+        xp: 80,
+        detail:
+          "The LLM Inference Handbook's getting-started part: cost crossovers, procurement economics (hyperscaler vs neocloud), and mapping model sizes to GPUs. Standard architecture-interview material.",
+      },
+      {
+        id: "elas-routing",
+        title: "Learn the routing & gateway layer: strategies, semantic caching, batch-first economics",
+        kind: "read",
+        xp: 80,
+        detail:
+          "Prefix-aware / KV-utilization-aware / PD-aware routing; app-level gateways (LiteLLM-class) with exact + semantic caching; and why offline batch inference is the cheapest tokens you'll ever serve.",
       },
     ],
   },
@@ -1159,6 +1474,14 @@ export const QUESTS: Quest[] = [
         xp: 100,
         detail:
           "'Design an LLM inference platform', 'serve a 70B under 200ms TTFT', 'multi-tenant GPU allocation with SLAs', 'LoRA adapter management'. Whiteboard each in 35 minutes, alone, out loud.",
+      },
+      {
+        id: "gauntlet-rounds",
+        title: "Prep the other rounds: DSA coding, ML breadth, behavioral",
+        kind: "build",
+        xp: 80,
+        detail:
+          "Real loops have four round types, not one. A week of DSA refresh, a pass through an LLM interview question bank, and three STAR stories with quantified performance wins.",
       },
       {
         id: "gauntlet-resume",
