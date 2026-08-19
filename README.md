@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚡ InferQuest
 
-## Getting Started
+A gamified, open curriculum for becoming an **inference engineer** — freeCodeCamp-style, built as a Next.js app. Four phases take you from "what's a KV cache" to a signed offer: transformer internals → GPU programming → serving frameworks → public proof of work.
 
-First, run the development server:
+- **~60 tasks across 14 quests**, each worth XP (papers, builds, kernels, benchmarks, OSS PRs, writing)
+- **10 levels**, from *Token* to *Inference Engineer*
+- **Skill-tree gating** — quests unlock when prerequisites are ≥50% done
+- **Streaks + activity heatmap**, GitHub-style
+- **16 achievements**
+- **No backend** — progress lives in your browser's localStorage, with JSON export/import (Achievements page). Cross-tab sync included.
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev   # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run build` produces a fully static build (all routes prerendered), so it deploys anywhere — Vercel, Netlify, GitHub Pages, a $5 VPS.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Edit the curriculum
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Everything lives in data files — no UI changes needed:
 
-## Learn More
+- `src/data/curriculum.ts` — phases, quests, tasks, XP values, prerequisites
+- `src/data/achievements.ts` — badge definitions and earn conditions
+- `src/lib/levels.ts` — level titles and XP thresholds
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`ROADMAP.md` is the prose version of the curriculum the app encodes.
