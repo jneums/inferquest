@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { todayKey } from "@/lib/progress";
 
-const WEEKS = 26;
+const WEEKS = 53;
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 /** Sequential single-hue ramp; thresholds in XP/day. Zero recedes to neutral. */

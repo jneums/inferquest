@@ -101,7 +101,7 @@ export default function Dashboard() {
       {/* Activity heatmap */}
       <section>
         <h2 className="mb-2 text-sm font-medium text-[var(--text-secondary)]">
-          Activity — XP per day, last 26 weeks
+          Activity — XP per day, last year
         </h2>
         <Card className="px-4 py-4">
           <Heatmap xpByDay={xpByDay} />
