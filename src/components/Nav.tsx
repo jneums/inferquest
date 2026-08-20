@@ -7,15 +7,17 @@ import { useProgress } from "@/lib/progress";
 import { levelForXP } from "@/lib/levels";
 
 const LINKS = [
-  { href: "/", label: "Dashboard" },
+  { href: "/", label: "Home" },
   { href: "/quests", label: "Quests" },
   { href: "/achievements", label: "Achievements" },
 ] as const;
 
 export function Nav() {
   const pathname = usePathname();
-  const { ready, xp, streak } = useProgress();
+  const { ready, synced, xp, streak } = useProgress();
   const level = levelForXP(xp);
+  // Don't render an empty "profile" for fresh anonymous visitors.
+  const showStats = ready && (synced || xp > 0);
 
   return (
     <header className="sticky top-0 z-10 border-b border-[var(--hairline)] bg-[var(--surface-1)]/90 backdrop-blur">
@@ -27,6 +29,7 @@ export function Nav() {
           {LINKS.map((l) => {
             const active =
               l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+            const label = l.href === "/" && synced ? "Dashboard" : l.label;
             return (
               <Link
                 key={l.href}
@@ -37,13 +40,13 @@ export function Nav() {
                     : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 }`}
               >
-                {l.label}
+                {label}
               </Link>
             );
           })}
         </nav>
         <div className="ml-auto flex items-center gap-3 text-sm text-[var(--text-secondary)]">
-          {ready && (
+          {showStats && (
             <>
               <span title="Current streak">🔥 {streak}</span>
               <span
