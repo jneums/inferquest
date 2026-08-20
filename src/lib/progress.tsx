@@ -20,6 +20,11 @@ import type { CheckResult } from "@/server/verifiers/net";
 const STORAGE_KEY = "inference-engineer-progress-v1";
 const MERGED_FLAG = "inferquest-merged-v1";
 
+/** Curriculum tasks plus synthetic daily-review completions. */
+function isKnownEventId(id: string): boolean {
+  return TASKS_BY_ID.has(id) || /^review-\d{4}-\d{2}-\d{2}$/.test(id);
+}
+
 export function todayKey(d = new Date()): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -65,7 +70,7 @@ function parseState(raw: string | null): ProgressState {
     try {
       const parsed = JSON.parse(raw) as ProgressState;
       if (parsed.version === 1 && Array.isArray(parsed.events)) {
-        parsed.events = parsed.events.filter((e) => TASKS_BY_ID.has(e.taskId));
+        parsed.events = parsed.events.filter((e) => isKnownEventId(e.taskId));
         return parsed;
       }
     } catch {
@@ -166,7 +171,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       const data = (await res.json()) as { events: XPEvent[] };
       setServerState({
         forUser: uid,
-        events: data.events.filter((e) => TASKS_BY_ID.has(e.taskId)),
+        events: data.events.filter((e) => isKnownEventId(e.taskId)),
       });
     }
   }, []);

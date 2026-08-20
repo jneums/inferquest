@@ -169,7 +169,7 @@ export const QUESTS: Quest[] = [
         title: "Implement a strided tensor: reshape/permute/slice as pure stride math",
         kind: "build",
         xp: 100,
-        link: "https://github.com/dlsyscourse/hw3",
+        link: "https://dlsyscourse.org/assignments/",
         detail:
           "CMU 10-714 hw3-style: views share one flat buffer (zero copy), plus a compact() that materializes. This indexing math underlies paged-KV layouts, Triton pointer arithmetic, and coalescing analysis.",
       },

@@ -9,6 +9,7 @@ import { levelForXP } from "@/lib/levels";
 const LINKS = [
   { href: "/", label: "Home" },
   { href: "/quests", label: "Quests" },
+  { href: "/review", label: "Review" },
   { href: "/achievements", label: "Achievements" },
 ] as const;
 

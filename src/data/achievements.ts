@@ -138,6 +138,22 @@ export const ACHIEVEMENTS: AchievementDef[] = [
       ),
   },
   {
+    id: "interleaver",
+    title: "Interleaver",
+    description: "Complete spaced review on 7 different days.",
+    emoji: "🔁",
+    earned: ({ events }) =>
+      new Set(events.filter((e) => e.taskId.startsWith("review-")).map((e) => e.taskId)).size >= 7,
+  },
+  {
+    id: "memory-bank",
+    title: "Memory Bank",
+    description: "Complete spaced review on 30 different days.",
+    emoji: "🧠",
+    earned: ({ events }) =>
+      new Set(events.filter((e) => e.taskId.startsWith("review-")).map((e) => e.taskId)).size >= 30,
+  },
+  {
     id: "week-streak",
     title: "Warm Cache",
     description: "Hit a 7-day streak.",

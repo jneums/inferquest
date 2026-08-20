@@ -1,4 +1,5 @@
 import {
+  doublePrecision,
   index,
   integer,
   jsonb,
@@ -23,6 +24,22 @@ export const taskCompletions = pgTable(
       .defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.taskId] })],
+);
+
+/** Per-user spaced-repetition state for one question. */
+export const reviewStates = pgTable(
+  "review_states",
+  {
+    userId: text("user_id").notNull(),
+    questionId: text("question_id").notNull(),
+    due: timestamp("due", { withTimezone: true }).notNull(),
+    intervalDays: doublePrecision("interval_days").notNull(),
+    ease: doublePrecision("ease").notNull(),
+    reps: integer("reps").notNull(),
+    lapses: integer("lapses").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.questionId] })],
 );
 
 /** Every verification attempt, pass or fail, with the evidence collected. */

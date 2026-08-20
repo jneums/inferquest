@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PHASES, QUESTS, TOTAL_XP } from "@/data/curriculum";
 import { ACHIEVEMENTS } from "@/data/achievements";
@@ -24,6 +25,20 @@ export function Dashboard() {
   const level = levelForXP(xp);
   const next = nextLevel(xp);
   const totalTasks = QUESTS.reduce((s, q) => s + q.tasks.length, 0);
+
+  const [reviewsDue, setReviewsDue] = useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/review")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled && d) setReviewsDue(d.dueCount);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const upNext = QUESTS.find((q) => {
     const { done, total } = questCompletion(q.id);
@@ -75,6 +90,26 @@ export function Dashboard() {
           sub={`of ${ACHIEVEMENTS.length}`}
         />
       </section>
+
+      {/* Spaced review */}
+      {reviewsDue !== null && reviewsDue > 0 && (
+        <section>
+          <Link href="/review" className="block">
+            <Card className="flex items-center gap-3 border-[var(--accent)] px-4 py-3 transition-colors hover:border-[var(--accent-strong)]">
+              <span className="text-xl" aria-hidden>🔁</span>
+              <div>
+                <div className="font-medium">
+                  {reviewsDue} review card{reviewsDue === 1 ? "" : "s"} due
+                </div>
+                <div className="text-xs text-[var(--text-muted)]">
+                  A few minutes now keeps last week loaded — and feeds the streak.
+                </div>
+              </div>
+              <span className="ml-auto text-sm text-[var(--accent-strong)]">Review →</span>
+            </Card>
+          </Link>
+        </section>
+      )}
 
       {/* Up next */}
       {upNext && nextTask && (

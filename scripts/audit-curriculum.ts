@@ -6,6 +6,8 @@
 import { readFileSync } from "node:fs";
 import { PHASES, QUESTS, TASKS_BY_ID, TOTAL_XP } from "../src/data/curriculum";
 import { QUIZZES } from "../src/server/quizBank";
+import { QUESTION_BANK, TASKS_WITH_CHECKS } from "../src/server/questionBank";
+import { CHECK_TASK_IDS } from "../src/data/checkTasks";
 import { LEVELS } from "../src/lib/levels";
 
 let problems = 0;
@@ -106,6 +108,26 @@ const ok = (msg: string) => console.log(`ok: ${msg}`);
     if (!used) flag(`grader script ${script} defined but no task uses it`);
   }
   ok("verifier wiring checked (quizzes, harness scripts, metric keys)");
+}
+
+// ── 3b. question bank / check-task wiring ──
+{
+  const serverSet = new Set(TASKS_WITH_CHECKS);
+  for (const id of serverSet) {
+    if (!CHECK_TASK_IDS.has(id))
+      flag(`questionBank has check questions for ${id} but src/data/checkTasks.ts doesn't list it`);
+    if (!TASKS_BY_ID.has(id)) flag(`check questions reference unknown task ${id}`);
+  }
+  for (const id of CHECK_TASK_IDS)
+    if (!serverSet.has(id))
+      flag(`checkTasks.ts lists ${id} but questionBank has no questions for it`);
+  for (const q of QUESTION_BANK.values()) {
+    if (q.answerIndex < 0 || q.answerIndex >= q.choices.length)
+      flag(`bank question ${q.id} answerIndex out of range`);
+    for (const t of q.tasks)
+      if (!TASKS_BY_ID.has(t)) flag(`bank question ${q.id} links unknown task ${t}`);
+  }
+  ok(`question bank: ${QUESTION_BANK.size} questions, check coverage on ${serverSet.size} tasks, wiring consistent`);
 }
 
 // ── 4. XP / level calibration ──

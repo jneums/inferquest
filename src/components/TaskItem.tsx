@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useProgress } from "@/lib/progress";
 import type { Task } from "@/lib/types";
+import { CHECK_TASK_IDS } from "@/data/checkTasks";
+import { CheckKnowledge } from "./CheckKnowledge";
 import { VerifyPanel } from "./VerifyPanel";
 import { KindChip, XPPill } from "./ui";
 
@@ -65,6 +67,7 @@ export function TaskItem({ task }: { task: Task }) {
           )}
         </div>
         {verified && (open || done) && <VerifyPanel task={task} />}
+        {CHECK_TASK_IDS.has(task.id) && <CheckKnowledge taskId={task.id} />}
       </div>
     </li>
   );
