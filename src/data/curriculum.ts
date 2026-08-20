@@ -229,11 +229,12 @@ export const QUESTS: Quest[] = [
       },
       {
         id: "fp-sampling",
-        title: "Implement the sampling zoo: temperature, top-k, top-p, min-p",
+        title: "Implement the sampling zoo: temperature, top-k, top-p, min-p, beam search",
         kind: "build",
-        xp: 80,
+        xp: 90,
         link: "https://huggingface.co/blog/how-to-generate",
-        detail: "Min-p (ICLR 2025) ships in every engine now — read arxiv.org/abs/2407.01082 alongside.",
+        detail:
+          "Min-p (ICLR 2025) ships in every engine now — read arxiv.org/abs/2407.01082 alongside. Include beam search: Perplexity hands candidates its exact signature and unit tests, and Mistral asks top-k/top-p from scratch with no libraries.",
       },
     ],
   },
@@ -479,7 +480,7 @@ export const QUESTS: Quest[] = [
         kind: "build",
         xp: 300,
         detail:
-          "Requests join/leave the batch at token boundaries; block-allocated KV; SSE streaming out. Any small model.",
+          "Requests join/leave the batch at token boundaries; block-allocated KV; SSE streaming out with per-request cancellation and timeouts (the 'streaming token generator with cancellation' is a recurring Fireworks/Together coding exercise). Any small model.",
       },
       {
         id: "engine-structured",
@@ -1468,28 +1469,37 @@ export const QUESTS: Quest[] = [
         verifier: { type: "quiz", quizId: "interview-gauntlet", passPct: 80 },
       },
       {
+        id: "gauntlet-sysdesign",
+        title: "Pass the system-design scenario drill",
+        kind: "quiz",
+        xp: 150,
+        detail:
+          "Seven scenarios distilled from REAL reported prompts: Anthropic's single-GPU batcher and GPU-credit scheduler, Fireworks' multi-tenant SLAs, Baseten's no-thrash autoscaling, Together's 100-model fleet and shared KV cache, the 100K-RPS p99 design. 75% to pass.",
+        verifier: { type: "quiz", quizId: "system-design-drill", passPct: 75 },
+      },
+      {
         id: "gauntlet-design",
-        title: "Drill the system-design prompts out loud",
+        title: "Drill the real system-design prompts out loud",
         kind: "build",
         xp: 100,
         detail:
-          "'Design an LLM inference platform', 'serve a 70B under 200ms TTFT', 'multi-tenant GPU allocation with SLAs', 'LoRA adapter management'. Whiteboard each in 35 minutes, alone, out loud.",
+          "The reported prompts, verbatim: 'Design an inference batching system — one GPU, up to 100 inputs per batch, users waiting' (Anthropic); 'serving path for a 70B under 200ms TTFT on H100' (Fireworks); 'serve 100+ open-source models on shared GPUs' and 'multi-tenant LoRA fine-tuning service' (Together); 'GPU autoscaling on queue depth without thrashing, handling cold starts' (Baseten); '100K QPS with strict p99' (NVIDIA). Whiteboard each in 35 minutes, alone, out loud.",
       },
       {
         id: "gauntlet-rounds",
-        title: "Prep the other rounds: DSA coding, ML breadth, behavioral",
+        title: "Prep the other rounds: DSA coding, practical debugging, behavioral",
         kind: "build",
         xp: 80,
         detail:
-          "Real loops have four round types, not one. A week of DSA refresh, a pass through an LLM interview question bank, and three STAR stories with quantified performance wins.",
+          "Real loops are bimodal: NVIDIA still asks LeetCode (reports of 2 hards in 40min) while Baseten/Modal ask practical infra. Drill the infra-flavored classics (interval merging as 'GPU idle windows', DAG cycle detection as 'pod dependencies', LRU cache, rate limiter, beam search against unit tests), practice the rising buggy-file round (Mistral hands you 300 lines with a bug in attention masking/sampling/batching — 30 minutes), and work a question bank (StackScholar's LLM-inference set, github.com/llmgenai/LLMInterviewQuestions).",
       },
       {
         id: "gauntlet-resume",
-        title: "Rewrite the resume around inference",
+        title: "Rewrite the resume around inference — with attributed numbers",
         kind: "write",
         xp: 100,
         detail:
-          "Fleet ops, verified endpoints, cost-per-token wins, merged PRs, published benchmarks, harness receipts. Cut everything else.",
+          "Fleet ops, verified endpoints, cost-per-token wins, merged PRs, published benchmarks, harness receipts. Cut everything else. Then rehearse the attribution drill: NVIDIA asks 'what percentage of the total improvement came from the specific thing YOU optimized?' — know the decomposition of every speedup you claim.",
       },
     ],
   },

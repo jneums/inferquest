@@ -165,6 +165,18 @@ const CHECK_QUESTIONS: Record<string, CheckQ[]> = {
       explanation:
         "The threshold scales with the top token's confidence — stricter when the model is sure, looser when it's not. That's why it beats top-p at high temperatures.",
     },
+    {
+      prompt: "How does beam search differ from top-k sampling?",
+      choices: [
+        "Beam search adds randomness; top-k is deterministic",
+        "Beam search deterministically keeps the k highest-cumulative-probability PARTIAL SEQUENCES at each step (searching for a high-probability whole sequence), while top-k randomly samples one next TOKEN from the k most likely",
+        "They are identical for k = 1",
+        "Beam search only works with encoder-decoder models",
+      ],
+      answerIndex: 1,
+      explanation:
+        "Beam search optimizes sequence-level probability by maintaining k hypotheses and extending each; sampling makes one stochastic token choice per step. (For k=1, beam search equals greedy — which top-k sampling is not.) It's a live-coding staple: Perplexity supplies the exact signature and unit tests.",
+    },
   ],
   "zoo-mqa": [
     {
@@ -871,6 +883,18 @@ const CHECK_QUESTIONS: Record<string, CheckQ[]> = {
       ],
       answerIndex: 2,
       explanation: "A graph bakes in pointers along with kernels, which is exactly why replay is so cheap — nothing is re-derived at launch. The price is a static-world contract: fixed shapes, fixed addresses, static control flow, and no CPU synchronization inside the captured region; new data flows in only by overwriting the placeholder buffers.",
+    },
+    {
+      prompt: "To overlap host-to-device transfers with GPU compute, you need CUDA streams AND pinned (page-locked) host memory. Why is pinned memory required?",
+      choices: [
+        "Pinned memory is physically faster RAM installed near the PCIe slot",
+        "Async copies (cudaMemcpyAsync) from pageable memory silently fall back to synchronous staging — the DMA engine needs a fixed physical address, which the OS can't guarantee for pageable pages — so only pinned buffers let the copy truly run concurrently with kernels in other streams",
+        "Streams can only be created in pinned memory regions",
+        "Pinned memory bypasses the L2 cache, avoiding pollution",
+      ],
+      answerIndex: 1,
+      explanation:
+        "DMA transfers need pages that can't be moved or swapped mid-copy; with pageable memory the driver first copies into an internal pinned staging buffer, serializing the 'async' transfer. Pin the buffer and the copy engine, compute engine, and CPU all run concurrently — the classic overlap recipe interviews probe.",
     },
   ],
   "compile-basics": [

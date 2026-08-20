@@ -130,12 +130,19 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: "drill-sergeant",
     title: "Drill Sergeant",
-    description: "Pass all 7 graded drills.",
+    description: "Pass all 8 graded drills.",
     emoji: "🎓",
     earned: ({ doneTaskIds }) =>
-      ["kv-quiz", "batch-quiz", "spec-quiz", "prof-quiz", "quant-quiz", "par-quiz", "gauntlet-quiz"].every(
-        (id) => doneTaskIds.has(id),
-      ),
+      [
+        "kv-quiz",
+        "batch-quiz",
+        "spec-quiz",
+        "prof-quiz",
+        "quant-quiz",
+        "par-quiz",
+        "gauntlet-quiz",
+        "gauntlet-sysdesign",
+      ].every((id) => doneTaskIds.has(id)),
   },
   {
     id: "interleaver",

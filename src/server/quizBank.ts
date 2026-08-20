@@ -435,6 +435,154 @@ QUIZZES["interview-gauntlet"] = {
       answerIndex: 1,
       explanation: "Orca's iteration-level scheduling — the single highest-leverage serving optimization (10-20× in practice).",
     },
+    {
+      prompt:
+        "A customer reports TPOT (time per output token) regressing under burst load while off-peak TPOT is fine. What is the FIRST hypothesis to check?",
+      choices: [
+        "The model weights are corrupted",
+        "Batch occupancy: bursts push the running batch (and chunked-prefill share) up, so every decode step does more work — check concurrent-sequence counts, token-budget saturation, and preemption/recompute metrics against the regression timeline",
+        "The tokenizer is slow",
+        "Network bandwidth to the client",
+      ],
+      answerIndex: 1,
+      explanation:
+        "ITL/TPOT is a direct function of per-step batch work. Under burst, more sequences (plus prefill chunks and possible KV-pressure preemptions) share each step — the diagnostic matrix starts with scheduler/batch metrics, not the model.",
+    },
+    {
+      prompt:
+        "Nsight Compute shows your kernel at HIGH occupancy but LOW achieved DRAM bandwidth AND low compute throughput. What is it bound by, and what helps?",
+      choices: [
+        "Memory-bandwidth-bound — reduce bytes moved",
+        "Compute-bound — use tensor cores",
+        "Latency-bound: plenty of warps exist but they're all stalled on long dependency chains (scoreboard stalls) — increase independent work per thread (ILP), restructure dependencies, or pipeline loads with cp.async/TMA",
+        "Occupancy-bound — launch more blocks",
+      ],
+      answerIndex: 2,
+      explanation:
+        "When neither ceiling (bandwidth or FLOPs) is approached despite high occupancy, warps are waiting, not working — the third roofline failure mode. More occupancy can't fix stalls that every warp shares; independent instructions can.",
+    },
+    {
+      prompt: "You must replace the serving fleet's model with a new fine-tune without risking production quality. The safest rollout is:",
+      choices: [
+        "Deploy to all replicas at once during low traffic",
+        "Shadow the new model on mirrored traffic (compare outputs/metrics offline), then canary a small live slice behind automatic rollback triggers on quality and latency SLOs, then ramp",
+        "A/B test on 50% of traffic immediately",
+        "Swap the weights in place on running replicas",
+      ],
+      answerIndex: 1,
+      explanation:
+        "Shadow traffic finds regressions without user exposure; the canary bounds blast radius with an automated exit; the ramp catches load-dependent issues. 'Roll out a new model safely' is a standard ops interview question, and this is the expected shape.",
+    },
+    {
+      prompt:
+        "Your LLM feature costs $50k/month with p95 latency of 8s, and you're asked to improve BOTH. What is the right first move?",
+      choices: [
+        "Upgrade to bigger GPUs",
+        "Decompose the latency and the bill: measure TTFT vs decode time, tokens per request by type, and cache-hit potential — then apply the targeted lever (prefix caching for shared prompts, quantization for decode, routing small requests to small models, batching for throughput)",
+        "Switch providers immediately",
+        "Reduce max_tokens for all users",
+      ],
+      answerIndex: 1,
+      explanation:
+        "Cost and latency share levers but only after attribution: an 8s p95 dominated by queueing needs capacity/admission, one dominated by long decodes needs faster decode or shorter outputs. Interviewers grade the decomposition step, not the lever list.",
+    },
+  ],
+};
+
+QUIZZES["system-design-drill"] = {
+  title: "System-design scenario drill",
+  questions: [
+    {
+      prompt:
+        "Anthropic's classic prompt: one GPU processes up to 100 inputs per batch; users wait synchronously. The core batching-policy decision is:",
+      choices: [
+        "Always wait until 100 inputs are queued to maximize efficiency",
+        "Dispatch every request immediately in its own batch to minimize latency",
+        "A time-window + size trigger: dispatch when the batch fills OR a small deadline expires — trading a bounded latency cost for amortized throughput, with the window tuned to the arrival rate",
+        "Random batching to keep fairness",
+      ],
+      answerIndex: 2,
+      explanation:
+        "Waiting for full batches starves users at low traffic; batch-of-one wastes the GPU at high traffic. The dual trigger bounds worst-case added latency while capturing batching wins — and saying how you'd tune the window against arrival rate is what interviewers listen for.",
+    },
+    {
+      prompt:
+        "Multi-tenant GPU serving with strict per-customer latency SLAs (Fireworks-style): a noisy neighbor floods requests. What actually protects the other tenants?",
+      choices: [
+        "Trusting fair CPU scheduling to spread the load",
+        "Per-tenant admission control and token-budget scheduling (rate limits at the gateway, per-tenant queue quotas, weighted share of each batch's token budget) — plus isolation tiers (dedicated pools) for the strictest SLAs",
+        "Doubling the fleet size",
+        "Per-tenant Docker containers on the same GPU",
+      ],
+      answerIndex: 1,
+      explanation:
+        "The contended resource is the engine's per-step token budget and KV memory, so protection must operate there: quotas on what enters the queue and weighted scheduling of what enters each batch. Containers don't partition a shared engine's batch; overprovisioning just moves the cliff.",
+    },
+    {
+      prompt:
+        "GPU autoscaling that doesn't thrash (Baseten-style): requests are bursty and replicas take ~2 minutes to cold-start. Which design element most directly prevents thrashing?",
+      choices: [
+        "Scaling on instantaneous GPU utilization for fast reaction",
+        "Asymmetric policy with hysteresis: scale up eagerly on sustained in-flight concurrency over a short window, scale down conservatively after a long cooldown — and mask cold starts with a small warm buffer of pre-started replicas",
+        "Scaling down immediately when any replica is idle",
+        "A fixed replica count sized for peak",
+      ],
+      answerIndex: 1,
+      explanation:
+        "Thrash comes from reacting symmetrically to a noisy signal with slow actuators. Asymmetry (fast up, slow down), windowed signals, and warm capacity absorb bursts without oscillation; instantaneous GPU-util is both noisy AND misleading for LLMs.",
+    },
+    {
+      prompt:
+        "Serving 100+ open-source models on shared GPU capacity (Together-style): the traffic is a few hot models plus a long tail. The economic core of the design is:",
+      choices: [
+        "One replica per model, always on",
+        "The biggest model hosts all the others via adapters",
+        "Round-robin every model across all GPUs",
+        "Tiering by traffic: dedicated always-warm pools for hot models, scale-to-zero with fast weight loading for the tail, multiplexed LoRA adapters where fine-tunes share a base — plus per-model routing",
+      ],
+      answerIndex: 3,
+      explanation:
+        "Always-on replicas for the tail burn idle GPUs; pure on-demand makes hot models pay cold starts. Traffic-tiered placement with fast-load infrastructure for the tail and adapter multiplexing for fine-tune families is the pattern the serving companies actually run.",
+    },
+    {
+      prompt:
+        "A multi-tenant prefix-sharing KV cache (Together-style design prompt): what pairing makes it both efficient and safe?",
+      choices: [
+        "Share every cached prefix globally and evict LRU",
+        "Disable caching for all tenants",
+        "Per-tenant cache namespaces (salting) so blocks never cross trust boundaries, with per-tenant memory budgets and LRU/leaf-first eviction inside each namespace — sharing freely only within a tenant's own traffic",
+        "Cache only system prompts, never user content",
+      ],
+      answerIndex: 2,
+      explanation:
+        "Global sharing leaks via timing side channels and lets one tenant's working set evict another's; no caching wastes the biggest serving win. Salted namespaces plus per-tenant budgets keep the reuse and bound both the leak and the noisy-neighbor eviction.",
+    },
+    {
+      prompt:
+        "100K requests/sec token-generation service with strict p99 (NVIDIA/Anthropic-scale prompt): which element does the heavy lifting for the P99 specifically?",
+      choices: [
+        "Admission control + queue-depth-aware routing with chunked prefill: bound what enters each replica's batch so no step (and no queue) grows unboundedly, and long prompts can't stall running decodes",
+        "The biggest possible max batch size for throughput",
+        "A single global FIFO queue for fairness",
+        "Retrying slow requests on a second replica",
+      ],
+      answerIndex: 0,
+      explanation:
+        "Tail latency dies from queueing and step-time variance, not average capacity: caps on queue depth and per-step token budgets plus chunked prefill flatten the step-time distribution. Max-throughput configs actively sacrifice p99; hedged retries double load exactly when you can least afford it.",
+    },
+    {
+      prompt:
+        "Anthropic's GPU-credit scheduler prompt: users spend credits for GPU time; the follow-ups probe preemption and monopolization. What design answers both?",
+      choices: [
+        "First-come-first-served with no preemption — simplest is best",
+        "Credit-weighted fair-share scheduling with caps on any single user's concurrent allocation, and checkpoint-preemption of long-running jobs when higher-priority (or starved) work arrives — credits buy share, not unbounded occupancy",
+        "Highest-credit-balance user always wins every allocation",
+        "Random lottery per GPU-hour",
+      ],
+      answerIndex: 1,
+      explanation:
+        "Pure priority lets a rich user monopolize; pure FCFS lets early jobs squat. Fair-share weighted by credits, concurrency caps, and preemption-with-checkpointing is the textbook answer — and the follow-ups (node failure, dynamic pricing) hang naturally off it.",
+    },
   ],
 };
 
