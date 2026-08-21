@@ -1,8 +1,10 @@
 # ⚡ InferQuest
 
+**Live at [inferquest.org](https://inferquest.org)** — free, no catch.
+
 A gamified, **verified** curriculum for becoming an inference engineer — freeCodeCamp for LLM serving. Built from real 2025–26 job-market research (Together, Fireworks, Baseten, NVIDIA, OpenAI, Anthropic, Red Hat/vLLM postings), the curricula the field actually uses (GPU MODE, PMPP, Stanford CS336), and the modern stack (vLLM V1, SGLang, TensorRT-LLM, Dynamo).
 
-**10 phases · 26 quests · ~100 tasks · 12,400 XP · 19 automatically verified tasks.**
+**10 phases · 28 quests · 129 tasks · 15,700 XP · 26 automatically verified tasks.**
 
 ## What "verified" means
 
