@@ -10,9 +10,9 @@ import {
   type ReactNode,
 } from "react";
 import { useUser } from "@clerk/nextjs";
-import { QUESTS, QUESTS_BY_ID, TASKS_BY_ID } from "@/data/curriculum";
+import { QUESTS_BY_ID, TASKS_BY_ID } from "@/data/curriculum";
 import { ACHIEVEMENTS } from "@/data/achievements";
-import type { Quest, XPEvent } from "./types";
+import type { XPEvent } from "./types";
 import type { CheckResult } from "@/server/verifiers/net";
 
 export function todayKey(d = new Date()): string {
@@ -223,8 +223,4 @@ export function useProgress(): Progress {
   const ctx = useContext(ProgressContext);
   if (!ctx) throw new Error("useProgress must be used within ProgressProvider");
   return ctx;
-}
-
-export function questsForPhase(phaseId: string): Quest[] {
-  return QUESTS.filter((q) => q.phaseId === phaseId);
 }

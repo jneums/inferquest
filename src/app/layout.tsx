@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ProgressProvider } from "@/lib/progress";
 import { Nav } from "@/components/Nav";
+import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION } from "@/lib/seo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,9 +17,54 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "InferQuest",
-  description:
-    "A gamified open curriculum for becoming an inference engineer — transformers, GPUs, and serving frameworks as a quest line.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_TITLE,
+    template: "%s · InferQuest",
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: "InferQuest",
+  keywords: [
+    "inference engineer",
+    "inference engineering",
+    "LLM inference",
+    "inference engineer roadmap",
+    "inference engineering course",
+    "LLM serving",
+    "vLLM",
+    "SGLang",
+    "KV cache",
+    "CUDA kernels",
+    "Triton kernels",
+    "GPU programming",
+    "quantization",
+    "continuous batching",
+    "MLSys",
+  ],
+  category: "education",
+  openGraph: {
+    type: "website",
+    siteName: "InferQuest",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

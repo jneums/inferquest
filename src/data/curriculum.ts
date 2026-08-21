@@ -1542,6 +1542,10 @@ export const TASKS_BY_ID = new Map(
 
 export const QUESTS_BY_ID = new Map(QUESTS.map((q) => [q.id, q]));
 
+export function questsForPhase(phaseId: string): Quest[] {
+  return QUESTS.filter((q) => q.phaseId === phaseId);
+}
+
 export const TOTAL_XP = QUESTS.reduce(
   (sum, q) => sum + q.tasks.reduce((s, t) => s + t.xp, 0),
   0,

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
 import { PHASES, QUESTS, TOTAL_XP } from "@/data/curriculum";
 import { LEVELS } from "@/lib/levels";
+import { FAQ } from "@/lib/seo";
 import { Card } from "./ui";
 
 const VERIFIERS = [
@@ -47,9 +48,9 @@ export function Landing() {
           Become an inference engineer.
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-lg text-[var(--text-secondary)]">
-          A free, open curriculum from “what&rsquo;s a KV cache” to a signed
-          offer — built from real job-market research, with milestones that are{" "}
-          <em>verified</em>, not checked off.
+          A free, open inference engineering roadmap from “what&rsquo;s a KV
+          cache” to a signed offer — built from real job-market research, with
+          milestones that are <em>verified</em>, not checked off.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <SignUpButton mode="modal">
@@ -130,6 +131,31 @@ export function Landing() {
             </li>
           ))}
         </ol>
+      </section>
+
+      {/* FAQ — rendered from the same source as the FAQPage JSON-LD */}
+      <section>
+        <h2 className="text-center text-2xl font-semibold tracking-tight">
+          Frequently asked questions
+        </h2>
+        <div className="mx-auto mt-6 max-w-2xl space-y-3">
+          {FAQ.map(({ q, a }) => (
+            <details
+              key={q}
+              className="group rounded-lg border border-[var(--border)] bg-[var(--surface-1)] px-5 py-4"
+            >
+              <summary className="cursor-pointer list-none font-medium marker:hidden [&::-webkit-details-marker]:hidden">
+                <span className="mr-2 inline-block text-[var(--accent-strong)] transition-transform group-open:rotate-90">
+                  ›
+                </span>
+                {q}
+              </summary>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+                {a}
+              </p>
+            </details>
+          ))}
+        </div>
       </section>
 
       {/* Closing CTA */}
