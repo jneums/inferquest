@@ -81,8 +81,24 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               {children}
             </main>
             <footer className="border-t border-[var(--hairline)] py-6 text-center text-sm text-[var(--text-muted)]">
-              An open, gamified path into inference engineering — with verified
-              quests.
+              <p>
+                An open, gamified path into inference engineering — with
+                verified quests.
+              </p>
+              <p className="mt-2 space-x-4">
+                <a href="/privacy" className="hover:text-[var(--text-secondary)]">
+                  Privacy
+                </a>
+                <a href="/terms" className="hover:text-[var(--text-secondary)]">
+                  Terms
+                </a>
+                <a
+                  href="https://github.com/jneums/inferquest"
+                  className="hover:text-[var(--text-secondary)]"
+                >
+                  GitHub
+                </a>
+              </p>
             </footer>
           </ProgressProvider>
         </ClerkProvider>
