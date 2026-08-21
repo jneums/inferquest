@@ -10,11 +10,16 @@ import { VerifyPanel } from "./VerifyPanel";
 import { IconCheck, IconLock, IconShield } from "@/components/icons";
 import { KindChip, XPPill } from "./ui";
 
-export function TaskItem({ task }: { task: Task }) {
+/** `locked`: the task's quest hasn't unlocked yet — look-ahead is read-only
+ * (also enforced server-side). A stray completed task stays uncheckable-off. */
+export function TaskItem({ task, locked = false }: { task: Task; locked?: boolean }) {
   const { synced, doneTaskIds, toggleTask } = useProgress();
   const done = doneTaskIds.has(task.id);
   const verified = Boolean(task.verifier);
   const [open, setOpen] = useState(false);
+  // Interactivity requires sign-in and an unlocked quest (un-checking a
+  // leftover completion is always allowed).
+  const interactive = synced && (!locked || done);
 
   return (
     <li className="flex gap-4 border-b border-[var(--hairline)] py-5 last:border-b-0">
@@ -28,6 +33,14 @@ export function TaskItem({ task }: { task: Task }) {
             <IconLock size={15} />
           </button>
         </SignInButton>
+      ) : locked && !done ? (
+        <span
+          className="mt-1 w-4 shrink-0 text-[var(--text-muted)]"
+          title="Unlocks with this quest's prerequisites — look ahead only"
+          aria-hidden
+        >
+          <IconLock size={15} />
+        </span>
       ) : verified ? (
         <span
           className={`mt-1 w-4 shrink-0 ${done ? "text-[var(--good-text)]" : "text-[var(--text-muted)]"}`}
@@ -47,9 +60,9 @@ export function TaskItem({ task }: { task: Task }) {
       )}
       <div className="min-w-0 flex-1">
         <label
-          htmlFor={verified || !synced ? undefined : `task-${task.id}`}
-          onClick={synced && verified ? () => setOpen((o) => !o) : undefined}
-          className={`cursor-pointer font-medium ${
+          htmlFor={verified || !interactive ? undefined : `task-${task.id}`}
+          onClick={interactive && verified ? () => setOpen((o) => !o) : undefined}
+          className={`font-medium ${interactive ? "cursor-pointer" : ""} ${
             done ? "text-[var(--text-muted)] line-through" : ""
           }`}
         >
@@ -69,7 +82,7 @@ export function TaskItem({ task }: { task: Task }) {
               auto-verified
             </span>
           )}
-          {synced && verified && !done && (
+          {interactive && verified && !done && (
             <button
               onClick={() => setOpen((o) => !o)}
               className="border border-[var(--border)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)] hover:border-[var(--ink)] hover:text-[var(--text-primary)]"
@@ -88,7 +101,7 @@ export function TaskItem({ task }: { task: Task }) {
             </a>
           )}
         </div>
-        {synced && verified && (open || done) && <VerifyPanel task={task} />}
+        {interactive && verified && (open || done) && <VerifyPanel task={task} />}
         {synced && CHECK_TASK_IDS.has(task.id) && <CheckKnowledge taskId={task.id} />}
       </div>
     </li>

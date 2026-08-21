@@ -1,8 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "@/db";
-import { TASKS_BY_ID } from "@/data/curriculum";
+import { TASKS_BY_ID, QUEST_ID_BY_TASK, isQuestUnlockedFor } from "@/data/curriculum";
 import { verifyGithubPr } from "@/server/verifiers/githubPr";
 import { verifyUrl } from "@/server/verifiers/urlCheck";
 import { verifyHarnessReport } from "@/server/verifiers/harness";
@@ -47,6 +48,22 @@ export async function POST(req: Request) {
   const verifier = task.verifier;
   if (!verifier) {
     return NextResponse.json({ error: "This task has no verifier" }, { status: 400 });
+  }
+
+  // Look-ahead is read-only: verifying requires the task's quest unlocked.
+  {
+    const rows = await db()
+      .select({ taskId: schema.taskCompletions.taskId })
+      .from(schema.taskCompletions)
+      .where(eq(schema.taskCompletions.userId, userId));
+    const doneSet = new Set(rows.map((r) => r.taskId));
+    const questId = QUEST_ID_BY_TASK.get(taskId);
+    if (!questId || !isQuestUnlockedFor(doneSet, questId)) {
+      return NextResponse.json(
+        { error: "This quest is still locked — finish its prerequisites first." },
+        { status: 403 },
+      );
+    }
   }
 
   let result: Outcome;

@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db, schema } from "@/db";
-import { TASKS_BY_ID } from "@/data/curriculum";
+import { TASKS_BY_ID, QUEST_ID_BY_TASK, isQuestUnlockedFor } from "@/data/curriculum";
 
 export async function GET() {
   const { userId } = await auth();
@@ -52,6 +52,22 @@ export async function POST(req: Request) {
       { error: "This task is verified — submit it through its verifier instead." },
       { status: 403 },
     );
+  }
+
+  if (done) {
+    // Look-ahead is read-only: completing a task requires its quest unlocked.
+    const rows = await db()
+      .select({ taskId: schema.taskCompletions.taskId })
+      .from(schema.taskCompletions)
+      .where(eq(schema.taskCompletions.userId, userId));
+    const doneSet = new Set(rows.map((r) => r.taskId));
+    const questId = QUEST_ID_BY_TASK.get(taskId);
+    if (!questId || !isQuestUnlockedFor(doneSet, questId)) {
+      return NextResponse.json(
+        { error: "This quest is still locked — finish its prerequisites first." },
+        { status: 403 },
+      );
+    }
   }
 
   if (done) {

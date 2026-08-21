@@ -1546,6 +1546,26 @@ export function questsForPhase(phaseId: string): Quest[] {
   return QUESTS.filter((q) => q.phaseId === phaseId);
 }
 
+export const QUEST_ID_BY_TASK = new Map(
+  QUESTS.flatMap((q) => q.tasks.map((t) => [t.id, q.id] as const)),
+);
+
+/** Pure unlock rule shared by client UI and API enforcement:
+ * a quest unlocks when every prereq quest is at least 50% complete. */
+export function isQuestUnlockedFor(
+  doneTaskIds: ReadonlySet<string>,
+  questId: string,
+): boolean {
+  const quest = QUESTS_BY_ID.get(questId);
+  if (!quest) return false;
+  return quest.prereqs.every((pid) => {
+    const prereq = QUESTS_BY_ID.get(pid);
+    if (!prereq || prereq.tasks.length === 0) return false;
+    const done = prereq.tasks.filter((t) => doneTaskIds.has(t.id)).length;
+    return done / prereq.tasks.length >= 0.5;
+  });
+}
+
 export const TOTAL_XP = QUESTS.reduce(
   (sum, q) => sum + q.tasks.reduce((s, t) => s + t.xp, 0),
   0,

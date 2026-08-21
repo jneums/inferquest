@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { useUser } from "@clerk/nextjs";
-import { QUESTS_BY_ID, TASKS_BY_ID } from "@/data/curriculum";
+import { QUESTS_BY_ID, TASKS_BY_ID, isQuestUnlockedFor } from "@/data/curriculum";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import type { XPEvent } from "./types";
 import type { CheckResult } from "@/server/verifiers/net";
@@ -181,14 +181,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       return { done, total: quest.tasks.length };
     };
 
-    const isQuestUnlocked = (questId: string) => {
-      const quest = QUESTS_BY_ID.get(questId);
-      if (!quest) return false;
-      return quest.prereqs.every((pid) => {
-        const { done, total } = questCompletion(pid);
-        return total > 0 && done / total >= 0.5;
-      });
-    };
+    const isQuestUnlocked = (questId: string) =>
+      isQuestUnlockedFor(doneTaskIds, questId);
 
     const ctx = { doneTaskIds, events, xp, streak, longestStreak };
     const earnedAchievementIds = new Set(

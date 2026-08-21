@@ -58,8 +58,8 @@ export function QuestDetail({ id }: { id: string }) {
           {quest.prereqs
             .map((pid) => QUESTS_BY_ID.get(pid)?.title ?? pid)
             .join(" and ")}{" "}
-          {quest.prereqs.length > 1 ? "are" : "is"} at least 50% complete. You
-          can still read ahead; checking tasks off works either way.</span>
+          {quest.prereqs.length > 1 ? "are" : "is"} at least 50% complete.
+          Read ahead all you like — tasks stay read-only until then.</span>
         </Card>
       )}
 
@@ -70,7 +70,7 @@ export function QuestDetail({ id }: { id: string }) {
         <Card className="mt-5 px-5">
           <ul>
             {quest.tasks.map((task) => (
-              <TaskItem key={task.id} task={task} />
+              <TaskItem key={task.id} task={task} locked={synced && !unlocked} />
             ))}
           </ul>
         </Card>
