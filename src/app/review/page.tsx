@@ -71,7 +71,7 @@ export default function ReviewPage() {
   if (!synced) {
     return (
       <div className="mx-auto max-w-md pt-16 text-center">
-        <IconCycle size={36} className="mx-auto text-[var(--accent)]" aria-hidden />
+        <IconCycle size={36} className="mx-auto text-[var(--accent-strong)]" aria-hidden />
         <h1 className="mt-3 text-2xl font-semibold">Spaced review</h1>
         <p className="mt-2 text-[var(--text-secondary)]">
           Questions from tasks you&rsquo;ve completed come back on an expanding
@@ -80,7 +80,7 @@ export default function ReviewPage() {
         </p>
         <div className="mt-5">
           <SignInButton mode="modal">
-            <button className="bg-[var(--accent)] px-5 py-2.5 font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
+            <button className="bg-[var(--ink)] px-5 py-2.5 font-bold text-[var(--on-ink)] hover:bg-black">
               Sign in to start reviewing
             </button>
           </SignInButton>
@@ -101,7 +101,7 @@ export default function ReviewPage() {
           <p className="text-lg">
             {correctCount}/{cards.length} correct
             {xpEarned > 0 && (
-              <span className="ml-2 bg-[var(--accent-track)] px-2 py-0.5 text-sm font-medium text-[var(--accent)]">
+              <span className="ml-2 bg-[var(--accent-track)] px-2 py-0.5 font-mono text-sm font-medium text-[var(--accent-strong)]">
                 +{xpEarned} XP
               </span>
             )}
@@ -131,7 +131,7 @@ export default function ReviewPage() {
   if (cards.length === 0) {
     return (
       <div className="mx-auto max-w-md pt-16 text-center">
-        <IconSun size={36} className="mx-auto text-[var(--amber)]" aria-hidden />
+        <IconSun size={36} className="mx-auto text-[var(--accent-strong)]" aria-hidden />
         <h1 className="mt-3 text-2xl font-semibold">Nothing due</h1>
         <p className="mt-2 text-[var(--text-secondary)]">
           {deckSize === 0
@@ -212,7 +212,7 @@ export default function ReviewPage() {
         <button
           disabled={picked === null || busy}
           onClick={grade}
-          className="bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)] disabled:opacity-50"
+          className="bg-[var(--ink)] px-4 py-2 text-sm font-bold text-[var(--on-ink)] hover:bg-black disabled:opacity-50"
         >
           {busy ? "Grading…" : "Check"}
         </button>
@@ -227,7 +227,7 @@ export default function ReviewPage() {
               setFeedback(null);
             }
           }}
-          className="bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)]"
+          className="bg-[var(--ink)] px-4 py-2 text-sm font-bold text-[var(--on-ink)] hover:bg-black"
         >
           {isLast ? "Finish session" : "Next card"}
         </button>

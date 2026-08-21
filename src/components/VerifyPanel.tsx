@@ -14,7 +14,7 @@ function CheckList({ checks }: { checks: CheckResult[] }) {
         <li key={i} className="flex gap-2 text-sm">
           <span
             aria-hidden
-            className={`w-10 shrink-0 text-[11px] font-bold leading-5 ${c.passed ? "text-[var(--accent)]" : "text-[var(--amber)]"}`}
+            className={`w-10 shrink-0 text-[11px] font-bold leading-5 ${c.passed ? "text-[var(--good-text)]" : "text-[var(--amber)]"}`}
           >
             {c.passed ? "PASS" : "FAIL"}
           </span>
@@ -48,7 +48,7 @@ function SubmitButton({ busy, label }: { busy: boolean; label: string }) {
     <button
       type="submit"
       disabled={busy}
-      className="bg-[var(--accent)] px-3 py-1.5 text-sm font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)] disabled:opacity-50"
+      className="bg-[var(--ink)] px-3 py-1.5 text-sm font-bold text-[var(--on-ink)] hover:bg-black disabled:opacity-50"
     >
       {busy ? "Verifying…" : label}
     </button>

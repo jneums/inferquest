@@ -17,9 +17,9 @@ export default function Image() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "#10263f",
-          color: "#eaf2fa",
-          fontFamily: "monospace",
+          background: "#fcfcfa",
+          color: "#131313",
+          fontFamily: "sans-serif",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -27,7 +27,7 @@ export default function Image() {
             style={{
               width: 28,
               height: 28,
-              background: "#7dd3fc",
+              background: "#ff4f00",
             }}
           />
           <div style={{ fontSize: 34, fontWeight: 600 }}>InferQuest</div>
@@ -38,7 +38,7 @@ export default function Image() {
               fontSize: 26,
               textTransform: "uppercase",
               letterSpacing: 4,
-              color: "#7dd3fc",
+              color: "#c23c00",
             }}
           >
             The verified path into LLM serving
@@ -54,7 +54,7 @@ export default function Image() {
             Become an inference engineer.
           </div>
         </div>
-        <div style={{ display: "flex", gap: 48, fontSize: 28, color: "#7f9ab5" }}>
+        <div style={{ display: "flex", gap: 48, fontSize: 28, color: "#6f6f6a" }}>
           <div>{`${PHASES.length} phases`}</div>
           <div>{`${TOTAL_TASKS} tasks`}</div>
           <div>{`${VERIFIED_TASKS} auto-verified milestones`}</div>

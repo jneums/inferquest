@@ -28,7 +28,7 @@ export function QuestDetail({ id }: { id: string }) {
         >
           ← Quest map
         </Link>
-        <div className="mt-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--accent)]">
+        <div className="mt-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--text-muted)]">
           Phase {phase?.number} · {phase?.theme}
         </div>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">
@@ -45,7 +45,7 @@ export function QuestDetail({ id }: { id: string }) {
 
       {!synced && (
         <Card className="flex items-start gap-2 border-[var(--accent)] px-4 py-3 text-sm text-[var(--text-secondary)]">
-          <IconEye size={15} className="mt-0.5 shrink-0 text-[var(--accent)]" />
+          <IconEye size={15} className="mt-0.5 shrink-0 text-[var(--accent-strong)]" />
           <span>You&rsquo;re previewing the curriculum. Sign in (top right) to
           track progress, take knowledge checks, and unlock the verifiers.</span>
         </Card>

@@ -19,7 +19,7 @@ export function Card({
   );
 }
 
-/** Blueprint meter: a bordered gauge track with a solid line-work fill. */
+/** Manual meter: flat track, solid signal-orange fill, sharp. */
 export function Meter({
   value,
   max,
@@ -36,7 +36,7 @@ export function Meter({
       aria-valuenow={value}
       aria-valuemin={0}
       aria-valuemax={max}
-      className={`h-2 border border-[var(--baseline)] bg-[var(--page)] p-px ${className}`}
+      className={`h-2 bg-[var(--hairline)] ${className}`}
     >
       <div
         className="h-full bg-[var(--accent)] transition-[width] duration-300"
@@ -61,7 +61,7 @@ export function StatTile({
       <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">
         {label}
       </div>
-      <div className="mt-1 text-2xl font-bold">{value}</div>
+      <div className="mt-1 text-2xl font-extrabold tracking-tight">{value}</div>
       {sub && <div className="mt-0.5 text-xs text-[var(--text-muted)]">{sub}</div>}
     </Card>
   );
@@ -69,15 +69,15 @@ export function StatTile({
 
 /* Categorical dots tuned for the phosphor surface. */
 export const KIND_META: Record<TaskKind, { label: string; dot: string }> = {
-  read: { label: "read", dot: "#58a6ff" },
-  watch: { label: "watch", dot: "#bc8cff" },
-  paper: { label: "paper", dot: "#f778ba" },
-  build: { label: "build", dot: "#3fb950" },
-  kernel: { label: "kernel", dot: "#ff9e64" },
-  bench: { label: "bench", dot: "#e3b341" },
-  oss: { label: "oss", dot: "#56d364" },
-  write: { label: "write", dot: "#f85149" },
-  quiz: { label: "drill", dot: "#8b949e" },
+  read: { label: "read", dot: "#0969da" },
+  watch: { label: "watch", dot: "#8250df" },
+  paper: { label: "paper", dot: "#bf3989" },
+  build: { label: "build", dot: "#1a7f37" },
+  kernel: { label: "kernel", dot: "#bc4c00" },
+  bench: { label: "bench", dot: "#9a6700" },
+  oss: { label: "oss", dot: "#2da44e" },
+  write: { label: "write", dot: "#cf222e" },
+  quiz: { label: "drill", dot: "#57606a" },
 };
 
 export function KindChip({ kind }: { kind: TaskKind }) {
@@ -96,7 +96,7 @@ export function KindChip({ kind }: { kind: TaskKind }) {
 
 export function XPPill({ xp }: { xp: number }) {
   return (
-    <span className="whitespace-nowrap bg-[var(--accent-track)] px-2 py-0.5 font-mono text-[11px] font-medium text-[var(--accent)]">
+    <span className="whitespace-nowrap bg-[var(--accent-track)] px-2 py-0.5 font-mono text-[11px] font-medium text-[var(--accent-strong)]">
       +{xp} XP
     </span>
   );

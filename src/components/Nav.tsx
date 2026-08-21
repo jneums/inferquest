@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { useProgress } from "@/lib/progress";
-import { IconBolt, IconFlame } from "@/components/icons";
+import { IconFlame } from "@/components/icons";
 import { levelForXP } from "@/lib/levels";
 
 const LINKS = [
@@ -22,16 +22,16 @@ export function Nav() {
   const showStats = ready && synced;
 
   return (
-    <header className="sticky top-0 z-10 border-b border-[var(--hairline)] bg-[var(--surface-1)]/90 backdrop-blur">
+    <header className="sticky top-0 z-10 border-b-[3px] border-[var(--ink)] bg-[var(--page)]/95 backdrop-blur">
       <div className="mx-auto flex w-full max-w-4xl items-center gap-4 px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.2em]"
+          className="flex items-center gap-2 text-base font-extrabold tracking-tight"
         >
-          <IconBolt size={15} className="text-[var(--accent)]" />
+          <span aria-hidden className="h-3 w-3 bg-[var(--accent)]" />
           InferQuest
         </Link>
-        <nav className="flex gap-1 font-mono text-xs uppercase tracking-wider">
+        <nav className="flex gap-1 text-sm font-medium">
           {LINKS.map((l) => {
             const active =
               l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
@@ -42,8 +42,8 @@ export function Nav() {
                 href={l.href}
                 className={`px-2.5 py-1 transition-colors ${
                   active
-                    ? "bg-[var(--accent-track)] font-medium text-[var(--accent)]"
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    ? "font-bold text-[var(--text-primary)] underline decoration-[var(--accent)] decoration-2 underline-offset-4"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                 }`}
               >
                 {label}
@@ -56,7 +56,7 @@ export function Nav() {
             <>
               <span
                 title="Current streak"
-                className="flex items-center gap-1 text-[var(--amber)]"
+                className="flex items-center gap-1 font-mono text-[var(--accent-strong)]"
               >
                 <IconFlame size={14} />
                 {streak}
@@ -71,7 +71,7 @@ export function Nav() {
           )}
           <Show when="signed-out">
             <SignInButton mode="modal">
-              <button className="border border-[var(--accent)] px-3 py-1 font-mono text-xs font-medium uppercase tracking-wider text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--on-accent)]">
+              <button className="bg-[var(--ink)] px-3.5 py-1.5 text-sm font-bold text-[var(--on-ink)] hover:bg-black">
                 Sign in
               </button>
             </SignInButton>

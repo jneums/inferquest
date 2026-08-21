@@ -1,51 +1,50 @@
 @import "tailwindcss";
 
-/* Blueprint design tokens — engineering-drawing aesthetic, dark-only.
-   Drafting-blue ground with a faint grid, cyan line-work accent,
-   Archivo for reading + IBM Plex Mono for labels and numbers. */
+/* Manual design tokens — Swiss technical-manual aesthetic, light-only.
+   Stark white paper, black ink, international orange as the single
+   signal color. Schibsted Grotesk for reading, IBM Plex Mono for
+   labels and numbers. Orange is a GRAPHIC color (fills, rules,
+   meters); orange TEXT always uses --accent-strong for contrast. */
 :root {
-  color-scheme: dark;
-  --page: #10263f;
-  --surface-1: #122a45;
-  --text-primary: #eaf2fa;
-  --text-secondary: #9db4ca;
-  --text-muted: #7f9ab5;
-  --hairline: #21395655;
-  --baseline: #4a6b8d;
-  --border: #2e4a68;
-  --accent: #7dd3fc;
-  --accent-strong: #bae6fd;
-  --accent-track: #1a3a5c;
-  --on-accent: #10263f;
-  --amber: #ffb454;
-  --good: #7dd3fc;
-  --good-text: #7dd3fc;
-  --grid-line: rgba(148, 197, 233, 0.06);
-  /* Sequential cyan ramp for the heatmap (zero recedes to neutral). */
-  --heat-0: #17304c;
-  --heat-1: #1d466b;
-  --heat-2: #2d6795;
-  --heat-3: #4a9cc9;
-  --heat-4: #7dd3fc;
+  color-scheme: light;
+  --page: #fcfcfa;
+  --surface-1: #ffffff;
+  --ink: #131313;
+  --on-ink: #fcfcfa;
+  --text-primary: #131313;
+  --text-secondary: #45453f;
+  --text-muted: #6f6f6a;
+  --hairline: #e8e8e2;
+  --baseline: #9a9a92;
+  --border: #d9d9d2;
+  --accent: #ff4f00;
+  --accent-strong: #c23c00;
+  --accent-track: #ffe9de;
+  --on-accent: #ffffff;
+  --amber: #a3430b;
+  --good: #1d7a3e;
+  --good-text: #1d7a3e;
+  /* Sequential orange ramp for the heatmap (zero recedes to neutral). */
+  --heat-0: #edece6;
+  --heat-1: #ffd0b5;
+  --heat-2: #ff9e66;
+  --heat-3: #ff6f24;
+  --heat-4: #d64200;
 }
 
 @theme inline {
   --color-background: var(--page);
   --color-foreground: var(--text-primary);
-  --font-sans: var(--font-archivo);
+  --font-sans: var(--font-schibsted);
   --font-mono: var(--font-plex-mono);
 }
 
 body {
-  background-color: var(--page);
-  background-image:
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background: var(--page);
   color: var(--text-primary);
 }
 
 ::selection {
-  background: var(--accent);
-  color: var(--on-accent);
+  background: var(--ink);
+  color: var(--on-ink);
 }

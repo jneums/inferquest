@@ -42,11 +42,11 @@ export function Landing() {
     <div className="space-y-16">
       {/* Hero */}
       <section className="pt-8">
-        <p className="font-mono text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)]">
-          Fig. 1 — InferQuest, the verified path into LLM serving
+        <p className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-[var(--text-muted)]">
+          InferQuest — the verified path into LLM serving
         </p>
-        <h1 className="mt-5 max-w-2xl text-4xl font-bold uppercase leading-tight tracking-tight sm:text-5xl">
-          Become an inference engineer.
+        <h1 className="mt-4 max-w-2xl text-5xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-6xl">
+          Become an inference engineer<span className="text-[var(--accent)]">.</span>
         </h1>
         <p className="mt-5 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">
           A free, open inference engineering roadmap from &ldquo;what&rsquo;s a
@@ -57,13 +57,13 @@ export function Landing() {
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <SignUpButton mode="modal">
-            <button className="bg-[var(--accent)] px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
+            <button className="bg-[var(--ink)] px-6 py-3 font-bold text-[var(--on-ink)] hover:bg-black">
               Start the quest — free
             </button>
           </SignUpButton>
           <Link
             href="/quests"
-            className="border border-dashed border-[var(--baseline)] px-5 py-2.5 text-sm font-medium uppercase tracking-wider text-[var(--text-secondary)] hover:border-solid hover:border-[var(--accent)] hover:text-[var(--text-primary)]"
+            className="border-b-2 border-[var(--ink)] pb-0.5 font-medium hover:border-[var(--accent)] hover:text-[var(--accent-strong)]"
           >
             Browse the quest map
           </Link>
@@ -100,23 +100,22 @@ export function Landing() {
       </section>
 
       {/* Numbers strip */}
-      <section className="grid grid-cols-2 border border-[var(--border)] sm:grid-cols-4">
+      <section className="grid grid-cols-2 gap-x-6 border-t-[3px] border-[var(--ink)] sm:grid-cols-4">
         {[
           [String(PHASES.length), "phases, bedrock → offer"],
           [String(totalTasks), "tasks across " + QUESTS.length + " quests"],
           [TOTAL_XP.toLocaleString(), "XP to the final level"],
           [String(verifiedCount), "auto-verified milestones"],
         ].map(([n, label], i) => (
-          <div
-            key={label}
-            className={`px-4 py-5 text-center ${i > 0 ? "border-l border-[var(--border)]" : ""} ${i >= 2 ? "border-t border-[var(--border)] sm:border-t-0" : ""}`}
-          >
+          <div key={label} className="py-4">
             <div
-              className={`text-3xl font-bold ${i === 3 ? "text-[var(--accent)]" : ""}`}
+              className={`text-3xl font-extrabold tracking-tight ${i === 3 ? "text-[var(--accent-strong)]" : ""}`}
             >
               {n}
             </div>
-            <div className="mt-1 text-xs text-[var(--text-muted)]">{label}</div>
+            <div className="mt-1 font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
+              {label}
+            </div>
           </div>
         ))}
       </section>
@@ -128,8 +127,11 @@ export function Landing() {
         </h2>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           {VERIFIERS.map((v) => (
-            <Card key={v.title} className="px-5 py-4">
-              <v.icon size={22} className="text-[var(--accent)]" />
+            <Card
+              key={v.title}
+              className="border-t-[3px] border-t-[var(--ink)] px-5 py-4"
+            >
+              <v.icon size={22} className="text-[var(--accent-strong)]" />
               <h3 className="mt-3 font-bold">{v.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-secondary)]">
                 {v.body}
@@ -156,8 +158,8 @@ export function Landing() {
                 <Card
                   className={`flex items-baseline gap-4 px-4 py-2.5 transition-colors hover:border-[var(--accent)] ${i > 0 ? "border-t-0" : ""}`}
                 >
-                  <span className="w-8 shrink-0 text-right font-mono text-sm text-[var(--accent)]">
-                    P{p.number}
+                  <span className="w-10 shrink-0 text-right text-xl font-extrabold tracking-tight text-[var(--border)]">
+                    {String(p.number).padStart(2, "0")}
                   </span>
                   <span className="font-medium">{p.title}</span>
                   <span className="ml-auto hidden font-mono text-xs uppercase tracking-wider text-[var(--text-muted)] sm:inline">
@@ -182,9 +184,10 @@ export function Landing() {
               className="group border border-[var(--border)] bg-[var(--surface-1)] px-5 py-4"
             >
               <summary className="cursor-pointer list-none font-medium marker:hidden [&::-webkit-details-marker]:hidden">
-                <span className="mr-2 inline-block text-[var(--accent)] transition-transform group-open:rotate-90">
-                  &gt;
-                </span>
+                <span
+                  aria-hidden
+                  className="mr-2.5 inline-block h-2.5 w-2.5 bg-[var(--accent)] transition-transform group-open:rotate-45"
+                />
                 {q}
               </summary>
               <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
@@ -207,7 +210,7 @@ export function Landing() {
         </p>
         <div className="mt-6">
           <SignInButton mode="modal">
-            <button className="bg-[var(--accent)] px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
+            <button className="bg-[var(--ink)] px-6 py-3 font-bold text-[var(--on-ink)] hover:bg-black">
               Sign in and start earning XP
             </button>
           </SignInButton>

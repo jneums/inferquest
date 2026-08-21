@@ -47,7 +47,7 @@ export function CheckKnowledge({ taskId }: { taskId: string }) {
     <div className="mt-2">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1.5 border border-[var(--border)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+        className="inline-flex items-center gap-1.5 border border-[var(--border)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)] hover:border-[var(--ink)] hover:text-[var(--text-primary)]"
       >
         {open ? "hide check" : (<><IconQuiz size={11} /> check your knowledge</>)}
       </button>
@@ -111,7 +111,7 @@ export function CheckKnowledge({ taskId }: { taskId: string }) {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="bg-[var(--accent)] px-3 py-1.5 text-sm font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)] disabled:opacity-50"
+                  className="bg-[var(--ink)] px-3 py-1.5 text-sm font-bold text-[var(--on-ink)] hover:bg-black disabled:opacity-50"
                 >
                   {busy ? "Checking…" : "Check answers"}
                 </button>

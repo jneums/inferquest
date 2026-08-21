@@ -30,7 +30,7 @@ export function TaskItem({ task }: { task: Task }) {
         </SignInButton>
       ) : verified ? (
         <span
-          className={`mt-1 w-4 shrink-0 ${done ? "text-[var(--accent)]" : "text-[var(--text-muted)]"}`}
+          className={`mt-1 w-4 shrink-0 ${done ? "text-[var(--good-text)]" : "text-[var(--text-muted)]"}`}
           title="Completed by automated verification"
           aria-hidden
         >
@@ -64,7 +64,7 @@ export function TaskItem({ task }: { task: Task }) {
           <KindChip kind={task.kind} />
           <XPPill xp={task.xp} />
           {verified && (
-            <span className="inline-flex items-center gap-1.5 border border-[var(--accent)] px-2 py-0.5 text-[11px] font-medium text-[var(--accent)]">
+            <span className="inline-flex items-center gap-1.5 border border-[var(--accent-strong)] px-2 py-0.5 font-mono text-[11px] font-medium text-[var(--accent-strong)]">
               <IconShield size={11} />
               auto-verified
             </span>
@@ -72,7 +72,7 @@ export function TaskItem({ task }: { task: Task }) {
           {synced && verified && !done && (
             <button
               onClick={() => setOpen((o) => !o)}
-              className="border border-[var(--border)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              className="border border-[var(--border)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)] hover:border-[var(--ink)] hover:text-[var(--text-primary)]"
             >
               {open ? "hide verifier" : "verify"}
             </button>

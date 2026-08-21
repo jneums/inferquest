@@ -14,7 +14,7 @@ export default function AchievementsPage() {
   if (!synced) {
     return (
       <div className="mx-auto max-w-md pt-16 text-center">
-        <IconTrophy size={36} className="mx-auto text-[var(--amber)]" aria-hidden />
+        <IconTrophy size={36} className="mx-auto text-[var(--accent-strong)]" aria-hidden />
         <h1 className="mt-3 text-2xl font-semibold">Achievements</h1>
         <p className="mt-2 text-[var(--text-secondary)]">
           {ACHIEVEMENTS.length} badges — from your first task to verified
@@ -22,7 +22,7 @@ export default function AchievementsPage() {
         </p>
         <div className="mt-5">
           <SignInButton mode="modal">
-            <button className="bg-[var(--accent)] px-5 py-2.5 font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
+            <button className="bg-[var(--ink)] px-5 py-2.5 font-bold text-[var(--on-ink)] hover:bg-black">
               Sign in
             </button>
           </SignInButton>
@@ -54,7 +54,7 @@ export default function AchievementsPage() {
                 aria-hidden
                 className={`flex h-10 w-10 shrink-0 items-center justify-center border text-xs font-extrabold tracking-widest ${
                   earned
-                    ? "border-[var(--accent)] bg-[var(--accent-track)] text-[var(--accent)]"
+                    ? "border-[var(--accent-strong)] bg-[var(--accent-track)] text-[var(--accent-strong)]"
                     : "border-[var(--border)] text-[var(--text-muted)]"
                 }`}
               >

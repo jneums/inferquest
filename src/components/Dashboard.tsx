@@ -51,7 +51,7 @@ export function Dashboard() {
     <div className="space-y-8">
       {/* Hero: current level + XP toward the next */}
       <section>
-        <div className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-[var(--accent)]">
+        <div className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-[var(--text-muted)]">
           Level {level.n}
         </div>
         <h1 className="text-4xl font-semibold tracking-tight">{level.title}</h1>
@@ -97,7 +97,7 @@ export function Dashboard() {
         <section>
           <Link href="/review" className="block">
             <Card className="flex items-center gap-3 border-[var(--accent)] px-4 py-3 transition-colors hover:border-[var(--accent-strong)]">
-              <IconCycle size={18} className="shrink-0 text-[var(--accent)]" aria-hidden />
+              <IconCycle size={18} className="shrink-0 text-[var(--accent-strong)]" aria-hidden />
               <div>
                 <div className="font-medium">
                   {reviewsDue} review card{reviewsDue === 1 ? "" : "s"} due
@@ -106,7 +106,7 @@ export function Dashboard() {
                   A few minutes now keeps last week loaded — and feeds the streak.
                 </div>
               </div>
-              <span className="ml-auto text-sm text-[var(--accent-strong)]">Review →</span>
+              <span className="ml-auto text-sm font-medium text-[var(--accent-strong)]">Review →</span>
             </Card>
           </Link>
         </section>
