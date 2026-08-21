@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
 import { PHASES, QUESTS, TOTAL_XP } from "@/data/curriculum";
 import { LEVELS } from "@/lib/levels";
@@ -31,6 +32,29 @@ const VERIFIERS = [
   },
 ];
 
+/** Numbered manual-style section: thick rule, mono index, flush-left heading. */
+function Section({
+  n,
+  title,
+  children,
+}: {
+  n: string;
+  title: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className="border-t-[3px] border-[var(--ink)] pt-6">
+      <div className="font-mono text-xs font-semibold tracking-[0.2em] text-[var(--accent-strong)]">
+        {n}
+      </div>
+      <h2 className="mt-2 max-w-2xl text-2xl font-extrabold tracking-tight sm:text-3xl">
+        {title}
+      </h2>
+      {children}
+    </section>
+  );
+}
+
 export function Landing() {
   const totalTasks = QUESTS.reduce((s, q) => s + q.tasks.length, 0);
   const verifiedCount = QUESTS.reduce(
@@ -39,25 +63,25 @@ export function Landing() {
   );
 
   return (
-    <div className="space-y-16">
-      {/* Hero */}
-      <section className="pt-8">
+    <div className="space-y-20 sm:space-y-28">
+      {/* Hero + numbers strip */}
+      <section className="pt-10">
         <p className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-[var(--text-muted)]">
           InferQuest — the verified path into LLM serving
         </p>
-        <h1 className="mt-4 max-w-2xl text-5xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-6xl">
+        <h1 className="mt-5 max-w-3xl text-5xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-6xl">
           Become an inference engineer<span className="text-[var(--accent)]">.</span>
         </h1>
-        <p className="mt-5 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">
+        <p className="mt-7 max-w-xl text-lg leading-relaxed text-[var(--text-secondary)]">
           A free, open inference engineering roadmap from &ldquo;what&rsquo;s a
           KV cache&rdquo; to a signed offer — built from real job-market
           research, with milestones that are{" "}
-          <span className="text-[var(--accent)]">verified</span>, not checked
-          off.
+          <span className="text-[var(--accent-strong)]">verified</span>, not
+          checked off.
         </p>
-        <div className="mt-8 flex flex-wrap items-center gap-3">
+        <div className="mt-10 flex flex-wrap items-center gap-6">
           <SignUpButton mode="modal">
-            <button className="bg-[var(--ink)] px-6 py-3 font-bold text-[var(--on-ink)] hover:bg-black">
+            <button className="bg-[var(--ink)] px-7 py-3.5 font-bold text-[var(--on-ink)] hover:bg-black">
               Start the quest — free
             </button>
           </SignUpButton>
@@ -68,18 +92,37 @@ export function Landing() {
             Browse the quest map
           </Link>
         </div>
-        <p className="mt-4 text-xs text-[var(--text-muted)]">
+        <p className="mt-5 text-sm text-[var(--text-muted)]">
           The full curriculum is open to browse — sign in (free) to track
           progress, take the drills, and unlock the verifiers.
         </p>
+
+        <div className="mt-16 grid grid-cols-2 gap-x-6 border-t-[3px] border-[var(--ink)] sm:grid-cols-4">
+          {[
+            [String(PHASES.length), "phases, bedrock → offer"],
+            [String(totalTasks), "tasks across " + QUESTS.length + " quests"],
+            [TOTAL_XP.toLocaleString(), "XP to the final level"],
+            [String(verifiedCount), "auto-verified milestones"],
+          ].map(([n, label], i) => (
+            <div key={label} className="py-5">
+              <div
+                className={`text-3xl font-extrabold tracking-tight ${i === 3 ? "text-[var(--accent-strong)]" : ""}`}
+              >
+                {n}
+              </div>
+              <div className="mt-1 font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
+                {label}
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
-      {/* What is InferQuest — explicit purpose statement (also required by
-          Google OAuth verification: the home page must name the app and
+      {/* 01 — What is InferQuest: explicit purpose statement (also required
+          by Google OAuth verification: the home page must name the app and
           describe what it does) */}
-      <section className="mx-auto max-w-2xl">
-        <h2 className="text-xl font-bold">What is InferQuest?</h2>
-        <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+      <Section n="01" title="What is InferQuest?">
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
           <strong className="text-[var(--text-primary)]">InferQuest</strong> is
           a free, open, non-commercial web application for learning inference
           engineering — the craft of serving large language models fast and
@@ -87,8 +130,11 @@ export function Landing() {
           tracks your progress with XP, levels, and streaks, drills you with
           graded quizzes and spaced-repetition reviews, and automatically
           verifies major milestones like deployed endpoints, GPU kernels, and
-          merged open-source pull requests. Signing in (with Google or email)
-          is used only to save that progress to your account — see the{" "}
+          merged open-source pull requests.
+        </p>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
+          Signing in (with Google or email) is used only to save that progress
+          to your account — see the{" "}
           <a
             href="/privacy"
             className="text-[var(--accent-strong)] underline underline-offset-2"
@@ -97,66 +143,42 @@ export function Landing() {
           </a>
           .
         </p>
-      </section>
+      </Section>
 
-      {/* Numbers strip */}
-      <section className="grid grid-cols-2 gap-x-6 border-t-[3px] border-[var(--ink)] sm:grid-cols-4">
-        {[
-          [String(PHASES.length), "phases, bedrock → offer"],
-          [String(totalTasks), "tasks across " + QUESTS.length + " quests"],
-          [TOTAL_XP.toLocaleString(), "XP to the final level"],
-          [String(verifiedCount), "auto-verified milestones"],
-        ].map(([n, label], i) => (
-          <div key={label} className="py-4">
-            <div
-              className={`text-3xl font-extrabold tracking-tight ${i === 3 ? "text-[var(--accent-strong)]" : ""}`}
-            >
-              {n}
-            </div>
-            <div className="mt-1 font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
-              {label}
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {/* Verifiers */}
-      <section>
-        <h2 className="text-center text-2xl font-bold tracking-tight">
-          Checkboxes are cheap. These aren&rsquo;t checkboxes.
-        </h2>
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+      {/* 02 — Verifiers */}
+      <Section
+        n="02"
+        title={<>Checkboxes are cheap. These aren&rsquo;t checkboxes.</>}
+      >
+        <div className="mt-8 grid gap-5 sm:grid-cols-2">
           {VERIFIERS.map((v) => (
             <Card
               key={v.title}
-              className="border-t-[3px] border-t-[var(--ink)] px-5 py-4"
+              className="border-t-[3px] border-t-[var(--ink)] px-6 py-5"
             >
               <v.icon size={22} className="text-[var(--accent-strong)]" />
-              <h3 className="mt-3 font-bold">{v.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-secondary)]">
+              <h3 className="mt-3 text-lg font-bold">{v.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
                 {v.body}
               </p>
             </Card>
           ))}
         </div>
-      </section>
+      </Section>
 
-      {/* The journey */}
-      <section>
-        <h2 className="text-center text-2xl font-bold tracking-tight">
-          The journey
-        </h2>
-        <p className="mx-auto mt-2 max-w-xl text-center text-sm text-[var(--text-secondary)]">
+      {/* 03 — The journey */}
+      <Section n="03" title="The journey">
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
           Level up from <strong>{LEVELS[0].title}</strong> to{" "}
           <strong>{LEVELS[LEVELS.length - 1].title}</strong> through ten phases
           — each quest unlocks as its prerequisites near completion.
         </p>
-        <ol className="mx-auto mt-6 max-w-2xl">
+        <ol className="mt-8 max-w-2xl">
           {PHASES.map((p, i) => (
             <li key={p.id}>
               <Link href="/quests" className="block">
                 <Card
-                  className={`flex items-baseline gap-4 px-4 py-2.5 transition-colors hover:border-[var(--accent)] ${i > 0 ? "border-t-0" : ""}`}
+                  className={`flex items-baseline gap-5 px-5 py-3 transition-colors hover:border-[var(--accent)] ${i > 0 ? "border-t-0" : ""}`}
                 >
                   <span className="w-10 shrink-0 text-right text-xl font-extrabold tracking-tight text-[var(--border)]">
                     {String(p.number).padStart(2, "0")}
@@ -170,14 +192,11 @@ export function Landing() {
             </li>
           ))}
         </ol>
-      </section>
+      </Section>
 
-      {/* FAQ — rendered from the same source as the FAQPage JSON-LD */}
-      <section>
-        <h2 className="text-center text-2xl font-bold tracking-tight">
-          Frequently asked questions
-        </h2>
-        <div className="mx-auto mt-6 max-w-2xl space-y-3">
+      {/* 04 — FAQ, rendered from the same source as the FAQPage JSON-LD */}
+      <Section n="04" title="Frequently asked questions">
+        <div className="mt-8 max-w-2xl space-y-4">
           {FAQ.map(({ q, a }) => (
             <details
               key={q}
@@ -190,27 +209,27 @@ export function Landing() {
                 />
                 {q}
               </summary>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+              <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
                 {a}
               </p>
             </details>
           ))}
         </div>
-      </section>
+      </Section>
 
       {/* Closing CTA */}
-      <section className="pb-4 text-center">
-        <h2 className="text-2xl font-bold tracking-tight">
+      <section className="border-t-[3px] border-[var(--ink)] pb-6 pt-10">
+        <h2 className="max-w-2xl text-3xl font-extrabold tracking-tight">
           The market pays for proof, not promises.
         </h2>
-        <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-[var(--text-secondary)]">
+        <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">
           Every verified milestone leaves a receipt: probe results, harness
           metrics with your GPU&rsquo;s name on them, merged-PR evidence.
           That&rsquo;s a portfolio, not a certificate.
         </p>
-        <div className="mt-6">
+        <div className="mt-8">
           <SignInButton mode="modal">
-            <button className="bg-[var(--ink)] px-6 py-3 font-bold text-[var(--on-ink)] hover:bg-black">
+            <button className="bg-[var(--ink)] px-7 py-3.5 font-bold text-[var(--on-ink)] hover:bg-black">
               Sign in and start earning XP
             </button>
           </SignInButton>
