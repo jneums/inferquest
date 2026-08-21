@@ -20,7 +20,7 @@ export function QuestCard({ quest }: { quest: Quest }) {
       className={`h-full px-4 py-3 transition-colors ${
         unlocked
           ? "hover:border-[var(--accent)]"
-          : "opacity-60"
+          : "border-dashed opacity-70"
       }`}
     >
       <div className="flex items-start justify-between gap-2">

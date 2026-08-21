@@ -43,8 +43,8 @@ export default function QuestsPage() {
       {PHASES.map((phase) => (
         <section key={phase.id}>
           <div className="mb-3 flex items-baseline gap-3">
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--amber)]">
-              {"//"} Phase {phase.number} · {phase.theme}
+            <span className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--accent)]">
+              Phase {phase.number} · {phase.theme}
             </span>
           </div>
           <h2 className="text-xl font-semibold">{phase.title}</h2>

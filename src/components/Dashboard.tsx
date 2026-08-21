@@ -51,8 +51,8 @@ export function Dashboard() {
     <div className="space-y-8">
       {/* Hero: current level + XP toward the next */}
       <section>
-        <div className="text-xs font-medium uppercase tracking-[0.25em] text-[var(--amber)]">
-          {"//"} Level {level.n}
+        <div className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-[var(--accent)]">
+          Level {level.n}
         </div>
         <h1 className="text-4xl font-semibold tracking-tight">{level.title}</h1>
         <div className="mt-4 max-w-xl">

@@ -1,41 +1,47 @@
 @import "tailwindcss";
 
-/* Phosphor design tokens — terminal/profiler aesthetic, dark-only.
-   Green phosphor accent + amber signal, sharp corners, mono type. */
+/* Blueprint design tokens — engineering-drawing aesthetic, dark-only.
+   Drafting-blue ground with a faint grid, cyan line-work accent,
+   Archivo for reading + IBM Plex Mono for labels and numbers. */
 :root {
   color-scheme: dark;
-  --page: #0a0d0a;
-  --surface-1: #0e130e;
-  --text-primary: #e8f0e3;
-  --text-secondary: #94a18d;
-  --text-muted: #7d8a76;
-  --hairline: #1a231a;
-  --baseline: #3a4a38;
-  --border: #223022;
-  --accent: #6ee787;
-  --accent-strong: #a3f7b5;
-  --accent-track: #16281a;
-  --on-accent: #0a0d0a;
+  --page: #10263f;
+  --surface-1: #122a45;
+  --text-primary: #eaf2fa;
+  --text-secondary: #9db4ca;
+  --text-muted: #7f9ab5;
+  --hairline: #21395655;
+  --baseline: #4a6b8d;
+  --border: #2e4a68;
+  --accent: #7dd3fc;
+  --accent-strong: #bae6fd;
+  --accent-track: #1a3a5c;
+  --on-accent: #10263f;
   --amber: #ffb454;
-  --good: #6ee787;
-  --good-text: #6ee787;
-  /* Sequential phosphor ramp for the heatmap (zero recedes to neutral). */
-  --heat-0: #161d16;
-  --heat-1: #1e3a24;
-  --heat-2: #2f5c37;
-  --heat-3: #4a9a56;
-  --heat-4: #6ee787;
+  --good: #7dd3fc;
+  --good-text: #7dd3fc;
+  --grid-line: rgba(148, 197, 233, 0.06);
+  /* Sequential cyan ramp for the heatmap (zero recedes to neutral). */
+  --heat-0: #17304c;
+  --heat-1: #1d466b;
+  --heat-2: #2d6795;
+  --heat-3: #4a9cc9;
+  --heat-4: #7dd3fc;
 }
 
 @theme inline {
   --color-background: var(--page);
   --color-foreground: var(--text-primary);
-  --font-sans: var(--font-jetbrains);
-  --font-mono: var(--font-jetbrains);
+  --font-sans: var(--font-archivo);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {
-  background: var(--page);
+  background-color: var(--page);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 24px 24px;
   color: var(--text-primary);
 }
 

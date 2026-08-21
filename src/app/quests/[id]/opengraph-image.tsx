@@ -30,8 +30,8 @@ export default async function Image({
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "#0a0d0a",
-          color: "#e8f0e3",
+          background: "#10263f",
+          color: "#eaf2fa",
           fontFamily: "monospace",
         }}
       >
@@ -40,7 +40,7 @@ export default async function Image({
             style={{
               width: 28,
               height: 28,
-              background: "#6ee787",
+              background: "#7dd3fc",
             }}
           />
           <div style={{ fontSize: 34, fontWeight: 600 }}>InferQuest</div>
@@ -51,7 +51,7 @@ export default async function Image({
               fontSize: 26,
               textTransform: "uppercase",
               letterSpacing: 4,
-              color: "#ffb454",
+              color: "#7dd3fc",
             }}
           >
             {`Phase ${phase?.number} · ${phase?.theme}`}
@@ -66,11 +66,11 @@ export default async function Image({
           >
             {quest?.title ?? "Quest"}
           </div>
-          <div style={{ marginTop: 20, fontSize: 32, color: "#7d8a76" }}>
+          <div style={{ marginTop: 20, fontSize: 32, color: "#7f9ab5" }}>
             {quest?.tagline}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 48, fontSize: 28, color: "#7d8a76" }}>
+        <div style={{ display: "flex", gap: 48, fontSize: 28, color: "#7f9ab5" }}>
           <div>{`${quest?.tasks.length ?? 0} tasks`}</div>
           <div>{`${totalXP} XP`}</div>
           {verified > 0 && <div>{`${verified} auto-verified`}</div>}

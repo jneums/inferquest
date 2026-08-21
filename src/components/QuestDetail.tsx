@@ -28,8 +28,8 @@ export function QuestDetail({ id }: { id: string }) {
         >
           ← Quest map
         </Link>
-        <div className="mt-3 text-xs font-medium uppercase tracking-[0.2em] text-[var(--amber)]">
-          {"//"} Phase {phase?.number} · {phase?.theme}
+        <div className="mt-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--accent)]">
+          Phase {phase?.number} · {phase?.theme}
         </div>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">
           {quest.title}

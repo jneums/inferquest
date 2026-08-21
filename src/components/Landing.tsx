@@ -42,15 +42,11 @@ export function Landing() {
     <div className="space-y-16">
       {/* Hero */}
       <section className="pt-8">
-        <p className="text-xs font-medium uppercase tracking-[0.3em] text-[var(--amber)]">
-          {"// InferQuest — the verified path into LLM serving"}
+        <p className="font-mono text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)]">
+          Fig. 1 — InferQuest, the verified path into LLM serving
         </p>
-        <h1 className="mt-5 max-w-2xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+        <h1 className="mt-5 max-w-2xl text-4xl font-bold uppercase leading-tight tracking-tight sm:text-5xl">
           Become an inference engineer.
-          <span
-            aria-hidden
-            className="ml-2 inline-block h-8 w-4 translate-y-1 animate-pulse bg-[var(--accent)] sm:h-10 sm:w-5"
-          />
         </h1>
         <p className="mt-5 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">
           A free, open inference engineering roadmap from &ldquo;what&rsquo;s a
@@ -61,15 +57,15 @@ export function Landing() {
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <SignUpButton mode="modal">
-            <button className="bg-[var(--accent)] px-5 py-2.5 font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
-              $ start --free
+            <button className="bg-[var(--accent)] px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
+              Start the quest — free
             </button>
           </SignUpButton>
           <Link
             href="/quests"
-            className="border border-[var(--baseline)] px-5 py-2.5 font-medium text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--text-primary)]"
+            className="border border-dashed border-[var(--baseline)] px-5 py-2.5 text-sm font-medium uppercase tracking-wider text-[var(--text-secondary)] hover:border-solid hover:border-[var(--accent)] hover:text-[var(--text-primary)]"
           >
-            browse the quest map
+            Browse the quest map
           </Link>
         </div>
         <p className="mt-4 text-xs text-[var(--text-muted)]">
@@ -82,9 +78,7 @@ export function Landing() {
           Google OAuth verification: the home page must name the app and
           describe what it does) */}
       <section className="mx-auto max-w-2xl">
-        <h2 className="text-xl font-bold">
-          <span className="text-[var(--accent)]">##</span> What is InferQuest?
-        </h2>
+        <h2 className="text-xl font-bold">What is InferQuest?</h2>
         <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
           <strong className="text-[var(--text-primary)]">InferQuest</strong> is
           a free, open, non-commercial web application for learning inference
@@ -118,7 +112,7 @@ export function Landing() {
             className={`px-4 py-5 text-center ${i > 0 ? "border-l border-[var(--border)]" : ""} ${i >= 2 ? "border-t border-[var(--border)] sm:border-t-0" : ""}`}
           >
             <div
-              className={`text-3xl font-extrabold ${i === 3 ? "text-[var(--amber)]" : ""}`}
+              className={`text-3xl font-bold ${i === 3 ? "text-[var(--accent)]" : ""}`}
             >
               {n}
             </div>
@@ -162,11 +156,11 @@ export function Landing() {
                 <Card
                   className={`flex items-baseline gap-4 px-4 py-2.5 transition-colors hover:border-[var(--accent)] ${i > 0 ? "border-t-0" : ""}`}
                 >
-                  <span className="w-8 shrink-0 text-right text-sm text-[var(--amber)]">
-                    p{p.number}
+                  <span className="w-8 shrink-0 text-right font-mono text-sm text-[var(--accent)]">
+                    P{p.number}
                   </span>
                   <span className="font-medium">{p.title}</span>
-                  <span className="ml-auto hidden text-xs uppercase tracking-wider text-[var(--text-muted)] sm:inline">
+                  <span className="ml-auto hidden font-mono text-xs uppercase tracking-wider text-[var(--text-muted)] sm:inline">
                     {p.theme}
                   </span>
                 </Card>
@@ -213,8 +207,8 @@ export function Landing() {
         </p>
         <div className="mt-6">
           <SignInButton mode="modal">
-            <button className="bg-[var(--accent)] px-5 py-2.5 font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
-              $ sign-in &amp;&amp; earn-xp
+            <button className="bg-[var(--accent)] px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
+              Sign in and start earning XP
             </button>
           </SignInButton>
         </div>

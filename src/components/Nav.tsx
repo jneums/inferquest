@@ -31,7 +31,7 @@ export function Nav() {
           <IconBolt size={15} className="text-[var(--accent)]" />
           InferQuest
         </Link>
-        <nav className="flex gap-1 text-sm">
+        <nav className="flex gap-1 font-mono text-xs uppercase tracking-wider">
           {LINKS.map((l) => {
             const active =
               l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
@@ -71,8 +71,8 @@ export function Nav() {
           )}
           <Show when="signed-out">
             <SignInButton mode="modal">
-              <button className="border border-[var(--accent)] px-3 py-1 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--on-accent)]">
-                sign in
+              <button className="border border-[var(--accent)] px-3 py-1 font-mono text-xs font-medium uppercase tracking-wider text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--on-accent)]">
+                Sign in
               </button>
             </SignInButton>
           </Show>
