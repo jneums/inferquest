@@ -17,10 +17,10 @@ export function QuestCard({ quest }: { quest: Quest }) {
 
   const body = (
     <Card
-      className={`h-full px-4 py-3 transition-colors ${
+      className={`h-full px-4 py-3 transition-all ${
         unlocked
           ? "hover:border-[var(--accent)]"
-          : "opacity-60"
+          : "opacity-60 hover:border-[var(--baseline)] hover:opacity-100"
       }`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -48,21 +48,26 @@ export function QuestCard({ quest }: { quest: Quest }) {
           </span>
         </div>
       ) : (
-        <p className="mt-3 text-xs text-[var(--text-muted)]">
-          Unlocks at 50% of{" "}
-          {quest.prereqs
-            .map((id) => QUESTS_BY_ID.get(id)?.title ?? id)
-            .join(" and ")}
+        <p className="mt-3 flex items-baseline justify-between gap-2 text-xs text-[var(--text-muted)]">
+          <span>
+            Unlocks at 50% of{" "}
+            {quest.prereqs
+              .map((id) => QUESTS_BY_ID.get(id)?.title ?? id)
+              .join(" and ")}
+          </span>
+          <span className="whitespace-nowrap font-medium text-[var(--accent-strong)]">
+            Look ahead →
+          </span>
         </p>
       )}
     </Card>
   );
 
-  return unlocked ? (
+  // Locked quests stay browsable — the quest page shows a lock banner but
+  // the full task list is readable, freeCodeCamp-style.
+  return (
     <Link href={`/quests/${quest.id}`} className="block h-full">
       {body}
     </Link>
-  ) : (
-    body
   );
 }
