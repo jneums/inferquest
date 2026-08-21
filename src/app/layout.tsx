@@ -78,7 +78,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ClerkProvider>
           <ProgressProvider>
             <Nav />
-            <main className="mx-auto w-full max-w-4xl flex-1 px-4 pb-16 pt-8 sm:px-6">
+            <main className="mx-auto w-full max-w-4xl flex-1 px-4 pb-24 pt-10 sm:px-6">
               {children}
             </main>
             <footer className="border-t border-[var(--hairline)] py-6 text-center text-sm text-[var(--text-muted)]">

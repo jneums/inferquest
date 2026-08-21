@@ -41,17 +41,20 @@ export default function QuestsPage() {
       </div>
 
       {PHASES.map((phase) => (
-        <section key={phase.id}>
-          <div className="mb-3 flex items-baseline gap-3">
-            <span className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--text-muted)]">
-              Phase {phase.number} · {phase.theme}
-            </span>
+        <section
+          key={phase.id}
+          className="border-t-[3px] border-[var(--ink)] pt-6"
+        >
+          <div className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
+            Phase {phase.number} · {phase.theme}
           </div>
-          <h2 className="text-xl font-semibold">{phase.title}</h2>
-          <p className="mt-1 max-w-2xl text-sm text-[var(--text-secondary)]">
+          <h2 className="mt-2 text-2xl font-extrabold tracking-tight">
+            {phase.title}
+          </h2>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
             {phase.description}
           </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2">
             {questsForPhase(phase.id).map((quest) => (
               <QuestCard key={quest.id} quest={quest} />
             ))}

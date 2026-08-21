@@ -32,21 +32,21 @@ export default function AchievementsPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Achievements</h1>
-        <p className="mt-1 text-[var(--text-secondary)]">
-          {earnedAchievementIds.size} of {ACHIEVEMENTS.length} earned.
+    <div className="space-y-12">
+      <div className="pt-2">
+        <h1 className="text-4xl font-extrabold tracking-tight">Achievements</h1>
+        <p className="mt-3 font-mono text-sm text-[var(--text-secondary)]">
+          {earnedAchievementIds.size} of {ACHIEVEMENTS.length} earned
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         {ACHIEVEMENTS.map((a) => {
           const earned = earnedAchievementIds.has(a.id);
           return (
             <Card
               key={a.id}
-              className={`flex items-center gap-3 px-4 py-3 ${
+              className={`flex items-center gap-4 px-5 py-4 ${
                 earned ? "" : "opacity-55"
               }`}
             >
@@ -83,8 +83,8 @@ export default function AchievementsPage() {
         })}
       </div>
 
-      <section className="space-y-2 border-t border-[var(--hairline)] pt-6">
-        <h2 className="text-sm font-medium text-[var(--text-secondary)]">
+      <section className="space-y-3 border-t-[3px] border-[var(--ink)] pt-5">
+        <h2 className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
           Your data
         </h2>
         <p className="text-sm text-[var(--text-muted)]">

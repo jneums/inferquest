@@ -175,16 +175,16 @@ export default function ReviewPage() {
   };
 
   return (
-    <div className="mx-auto max-w-xl space-y-4 pt-4">
-      <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Review</h1>
-        <span className="text-sm text-[var(--text-muted)]">
+    <div className="mx-auto max-w-xl space-y-6 pt-6">
+      <div className="flex items-baseline justify-between border-b-[3px] border-[var(--ink)] pb-3">
+        <h1 className="text-2xl font-extrabold tracking-tight">Review</h1>
+        <span className="font-mono text-sm text-[var(--text-muted)]">
           {idx + 1} / {cards.length}
         </span>
       </div>
-      <Card className="px-5 py-4">
-        <p className="font-medium">{card.prompt}</p>
-        <div className="mt-3 space-y-1.5">
+      <Card className="px-6 py-5">
+        <p className="font-medium leading-relaxed">{card.prompt}</p>
+        <div className="mt-4 space-y-2.5">
           {card.choices.map((choice, ci) => (
             <label key={ci} className="flex items-start gap-2 text-sm">
               <input

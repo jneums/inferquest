@@ -20,22 +20,22 @@ export function QuestDetail({ id }: { id: string }) {
   const totalXP = quest.tasks.reduce((s, t) => s + t.xp, 0);
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="space-y-10">
+      <div className="pt-2">
         <Link
           href="/quests"
           className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
         >
           ← Quest map
         </Link>
-        <div className="mt-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--text-muted)]">
+        <div className="mt-6 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
           Phase {phase?.number} · {phase?.theme}
         </div>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight">
+        <h1 className="mt-2 text-4xl font-extrabold tracking-tight">
           {quest.title}
         </h1>
-        <p className="mt-1 text-[var(--text-secondary)]">{quest.tagline}</p>
-        <div className="mt-4 flex max-w-md items-center gap-3">
+        <p className="mt-3 text-lg text-[var(--text-secondary)]">{quest.tagline}</p>
+        <div className="mt-6 flex max-w-md items-center gap-3">
           <Meter value={done} max={total} className="flex-1" />
           <span className="whitespace-nowrap text-sm text-[var(--text-muted)]">
             {done}/{total} · {totalXP} XP
@@ -63,13 +63,18 @@ export function QuestDetail({ id }: { id: string }) {
         </Card>
       )}
 
-      <Card className="px-4">
-        <ul>
-          {quest.tasks.map((task) => (
-            <TaskItem key={task.id} task={task} />
-          ))}
-        </ul>
-      </Card>
+      <div className="border-t-[3px] border-[var(--ink)] pt-6">
+        <div className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+          Tasks
+        </div>
+        <Card className="mt-5 px-5">
+          <ul>
+            {quest.tasks.map((task) => (
+              <TaskItem key={task.id} task={task} />
+            ))}
+          </ul>
+        </Card>
+      </div>
     </div>
   );
 }

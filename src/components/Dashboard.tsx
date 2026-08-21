@@ -48,19 +48,19 @@ export function Dashboard() {
   const nextTask = upNext?.tasks.find((t) => !doneTaskIds.has(t.id));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12 sm:space-y-14">
       {/* Hero: current level + XP toward the next */}
-      <section>
-        <div className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-[var(--text-muted)]">
+      <section className="pt-2">
+        <div className="font-mono text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent-strong)]">
           Level {level.n}
         </div>
-        <h1 className="text-4xl font-semibold tracking-tight">{level.title}</h1>
-        <div className="mt-4 max-w-xl">
+        <h1 className="mt-2 text-4xl font-extrabold tracking-tight">{level.title}</h1>
+        <div className="mt-6 max-w-xl">
           <Meter
             value={xp - level.minXP}
             max={(next?.minXP ?? xp) - level.minXP || 1}
           />
-          <div className="mt-1.5 text-sm text-[var(--text-secondary)]">
+          <div className="mt-2 text-sm text-[var(--text-secondary)]">
             {next
               ? `${xp.toLocaleString()} XP — ${(next.minXP - xp).toLocaleString()} to Level ${next.n}: ${next.title}`
               : `${xp.toLocaleString()} XP — max level reached. Go get paid.`}
@@ -69,7 +69,7 @@ export function Dashboard() {
       </section>
 
       {/* Stat tiles */}
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatTile
           label="Total XP"
           value={ready ? xp.toLocaleString() : "—"}
@@ -114,8 +114,8 @@ export function Dashboard() {
 
       {/* Up next */}
       {upNext && nextTask && (
-        <section>
-          <h2 className="mb-2 text-sm font-medium text-[var(--text-secondary)]">
+        <section className="border-t-[3px] border-[var(--ink)] pt-5">
+          <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
             Up next
           </h2>
           <Link href={`/quests/${upNext.id}`} className="block">
@@ -135,8 +135,8 @@ export function Dashboard() {
       )}
 
       {/* Activity heatmap */}
-      <section>
-        <h2 className="mb-2 text-sm font-medium text-[var(--text-secondary)]">
+      <section className="border-t-[3px] border-[var(--ink)] pt-5">
+        <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
           Activity — XP per day, last year
         </h2>
         <Card className="px-4 py-4">
@@ -145,11 +145,11 @@ export function Dashboard() {
       </section>
 
       {/* Phase progress */}
-      <section>
-        <h2 className="mb-2 text-sm font-medium text-[var(--text-secondary)]">
+      <section className="border-t-[3px] border-[var(--ink)] pt-5">
+        <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
           Phases
         </h2>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {PHASES.map((phase) => {
             const quests = QUESTS.filter((q) => q.phaseId === phase.id);
             const total = quests.reduce((s, q) => s + q.tasks.length, 0);

@@ -17,7 +17,7 @@ export function TaskItem({ task }: { task: Task }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <li className="flex gap-3 border-b border-[var(--hairline)] py-3 last:border-b-0">
+    <li className="flex gap-4 border-b border-[var(--hairline)] py-5 last:border-b-0">
       {!synced ? (
         <SignInButton mode="modal">
           <button
@@ -56,11 +56,11 @@ export function TaskItem({ task }: { task: Task }) {
           {task.title}
         </label>
         {task.detail && (
-          <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
+          <p className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]">
             {task.detail}
           </p>
         )}
-        <div className="mt-1.5 flex flex-wrap items-center gap-2">
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
           <KindChip kind={task.kind} />
           <XPPill xp={task.xp} />
           {verified && (
