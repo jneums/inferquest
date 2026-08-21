@@ -5,13 +5,19 @@ import { SignInButton } from "@clerk/nextjs";
 import { useProgress, type VerifyOutcome } from "@/lib/progress";
 import type { Task, Verifier } from "@/lib/types";
 import type { CheckResult } from "@/server/verifiers/net";
+import { IconCheck, IconShield } from "@/components/icons";
 
 function CheckList({ checks }: { checks: CheckResult[] }) {
   return (
     <ul className="mt-3 space-y-1.5">
       {checks.map((c, i) => (
         <li key={i} className="flex gap-2 text-sm">
-          <span aria-hidden>{c.passed ? "✅" : "❌"}</span>
+          <span
+            aria-hidden
+            className={`w-10 shrink-0 text-[11px] font-bold leading-5 ${c.passed ? "text-[var(--accent)]" : "text-[var(--amber)]"}`}
+          >
+            {c.passed ? "PASS" : "FAIL"}
+          </span>
           <span>
             <span className="font-medium">{c.name}</span>{" "}
             <span className="text-[var(--text-secondary)]">— {c.detail}</span>
@@ -31,7 +37,7 @@ function Field({
       <span className="text-[var(--text-secondary)]">{label}</span>
       <input
         {...props}
-        className="mt-1 w-full rounded-md border border-[var(--border)] bg-transparent px-2.5 py-1.5 font-mono text-sm outline-none focus:border-[var(--accent)]"
+        className="mt-1 w-full border border-[var(--border)] bg-transparent px-2.5 py-1.5 font-mono text-sm outline-none focus:border-[var(--accent)]"
       />
     </label>
   );
@@ -42,7 +48,7 @@ function SubmitButton({ busy, label }: { busy: boolean; label: string }) {
     <button
       type="submit"
       disabled={busy}
-      className="rounded-md bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-white hover:bg-[var(--accent-strong)] disabled:opacity-50"
+      className="bg-[var(--accent)] px-3 py-1.5 text-sm font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)] disabled:opacity-50"
     >
       {busy ? "Verifying…" : label}
     </button>
@@ -187,7 +193,7 @@ function HarnessForm({
         Run the grader on a machine with a GPU, then paste the JSON report it
         prints:
       </p>
-      <pre className="overflow-x-auto rounded-md bg-[var(--accent-track)] px-3 py-2 font-mono text-xs">
+      <pre className="overflow-x-auto bg-[var(--accent-track)] px-3 py-2 font-mono text-xs">
         python harness/run.py {verifier.script}
       </pre>
       <label className="block text-sm">
@@ -197,11 +203,11 @@ function HarnessForm({
           onChange={(e) => setReport(e.target.value)}
           required
           rows={5}
-          className="mt-1 w-full rounded-md border border-[var(--border)] bg-transparent px-2.5 py-1.5 font-mono text-xs outline-none focus:border-[var(--accent)]"
+          className="mt-1 w-full border border-[var(--border)] bg-transparent px-2.5 py-1.5 font-mono text-xs outline-none focus:border-[var(--accent)]"
           placeholder='{"harness_version": "1", "task_id": "…", …}'
         />
       </label>
-      {parseError && <p className="text-sm text-[#d03b3b]">{parseError}</p>}
+      {parseError && <p className="text-sm text-[var(--amber)]">{parseError}</p>}
       <SubmitButton busy={busy} label="Submit report" />
     </form>
   );
@@ -293,8 +299,9 @@ export function VerifyPanel({ task }: { task: Task }) {
 
   if (done) {
     return (
-      <p className="mt-2 text-sm text-[var(--good-text)]">
-        ✅ Verified{result?.checks?.length ? " — checks passed" : ""}
+      <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-[var(--good-text)]">
+        <IconCheck size={13} />
+        Verified{result?.checks?.length ? " — checks passed" : ""}
       </p>
     );
   }
@@ -302,7 +309,7 @@ export function VerifyPanel({ task }: { task: Task }) {
   if (!synced) {
     return (
       <div className="mt-2 flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-        <span aria-hidden>🛡️</span>
+        <IconShield size={15} className="shrink-0 text-[var(--text-muted)]" aria-hidden />
         This task is completed by automated verification —
         <SignInButton mode="modal">
           <button className="font-medium text-[var(--accent-strong)] underline underline-offset-2">
@@ -314,7 +321,7 @@ export function VerifyPanel({ task }: { task: Task }) {
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-[var(--hairline)] bg-[var(--page)] p-3">
+    <div className="mt-3 border border-[var(--hairline)] bg-[var(--page)] p-3">
       {verifier.type === "endpoint" && (
         <EndpointForm task={task} verifier={verifier} onResult={setResult} />
       )}
@@ -345,12 +352,12 @@ export function VerifyPanel({ task }: { task: Task }) {
 
       {result && (
         <div className="mt-3 border-t border-[var(--hairline)] pt-3">
-          <p className={`text-sm font-medium ${result.passed ? "text-[var(--good-text)]" : ""}`}>
+          <p className={`text-sm font-bold ${result.passed ? "text-[var(--good-text)]" : "text-[var(--amber)]"}`}>
             {result.passed
-              ? `✅ Passed — +${task.xp} XP`
+              ? `PASS — +${task.xp} XP`
               : result.error
-                ? `⚠️ ${result.error}`
-                : "❌ Not yet — fix the failing checks and rerun"}
+                ? `WARN — ${result.error}`
+                : "FAIL — fix the failing checks and rerun"}
           </p>
           {result.checks.length > 0 && <CheckList checks={result.checks} />}
         </div>

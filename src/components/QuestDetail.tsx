@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PHASES, QUESTS_BY_ID } from "@/data/curriculum";
 import { useProgress } from "@/lib/progress";
+import { IconEye, IconLock } from "@/components/icons";
 import { TaskItem } from "@/components/TaskItem";
 import { Card, Meter } from "@/components/ui";
 
@@ -27,8 +28,8 @@ export function QuestDetail({ id }: { id: string }) {
         >
           ← Quest map
         </Link>
-        <div className="mt-3 text-xs font-medium uppercase tracking-wide text-[var(--accent-strong)]">
-          Phase {phase?.number} · {phase?.theme}
+        <div className="mt-3 text-xs font-medium uppercase tracking-[0.2em] text-[var(--amber)]">
+          {"//"} Phase {phase?.number} · {phase?.theme}
         </div>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">
           {quest.title}
@@ -43,20 +44,22 @@ export function QuestDetail({ id }: { id: string }) {
       </div>
 
       {!synced && (
-        <Card className="border-[var(--accent)] px-4 py-3 text-sm text-[var(--text-secondary)]">
-          👀 You&rsquo;re previewing the curriculum. Sign in (top right) to
-          track progress, take knowledge checks, and unlock the verifiers.
+        <Card className="flex items-start gap-2 border-[var(--accent)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+          <IconEye size={15} className="mt-0.5 shrink-0 text-[var(--accent)]" />
+          <span>You&rsquo;re previewing the curriculum. Sign in (top right) to
+          track progress, take knowledge checks, and unlock the verifiers.</span>
         </Card>
       )}
 
       {synced && !unlocked && (
-        <Card className="border-[var(--baseline)] px-4 py-3 text-sm text-[var(--text-secondary)]">
-          🔒 This quest is locked — it unlocks when{" "}
+        <Card className="flex items-start gap-2 border-[var(--baseline)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+          <IconLock size={15} className="mt-0.5 shrink-0 text-[var(--text-muted)]" />
+          <span>This quest is locked — it unlocks when{" "}
           {quest.prereqs
             .map((pid) => QUESTS_BY_ID.get(pid)?.title ?? pid)
             .join(" and ")}{" "}
           {quest.prereqs.length > 1 ? "are" : "is"} at least 50% complete. You
-          can still read ahead; checking tasks off works either way.
+          can still read ahead; checking tasks off works either way.</span>
         </Card>
       )}
 

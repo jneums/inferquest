@@ -5,26 +5,27 @@ import { SignUpButton, SignInButton } from "@clerk/nextjs";
 import { PHASES, QUESTS, TOTAL_XP } from "@/data/curriculum";
 import { LEVELS } from "@/lib/levels";
 import { FAQ } from "@/lib/seo";
+import { IconPlug, IconBolt, IconMerge, IconGrad } from "@/components/icons";
 import { Card } from "./ui";
 
 const VERIFIERS = [
   {
-    emoji: "🔌",
+    icon: IconPlug,
     title: "Live endpoint probes",
     body: "Deploy an OpenAI-compatible endpoint — your own engine, then production vLLM — and InferQuest probes it for real: streaming framing, usage accounting, max_tokens cutoffs, error shapes, latency targets.",
   },
   {
-    emoji: "⚡",
+    icon: IconBolt,
     title: "GPU-graded kernels",
     body: "A local harness grades your attention, KV cache, Triton softmax, tiled matmul, flash attention, quantizer, and ring all-reduce on your own hardware — correctness against references AND measured speed.",
   },
   {
-    emoji: "🔮",
+    icon: IconMerge,
     title: "Merged-PR checks",
     body: "The open-source milestones verify against the GitHub API that your PRs into vLLM, SGLang, FlashInfer & co. actually exist, actually merged, and aren't typo fixes.",
   },
   {
-    emoji: "🎓",
+    icon: IconGrad,
     title: "Graded interview drills",
     body: "KV-cache sizing math, rooflines, speculative-decoding acceptance, parallelism tradeoffs — graded server-side, answers never shipped to your browser.",
   },
@@ -40,32 +41,38 @@ export function Landing() {
   return (
     <div className="space-y-16">
       {/* Hero */}
-      <section className="pt-8 text-center">
-        <p className="text-sm font-medium uppercase tracking-wide text-[var(--accent-strong)]">
-          InferQuest — the verified path into LLM serving
+      <section className="pt-8">
+        <p className="text-xs font-medium uppercase tracking-[0.3em] text-[var(--amber)]">
+          {"// InferQuest — the verified path into LLM serving"}
         </p>
-        <h1 className="mx-auto mt-3 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
+        <h1 className="mt-5 max-w-2xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
           Become an inference engineer.
+          <span
+            aria-hidden
+            className="ml-2 inline-block h-8 w-4 translate-y-1 animate-pulse bg-[var(--accent)] sm:h-10 sm:w-5"
+          />
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-lg text-[var(--text-secondary)]">
-          A free, open inference engineering roadmap from “what&rsquo;s a KV
-          cache” to a signed offer — built from real job-market research, with
-          milestones that are <em>verified</em>, not checked off.
+        <p className="mt-5 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">
+          A free, open inference engineering roadmap from &ldquo;what&rsquo;s a
+          KV cache&rdquo; to a signed offer — built from real job-market
+          research, with milestones that are{" "}
+          <span className="text-[var(--accent)]">verified</span>, not checked
+          off.
         </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
           <SignUpButton mode="modal">
-            <button className="rounded-lg bg-[var(--accent)] px-5 py-2.5 font-medium text-white hover:bg-[var(--accent-strong)]">
-              Start the quest — free
+            <button className="bg-[var(--accent)] px-5 py-2.5 font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
+              $ start --free
             </button>
           </SignUpButton>
           <Link
             href="/quests"
-            className="rounded-lg border border-[var(--border)] px-5 py-2.5 font-medium hover:border-[var(--baseline)]"
+            className="border border-[var(--baseline)] px-5 py-2.5 font-medium text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--text-primary)]"
           >
-            Browse the quest map
+            browse the quest map
           </Link>
         </div>
-        <p className="mt-3 text-xs text-[var(--text-muted)]">
+        <p className="mt-4 text-xs text-[var(--text-muted)]">
           The full curriculum is open to browse — sign in (free) to track
           progress, take the drills, and unlock the verifiers.
         </p>
@@ -74,20 +81,20 @@ export function Landing() {
       {/* What is InferQuest — explicit purpose statement (also required by
           Google OAuth verification: the home page must name the app and
           describe what it does) */}
-      <section className="mx-auto max-w-2xl text-center">
-        <h2 className="text-2xl font-semibold tracking-tight">
-          What is InferQuest?
+      <section className="mx-auto max-w-2xl">
+        <h2 className="text-xl font-bold">
+          <span className="text-[var(--accent)]">##</span> What is InferQuest?
         </h2>
-        <p className="mt-3 text-[var(--text-secondary)]">
-          <strong>InferQuest</strong> is a free, open, non-commercial web
-          application for learning inference engineering — the craft of
-          serving large language models fast and cheaply. It organizes a
-          complete curriculum into quests and tasks, tracks your progress
-          with XP, levels, and streaks, drills you with graded quizzes and
-          spaced-repetition reviews, and automatically verifies major
-          milestones like deployed endpoints, GPU kernels, and merged
-          open-source pull requests. Signing in (with Google or email) is
-          used only to save that progress to your account — see the{" "}
+        <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+          <strong className="text-[var(--text-primary)]">InferQuest</strong> is
+          a free, open, non-commercial web application for learning inference
+          engineering — the craft of serving large language models fast and
+          cheaply. It organizes a complete curriculum into quests and tasks,
+          tracks your progress with XP, levels, and streaks, drills you with
+          graded quizzes and spaced-repetition reviews, and automatically
+          verifies major milestones like deployed endpoints, GPU kernels, and
+          merged open-source pull requests. Signing in (with Google or email)
+          is used only to save that progress to your account — see the{" "}
           <a
             href="/privacy"
             className="text-[var(--accent-strong)] underline underline-offset-2"
@@ -99,33 +106,40 @@ export function Landing() {
       </section>
 
       {/* Numbers strip */}
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="grid grid-cols-2 border border-[var(--border)] sm:grid-cols-4">
         {[
           [String(PHASES.length), "phases, bedrock → offer"],
           [String(totalTasks), "tasks across " + QUESTS.length + " quests"],
           [TOTAL_XP.toLocaleString(), "XP to the final level"],
           [String(verifiedCount), "auto-verified milestones"],
-        ].map(([n, label]) => (
-          <Card key={label} className="px-4 py-4 text-center">
-            <div className="text-3xl font-semibold">{n}</div>
-            <div className="mt-1 text-xs text-[var(--text-secondary)]">{label}</div>
-          </Card>
+        ].map(([n, label], i) => (
+          <div
+            key={label}
+            className={`px-4 py-5 text-center ${i > 0 ? "border-l border-[var(--border)]" : ""} ${i >= 2 ? "border-t border-[var(--border)] sm:border-t-0" : ""}`}
+          >
+            <div
+              className={`text-3xl font-extrabold ${i === 3 ? "text-[var(--amber)]" : ""}`}
+            >
+              {n}
+            </div>
+            <div className="mt-1 text-xs text-[var(--text-muted)]">{label}</div>
+          </div>
         ))}
       </section>
 
       {/* Verifiers */}
       <section>
-        <h2 className="text-center text-2xl font-semibold tracking-tight">
+        <h2 className="text-center text-2xl font-bold tracking-tight">
           Checkboxes are cheap. These aren&rsquo;t checkboxes.
         </h2>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           {VERIFIERS.map((v) => (
             <Card key={v.title} className="px-5 py-4">
-              <div className="text-2xl" aria-hidden>
-                {v.emoji}
-              </div>
-              <h3 className="mt-2 font-medium">{v.title}</h3>
-              <p className="mt-1 text-sm text-[var(--text-secondary)]">{v.body}</p>
+              <v.icon size={22} className="text-[var(--accent)]" />
+              <h3 className="mt-3 font-bold">{v.title}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-secondary)]">
+                {v.body}
+              </p>
             </Card>
           ))}
         </div>
@@ -133,7 +147,7 @@ export function Landing() {
 
       {/* The journey */}
       <section>
-        <h2 className="text-center text-2xl font-semibold tracking-tight">
+        <h2 className="text-center text-2xl font-bold tracking-tight">
           The journey
         </h2>
         <p className="mx-auto mt-2 max-w-xl text-center text-sm text-[var(--text-secondary)]">
@@ -141,16 +155,18 @@ export function Landing() {
           <strong>{LEVELS[LEVELS.length - 1].title}</strong> through ten phases
           — each quest unlocks as its prerequisites near completion.
         </p>
-        <ol className="mx-auto mt-6 max-w-2xl space-y-2">
-          {PHASES.map((p) => (
+        <ol className="mx-auto mt-6 max-w-2xl">
+          {PHASES.map((p, i) => (
             <li key={p.id}>
               <Link href="/quests" className="block">
-                <Card className="flex items-baseline gap-3 px-4 py-2.5 transition-colors hover:border-[var(--baseline)]">
-                  <span className="w-6 shrink-0 text-right font-mono text-sm text-[var(--text-muted)]">
-                    {p.number}
+                <Card
+                  className={`flex items-baseline gap-4 px-4 py-2.5 transition-colors hover:border-[var(--accent)] ${i > 0 ? "border-t-0" : ""}`}
+                >
+                  <span className="w-8 shrink-0 text-right text-sm text-[var(--amber)]">
+                    p{p.number}
                   </span>
                   <span className="font-medium">{p.title}</span>
-                  <span className="ml-auto hidden text-xs text-[var(--text-muted)] sm:inline">
+                  <span className="ml-auto hidden text-xs uppercase tracking-wider text-[var(--text-muted)] sm:inline">
                     {p.theme}
                   </span>
                 </Card>
@@ -162,18 +178,18 @@ export function Landing() {
 
       {/* FAQ — rendered from the same source as the FAQPage JSON-LD */}
       <section>
-        <h2 className="text-center text-2xl font-semibold tracking-tight">
+        <h2 className="text-center text-2xl font-bold tracking-tight">
           Frequently asked questions
         </h2>
         <div className="mx-auto mt-6 max-w-2xl space-y-3">
           {FAQ.map(({ q, a }) => (
             <details
               key={q}
-              className="group rounded-lg border border-[var(--border)] bg-[var(--surface-1)] px-5 py-4"
+              className="group border border-[var(--border)] bg-[var(--surface-1)] px-5 py-4"
             >
               <summary className="cursor-pointer list-none font-medium marker:hidden [&::-webkit-details-marker]:hidden">
-                <span className="mr-2 inline-block text-[var(--accent-strong)] transition-transform group-open:rotate-90">
-                  ›
+                <span className="mr-2 inline-block text-[var(--accent)] transition-transform group-open:rotate-90">
+                  &gt;
                 </span>
                 {q}
               </summary>
@@ -187,18 +203,18 @@ export function Landing() {
 
       {/* Closing CTA */}
       <section className="pb-4 text-center">
-        <h2 className="text-2xl font-semibold tracking-tight">
+        <h2 className="text-2xl font-bold tracking-tight">
           The market pays for proof, not promises.
         </h2>
-        <p className="mx-auto mt-2 max-w-xl text-[var(--text-secondary)]">
+        <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-[var(--text-secondary)]">
           Every verified milestone leaves a receipt: probe results, harness
           metrics with your GPU&rsquo;s name on them, merged-PR evidence.
           That&rsquo;s a portfolio, not a certificate.
         </p>
         <div className="mt-6">
           <SignInButton mode="modal">
-            <button className="rounded-lg bg-[var(--accent)] px-5 py-2.5 font-medium text-white hover:bg-[var(--accent-strong)]">
-              Sign in and start earning XP
+            <button className="bg-[var(--accent)] px-5 py-2.5 font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
+              $ sign-in &amp;&amp; earn-xp
             </button>
           </SignInButton>
         </div>

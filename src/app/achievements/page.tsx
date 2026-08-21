@@ -4,6 +4,7 @@ import { SignInButton } from "@clerk/nextjs";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import { useProgress } from "@/lib/progress";
 import { Card } from "@/components/ui";
+import { IconTrophy } from "@/components/icons";
 
 export default function AchievementsPage() {
   const { ready, earnedAchievementIds, synced } = useProgress();
@@ -13,7 +14,7 @@ export default function AchievementsPage() {
   if (!synced) {
     return (
       <div className="mx-auto max-w-md pt-16 text-center">
-        <div className="text-4xl" aria-hidden>🏆</div>
+        <IconTrophy size={36} className="mx-auto text-[var(--amber)]" aria-hidden />
         <h1 className="mt-3 text-2xl font-semibold">Achievements</h1>
         <p className="mt-2 text-[var(--text-secondary)]">
           {ACHIEVEMENTS.length} badges — from your first task to verified
@@ -21,7 +22,7 @@ export default function AchievementsPage() {
         </p>
         <div className="mt-5">
           <SignInButton mode="modal">
-            <button className="rounded-lg bg-[var(--accent)] px-5 py-2.5 font-medium text-white hover:bg-[var(--accent-strong)]">
+            <button className="bg-[var(--accent)] px-5 py-2.5 font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)]">
               Sign in
             </button>
           </SignInButton>
@@ -46,11 +47,23 @@ export default function AchievementsPage() {
             <Card
               key={a.id}
               className={`flex items-center gap-3 px-4 py-3 ${
-                earned ? "" : "opacity-50 grayscale"
+                earned ? "" : "opacity-55"
               }`}
             >
-              <span className="text-3xl" aria-hidden>
-                {a.emoji}
+              <span
+                aria-hidden
+                className={`flex h-10 w-10 shrink-0 items-center justify-center border text-xs font-extrabold tracking-widest ${
+                  earned
+                    ? "border-[var(--accent)] bg-[var(--accent-track)] text-[var(--accent)]"
+                    : "border-[var(--border)] text-[var(--text-muted)]"
+                }`}
+              >
+                {a.title
+                  .split(/\s+/)
+                  .map((w) => w[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
               </span>
               <div>
                 <div className="font-medium">

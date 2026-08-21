@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { useProgress } from "@/lib/progress";
+import { IconBolt, IconFlame } from "@/components/icons";
 import { levelForXP } from "@/lib/levels";
 
 const LINKS = [
@@ -23,8 +24,12 @@ export function Nav() {
   return (
     <header className="sticky top-0 z-10 border-b border-[var(--hairline)] bg-[var(--surface-1)]/90 backdrop-blur">
       <div className="mx-auto flex w-full max-w-4xl items-center gap-4 px-4 py-3 sm:px-6">
-        <Link href="/" className="text-base font-semibold tracking-tight">
-          ⚡ InferQuest
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.2em]"
+        >
+          <IconBolt size={15} className="text-[var(--accent)]" />
+          InferQuest
         </Link>
         <nav className="flex gap-1 text-sm">
           {LINKS.map((l) => {
@@ -35,9 +40,9 @@ export function Nav() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`rounded-md px-2.5 py-1 transition-colors ${
+                className={`px-2.5 py-1 transition-colors ${
                   active
-                    ? "bg-[var(--accent-track)] font-medium text-[var(--text-primary)]"
+                    ? "bg-[var(--accent-track)] font-medium text-[var(--accent)]"
                     : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 }`}
               >
@@ -49,7 +54,13 @@ export function Nav() {
         <div className="ml-auto flex items-center gap-3 text-sm text-[var(--text-secondary)]">
           {showStats && (
             <>
-              <span title="Current streak">🔥 {streak}</span>
+              <span
+                title="Current streak"
+                className="flex items-center gap-1 text-[var(--amber)]"
+              >
+                <IconFlame size={14} />
+                {streak}
+              </span>
               <span
                 className="hidden sm:inline"
                 title={`Level ${level.n} — ${level.title}`}
@@ -60,8 +71,8 @@ export function Nav() {
           )}
           <Show when="signed-out">
             <SignInButton mode="modal">
-              <button className="rounded-md bg-[var(--accent)] px-3 py-1 text-sm font-medium text-white hover:bg-[var(--accent-strong)]">
-                Sign in
+              <button className="border border-[var(--accent)] px-3 py-1 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--on-accent)]">
+                sign in
               </button>
             </SignInButton>
           </Show>

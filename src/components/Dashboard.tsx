@@ -7,6 +7,7 @@ import { ACHIEVEMENTS } from "@/data/achievements";
 import { levelForXP, nextLevel } from "@/lib/levels";
 import { useProgress } from "@/lib/progress";
 import { Heatmap } from "@/components/Heatmap";
+import { IconCycle } from "@/components/icons";
 import { Card, Meter, StatTile } from "@/components/ui";
 
 export function Dashboard() {
@@ -50,8 +51,8 @@ export function Dashboard() {
     <div className="space-y-8">
       {/* Hero: current level + XP toward the next */}
       <section>
-        <div className="text-sm text-[var(--text-secondary)]">
-          Level {level.n}
+        <div className="text-xs font-medium uppercase tracking-[0.25em] text-[var(--amber)]">
+          {"//"} Level {level.n}
         </div>
         <h1 className="text-4xl font-semibold tracking-tight">{level.title}</h1>
         <div className="mt-4 max-w-xl">
@@ -96,7 +97,7 @@ export function Dashboard() {
         <section>
           <Link href="/review" className="block">
             <Card className="flex items-center gap-3 border-[var(--accent)] px-4 py-3 transition-colors hover:border-[var(--accent-strong)]">
-              <span className="text-xl" aria-hidden>🔁</span>
+              <IconCycle size={18} className="shrink-0 text-[var(--accent)]" aria-hidden />
               <div>
                 <div className="font-medium">
                   {reviewsDue} review card{reviewsDue === 1 ? "" : "s"} due
@@ -118,7 +119,7 @@ export function Dashboard() {
             Up next
           </h2>
           <Link href={`/quests/${upNext.id}`} className="block">
-            <Card className="px-4 py-3 transition-colors hover:border-[var(--baseline)]">
+            <Card className="px-4 py-3 transition-colors hover:border-[var(--accent)]">
               <div className="text-xs text-[var(--text-muted)]">
                 {upNext.title}
               </div>
@@ -158,7 +159,7 @@ export function Dashboard() {
             );
             return (
               <Link key={phase.id} href="/quests" className="block">
-                <Card className="px-4 py-3 transition-colors hover:border-[var(--baseline)]">
+                <Card className="px-4 py-3 transition-colors hover:border-[var(--accent)]">
                   <div className="flex items-center justify-between gap-3">
                     <div className="font-medium">
                       {phase.number}. {phase.title}

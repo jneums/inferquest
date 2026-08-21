@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { IconQuiz } from "@/components/icons";
 
 interface CheckQ {
   id: string;
@@ -46,13 +47,13 @@ export function CheckKnowledge({ taskId }: { taskId: string }) {
     <div className="mt-2">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="rounded-full border border-[var(--border)] px-2 py-0.5 text-xs text-[var(--text-secondary)] hover:border-[var(--baseline)]"
+        className="inline-flex items-center gap-1.5 border border-[var(--border)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
       >
-        {open ? "Hide check" : "🧠 Check your knowledge"}
+        {open ? "hide check" : (<><IconQuiz size={11} /> check your knowledge</>)}
       </button>
 
       {open && (
-        <div className="mt-3 rounded-lg border border-[var(--hairline)] bg-[var(--page)] p-3">
+        <div className="mt-3 border border-[var(--hairline)] bg-[var(--page)] p-3">
           {!questions ? (
             <p className="text-sm text-[var(--text-muted)]">Loading…</p>
           ) : (
@@ -98,8 +99,8 @@ export function CheckKnowledge({ taskId }: { taskId: string }) {
                       </label>
                     ))}
                     {r && (
-                      <p className={`text-sm ${r.correct ? "text-[var(--good-text)]" : ""}`}>
-                        {r.correct ? "✅ Correct" : `❌ Answer: ${r.correctChoice}`}{" "}
+                      <p className={`text-sm font-medium ${r.correct ? "text-[var(--good-text)]" : "text-[var(--amber)]"}`}>
+                        {r.correct ? "PASS — correct" : `FAIL — answer: ${r.correctChoice}`}{" "}
                         <span className="text-[var(--text-secondary)]">— {r.explanation}</span>
                       </p>
                     )}
@@ -110,7 +111,7 @@ export function CheckKnowledge({ taskId }: { taskId: string }) {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="rounded-md bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-white hover:bg-[var(--accent-strong)] disabled:opacity-50"
+                  className="bg-[var(--accent)] px-3 py-1.5 text-sm font-bold text-[var(--on-accent)] hover:bg-[var(--accent-strong)] disabled:opacity-50"
                 >
                   {busy ? "Checking…" : "Check answers"}
                 </button>
@@ -121,7 +122,7 @@ export function CheckKnowledge({ taskId }: { taskId: string }) {
                     setResults(null);
                     setAnswers({});
                   }}
-                  className="rounded-md border border-[var(--border)] px-3 py-1.5 text-sm hover:border-[var(--baseline)]"
+                  className="border border-[var(--border)] px-3 py-1.5 text-sm hover:border-[var(--accent)]"
                 >
                   Try again
                 </button>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { QUESTS_BY_ID } from "@/data/curriculum";
 import { useProgress } from "@/lib/progress";
 import type { Quest } from "@/lib/types";
+import { IconCheck, IconLock } from "@/components/icons";
 import { Card, Meter } from "./ui";
 
 export function QuestCard({ quest }: { quest: Quest }) {
@@ -18,13 +19,14 @@ export function QuestCard({ quest }: { quest: Quest }) {
     <Card
       className={`h-full px-4 py-3 transition-colors ${
         unlocked
-          ? "hover:border-[var(--baseline)]"
+          ? "hover:border-[var(--accent)]"
           : "opacity-60"
       }`}
     >
       <div className="flex items-start justify-between gap-2">
-        <div className="font-medium">
-          {complete ? "✅ " : unlocked ? "" : "🔒 "}
+        <div className="flex items-center gap-2 font-medium">
+          {complete && <IconCheck size={14} className="shrink-0 text-[var(--accent)]" />}
+          {!unlocked && <IconLock size={14} className="shrink-0 text-[var(--text-muted)]" />}
           {quest.title}
         </div>
         <span className="whitespace-nowrap text-xs text-[var(--text-muted)]">

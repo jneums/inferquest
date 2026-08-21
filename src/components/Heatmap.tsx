@@ -69,7 +69,7 @@ export function Heatmap({ xpByDay }: { xpByDay: Map<string, number> }) {
                     title={
                       cell.future ? undefined : `${cell.key} — ${xp} XP`
                     }
-                    className="h-3 w-3 rounded-[2px]"
+                    className="h-3 w-3"
                     style={{
                       backgroundColor: cell.future
                         ? "transparent"
@@ -86,7 +86,7 @@ export function Heatmap({ xpByDay }: { xpByDay: Map<string, number> }) {
           {[0, 30, 80, 150, 300].map((v) => (
             <span
               key={v}
-              className="h-3 w-3 rounded-[2px]"
+              className="h-3 w-3"
               style={{ backgroundColor: heatVar(v) }}
             />
           ))}

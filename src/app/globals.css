@@ -1,61 +1,45 @@
 @import "tailwindcss";
 
-/* Design tokens — reference dataviz palette (light), stepped for dark below. */
+/* Phosphor design tokens — terminal/profiler aesthetic, dark-only.
+   Green phosphor accent + amber signal, sharp corners, mono type. */
 :root {
-  color-scheme: light;
-  --page: #f9f9f7;
-  --surface-1: #fcfcfb;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #898781;
-  --hairline: #e1e0d9;
-  --baseline: #c3c2b7;
-  --border: rgba(11, 11, 11, 0.1);
-  --accent: #2a78d6;
-  --accent-strong: #1c5cab;
-  --accent-track: #cde2fb;
-  --good: #0ca30c;
-  --good-text: #006300;
-  /* Sequential blue ramp for the heatmap (near-zero recedes to neutral). */
-  --heat-0: #eeede9;
-  --heat-1: #cde2fb;
-  --heat-2: #9ec5f4;
-  --heat-3: #5598e7;
-  --heat-4: #2a78d6;
+  color-scheme: dark;
+  --page: #0a0d0a;
+  --surface-1: #0e130e;
+  --text-primary: #e8f0e3;
+  --text-secondary: #94a18d;
+  --text-muted: #7d8a76;
+  --hairline: #1a231a;
+  --baseline: #3a4a38;
+  --border: #223022;
+  --accent: #6ee787;
+  --accent-strong: #a3f7b5;
+  --accent-track: #16281a;
+  --on-accent: #0a0d0a;
+  --amber: #ffb454;
+  --good: #6ee787;
+  --good-text: #6ee787;
+  /* Sequential phosphor ramp for the heatmap (zero recedes to neutral). */
+  --heat-0: #161d16;
+  --heat-1: #1e3a24;
+  --heat-2: #2f5c37;
+  --heat-3: #4a9a56;
+  --heat-4: #6ee787;
 }
 
 @theme inline {
   --color-background: var(--page);
   --color-foreground: var(--text-primary);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --page: #0d0d0d;
-    --surface-1: #1a1a19;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --hairline: #2c2c2a;
-    --baseline: #383835;
-    --border: rgba(255, 255, 255, 0.1);
-    --accent: #3987e5;
-    --accent-strong: #6da7ec;
-    --accent-track: #16283f;
-    --good: #0ca30c;
-    --good-text: #0ca30c;
-    --heat-0: #2c2c2a;
-    --heat-1: #184f95;
-    --heat-2: #256abf;
-    --heat-3: #3987e5;
-    --heat-4: #86b6ef;
-  }
+  --font-sans: var(--font-jetbrains);
+  --font-mono: var(--font-jetbrains);
 }
 
 body {
   background: var(--page);
   color: var(--text-primary);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
 }
