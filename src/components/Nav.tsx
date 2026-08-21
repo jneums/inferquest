@@ -17,8 +17,8 @@ export function Nav() {
   const pathname = usePathname();
   const { ready, synced, xp, streak } = useProgress();
   const level = levelForXP(xp);
-  // Don't render an empty "profile" for fresh anonymous visitors.
-  const showStats = ready && (synced || xp > 0);
+  // Stats exist only for signed-in users.
+  const showStats = ready && synced;
 
   return (
     <header className="sticky top-0 z-10 border-b border-[var(--hairline)] bg-[var(--surface-1)]/90 backdrop-blur">

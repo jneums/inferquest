@@ -65,8 +65,8 @@ export function Landing() {
           </Link>
         </div>
         <p className="mt-3 text-xs text-[var(--text-muted)]">
-          No account needed to explore — sign in when you want progress saved
-          and verifiers unlocked.
+          The full curriculum is open to browse — sign in (free) to track
+          progress, take the drills, and unlock the verifiers.
         </p>
       </section>
 

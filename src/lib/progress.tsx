@@ -6,30 +6,25 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
-  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { useUser } from "@clerk/nextjs";
 import { QUESTS, QUESTS_BY_ID, TASKS_BY_ID } from "@/data/curriculum";
 import { ACHIEVEMENTS } from "@/data/achievements";
-import type { ProgressState, Quest, XPEvent } from "./types";
+import type { Quest, XPEvent } from "./types";
 import type { CheckResult } from "@/server/verifiers/net";
-
-const STORAGE_KEY = "inference-engineer-progress-v1";
-const MERGED_FLAG = "inferquest-merged-v1";
-
-/** Curriculum tasks plus synthetic daily-review completions. */
-function isKnownEventId(id: string): boolean {
-  return TASKS_BY_ID.has(id) || /^review-\d{4}-\d{2}-\d{2}$/.test(id);
-}
 
 export function todayKey(d = new Date()): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
+}
+
+/** Curriculum tasks plus synthetic daily-review completions. */
+function isKnownEventId(id: string): boolean {
+  return TASKS_BY_ID.has(id) || /^review-\d{4}-\d{2}-\d{2}$/.test(id);
 }
 
 function addDays(key: string, n: number): string {
@@ -61,65 +56,6 @@ function computeStreaks(dates: Set<string>): {
   return { current, longest };
 }
 
-// ── localStorage store (anonymous visitors) ─────────────────────────────────
-
-const DEFAULT_STATE: ProgressState = { version: 1, events: [] };
-
-function parseState(raw: string | null): ProgressState {
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw) as ProgressState;
-      if (parsed.version === 1 && Array.isArray(parsed.events)) {
-        parsed.events = parsed.events.filter((e) => isKnownEventId(e.taskId));
-        return parsed;
-      }
-    } catch {
-      // Corrupt storage — start fresh rather than crash.
-    }
-  }
-  return DEFAULT_STATE;
-}
-
-let cachedRaw: string | null = null;
-let cachedState: ProgressState = DEFAULT_STATE;
-const listeners = new Set<() => void>();
-
-function getSnapshot(): ProgressState {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw !== cachedRaw) {
-    cachedRaw = raw;
-    cachedState = parseState(raw);
-  }
-  return cachedState;
-}
-
-function getServerSnapshot(): ProgressState {
-  return DEFAULT_STATE;
-}
-
-function subscribe(onChange: () => void): () => void {
-  listeners.add(onChange);
-  window.addEventListener("storage", onChange);
-  return () => {
-    listeners.delete(onChange);
-    window.removeEventListener("storage", onChange);
-  };
-}
-
-function updateLocalState(updater: (prev: ProgressState) => ProgressState): void {
-  const next = updater(getSnapshot());
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  } catch {
-    // Storage full or unavailable — progress just won't persist.
-  }
-  cachedRaw = localStorage.getItem(STORAGE_KEY);
-  cachedState = next;
-  listeners.forEach((l) => l());
-}
-
-// ── React context ───────────────────────────────────────────────────────────
-
 export interface VerifyOutcome {
   passed: boolean;
   checks: CheckResult[];
@@ -127,9 +63,9 @@ export interface VerifyOutcome {
 }
 
 export interface Progress {
-  /** False until the active source (localStorage or API) has loaded. */
+  /** False until Clerk has resolved (and, when signed in, progress loaded). */
   ready: boolean;
-  /** True when progress is backed by the server (signed in). */
+  /** True when signed in — the only mode with progress. */
   synced: boolean;
   events: XPEvent[];
   doneTaskIds: Set<string>;
@@ -143,27 +79,18 @@ export interface Progress {
   submitVerification: (taskId: string, submission: unknown) => Promise<VerifyOutcome>;
   isQuestUnlocked: (questId: string) => boolean;
   questCompletion: (questId: string) => { done: number; total: number };
-  resetAll: () => void;
 }
 
 const ProgressContext = createContext<Progress | null>(null);
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const { isSignedIn, isLoaded, user } = useUser();
-  const localState = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const hydrated = useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false,
-  );
 
-  // Server progress is keyed by user id, so a signed-out render (or a
-  // different user) simply doesn't match — no reset-on-signout state writes.
+  // Server progress, keyed by user id so a stale user's data never renders.
   const [serverState, setServerState] = useState<{
     forUser: string;
     events: XPEvent[];
   } | null>(null);
-  const mergeStarted = useRef(false);
 
   const loadServer = useCallback(async (uid: string) => {
     const res = await fetch("/api/progress");
@@ -176,32 +103,11 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // On sign-in: one-time merge of pre-signup localStorage progress, then load.
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !user?.id) {
-      mergeStarted.current = false;
-      return;
-    }
+    if (!isLoaded || !isSignedIn || !user?.id) return;
     const uid = user.id;
     let cancelled = false;
     (async () => {
-      const flag = `${MERGED_FLAG}:${uid}`;
-      const local = getSnapshot().events;
-      if (!localStorage.getItem(flag) && local.length > 0 && !mergeStarted.current) {
-        mergeStarted.current = true;
-        try {
-          await fetch("/api/progress/merge", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              events: local.map((e) => ({ taskId: e.taskId, date: e.date })),
-            }),
-          });
-          localStorage.setItem(flag, "1");
-        } catch {
-          // merge is best-effort; the toggle path still works
-        }
-      }
       if (!cancelled) await loadServer(uid);
     })();
     return () => {
@@ -216,18 +122,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     (taskId: string) => {
       const task = TASKS_BY_ID.get(taskId);
       if (!task || task.verifier) return;
-      const date = todayKey();
-      if (!synced) {
-        updateLocalState((prev) => {
-          const exists = prev.events.some((e) => e.taskId === taskId);
-          const events = exists
-            ? prev.events.filter((e) => e.taskId !== taskId)
-            : [...prev.events, { taskId, xp: task.xp, date, at: Date.now() }];
-          return { ...prev, events };
-        });
-        return;
-      }
       if (!serverReady || !serverState) return;
+      const date = todayKey();
       const exists = serverState.events.some((e) => e.taskId === taskId);
       const optimistic = exists
         ? serverState.events.filter((e) => e.taskId !== taskId)
@@ -241,7 +137,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         if (!res.ok) loadServer(serverState.forUser); // revert to server truth
       });
     },
-    [synced, serverReady, serverState, loadServer],
+    [serverReady, serverState, loadServer],
   );
 
   const submitVerification = useCallback(
@@ -265,18 +161,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [synced, user, loadServer],
   );
 
-  const resetAll = useCallback(() => {
-    if (!synced) updateLocalState(() => ({ version: 1, events: [] }));
-    // Server-side reset is deliberately not exposed — completions are earned.
-  }, [synced]);
-
   const value = useMemo<Progress>(() => {
-    const events = synced
-      ? serverReady
-        ? serverState!.events
-        : []
-      : localState.events;
-    const ready = synced ? serverReady : hydrated;
+    const events = serverReady ? serverState!.events : [];
+    const ready = synced ? serverReady : isLoaded;
     const doneTaskIds = new Set(events.map((e) => e.taskId));
     const xp = events.reduce((s, e) => s + e.xp, 0);
     const xpByDay = new Map<string, number>();
@@ -322,18 +209,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       submitVerification,
       isQuestUnlocked,
       questCompletion,
-      resetAll,
     };
-  }, [
-    synced,
-    serverReady,
-    serverState,
-    localState,
-    hydrated,
-    toggleTask,
-    submitVerification,
-    resetAll,
-  ]);
+  }, [synced, serverReady, serverState, isLoaded, toggleTask, submitVerification]);
 
   return (
     <ProgressContext.Provider value={value}>

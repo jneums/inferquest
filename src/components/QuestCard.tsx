@@ -7,11 +7,12 @@ import type { Quest } from "@/lib/types";
 import { Card, Meter } from "./ui";
 
 export function QuestCard({ quest }: { quest: Quest }) {
-  const { isQuestUnlocked, questCompletion } = useProgress();
-  const unlocked = isQuestUnlocked(quest.id);
+  const { synced, isQuestUnlocked, questCompletion } = useProgress();
+  // Signed-out visitors browse everything as a read-only preview.
+  const unlocked = !synced || isQuestUnlocked(quest.id);
   const { done, total } = questCompletion(quest.id);
   const totalXP = quest.tasks.reduce((s, t) => s + t.xp, 0);
-  const complete = done === total;
+  const complete = synced && done === total;
 
   const body = (
     <Card
@@ -33,7 +34,11 @@ export function QuestCard({ quest }: { quest: Quest }) {
       <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
         {quest.tagline}
       </p>
-      {unlocked ? (
+      {!synced ? (
+        <p className="mt-3 text-xs text-[var(--text-muted)]">
+          {total} tasks
+        </p>
+      ) : unlocked ? (
         <div className="mt-3 flex items-center gap-2">
           <Meter value={done} max={total} className="flex-1" />
           <span className="text-xs text-[var(--text-muted)]">

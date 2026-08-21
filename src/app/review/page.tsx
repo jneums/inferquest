@@ -54,7 +54,15 @@ export default function ReviewPage() {
   }, []);
 
   useEffect(() => {
-    if (synced) load();
+    if (!synced) return;
+    let cancelled = false;
+    (async () => {
+      // All state updates happen after the fetch resolves, never synchronously.
+      if (!cancelled) await load();
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [synced, load]);
 
   if (!ready) return <div className="min-h-[50vh]" />;

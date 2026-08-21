@@ -9,7 +9,7 @@ import { Card, Meter } from "@/components/ui";
 
 export function QuestDetail({ id }: { id: string }) {
   const quest = QUESTS_BY_ID.get(id);
-  const { isQuestUnlocked, questCompletion } = useProgress();
+  const { synced, isQuestUnlocked, questCompletion } = useProgress();
 
   if (!quest) notFound();
 
@@ -42,7 +42,14 @@ export function QuestDetail({ id }: { id: string }) {
         </div>
       </div>
 
-      {!unlocked && (
+      {!synced && (
+        <Card className="border-[var(--accent)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+          👀 You&rsquo;re previewing the curriculum. Sign in (top right) to
+          track progress, take knowledge checks, and unlock the verifiers.
+        </Card>
+      )}
+
+      {synced && !unlocked && (
         <Card className="border-[var(--baseline)] px-4 py-3 text-sm text-[var(--text-secondary)]">
           🔒 This quest is locked — it unlocks when{" "}
           {quest.prereqs

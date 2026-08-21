@@ -6,7 +6,29 @@ import { useProgress } from "@/lib/progress";
 import { Card } from "@/components/ui";
 
 export default function AchievementsPage() {
-  const { earnedAchievementIds, synced, resetAll } = useProgress();
+  const { ready, earnedAchievementIds, synced } = useProgress();
+
+  if (!ready) return <div className="min-h-[50vh]" />;
+
+  if (!synced) {
+    return (
+      <div className="mx-auto max-w-md pt-16 text-center">
+        <div className="text-4xl" aria-hidden>🏆</div>
+        <h1 className="mt-3 text-2xl font-semibold">Achievements</h1>
+        <p className="mt-2 text-[var(--text-secondary)]">
+          {ACHIEVEMENTS.length} badges — from your first task to verified
+          merged PRs and 30-day review streaks. Sign in to start earning them.
+        </p>
+        <div className="mt-5">
+          <SignInButton mode="modal">
+            <button className="rounded-lg bg-[var(--accent)] px-5 py-2.5 font-medium text-white hover:bg-[var(--accent-strong)]">
+              Sign in
+            </button>
+          </SignInButton>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -52,35 +74,10 @@ export default function AchievementsPage() {
         <h2 className="text-sm font-medium text-[var(--text-secondary)]">
           Your data
         </h2>
-        {synced ? (
-          <p className="text-sm text-[var(--text-muted)]">
-            Progress is saved to your account, including verification receipts
-            (probe results, harness metrics, merged-PR evidence).
-          </p>
-        ) : (
-          <div className="text-sm text-[var(--text-muted)]">
-            <p>
-              You&apos;re browsing anonymously — progress lives only in this
-              browser.{" "}
-              <SignInButton mode="modal">
-                <button className="font-medium text-[var(--accent-strong)] underline underline-offset-2">
-                  Sign in
-                </button>
-              </SignInButton>{" "}
-              to save it to an account (your local progress is imported
-              automatically) and to unlock verified tasks.
-            </p>
-            <button
-              onClick={() => {
-                if (confirm("Reset local progress? This cannot be undone."))
-                  resetAll();
-              }}
-              className="mt-2 rounded-md border border-[var(--border)] px-3 py-1.5 text-[var(--text-muted)] hover:border-[var(--baseline)]"
-            >
-              Reset local progress
-            </button>
-          </div>
-        )}
+        <p className="text-sm text-[var(--text-muted)]">
+          Progress is saved to your account, including verification receipts
+          (probe results, harness metrics, merged-PR evidence).
+        </p>
       </section>
     </div>
   );

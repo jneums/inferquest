@@ -162,7 +162,7 @@ async function checkLinks() {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 15000);
       try {
-        let res = await fetch(u, {
+        const res = await fetch(u, {
           method: "GET",
           redirect: "follow",
           signal: controller.signal,

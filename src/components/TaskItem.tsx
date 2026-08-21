@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SignInButton } from "@clerk/nextjs";
 import { useProgress } from "@/lib/progress";
 import type { Task } from "@/lib/types";
 import { CHECK_TASK_IDS } from "@/data/checkTasks";
@@ -9,14 +10,24 @@ import { VerifyPanel } from "./VerifyPanel";
 import { KindChip, XPPill } from "./ui";
 
 export function TaskItem({ task }: { task: Task }) {
-  const { doneTaskIds, toggleTask } = useProgress();
+  const { synced, doneTaskIds, toggleTask } = useProgress();
   const done = doneTaskIds.has(task.id);
   const verified = Boolean(task.verifier);
   const [open, setOpen] = useState(false);
 
   return (
     <li className="flex gap-3 border-b border-[var(--hairline)] py-3 last:border-b-0">
-      {verified ? (
+      {!synced ? (
+        <SignInButton mode="modal">
+          <button
+            className="mt-0.5 w-4 shrink-0 text-center opacity-60"
+            title="Sign in to track progress"
+            aria-label="Sign in to track progress"
+          >
+            🔒
+          </button>
+        </SignInButton>
+      ) : verified ? (
         <span className="mt-0.5 w-4 shrink-0 text-center" title="Completed by automated verification" aria-hidden>
           {done ? "✅" : "🛡️"}
         </span>
@@ -31,8 +42,8 @@ export function TaskItem({ task }: { task: Task }) {
       )}
       <div className="min-w-0 flex-1">
         <label
-          htmlFor={verified ? undefined : `task-${task.id}`}
-          onClick={verified ? () => setOpen((o) => !o) : undefined}
+          htmlFor={verified || !synced ? undefined : `task-${task.id}`}
+          onClick={synced && verified ? () => setOpen((o) => !o) : undefined}
           className={`cursor-pointer font-medium ${
             done ? "text-[var(--text-muted)] line-through" : ""
           }`}
@@ -47,12 +58,17 @@ export function TaskItem({ task }: { task: Task }) {
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
           <KindChip kind={task.kind} />
           <XPPill xp={task.xp} />
-          {verified && !done && (
+          {verified && (
+            <span className="rounded-full border border-[var(--accent)] px-2 py-0.5 text-xs font-medium text-[var(--accent-strong)]">
+              🛡️ Auto-verified
+            </span>
+          )}
+          {synced && verified && !done && (
             <button
               onClick={() => setOpen((o) => !o)}
-              className="rounded-full border border-[var(--accent)] px-2 py-0.5 text-xs font-medium text-[var(--accent-strong)]"
+              className="rounded-full border border-[var(--border)] px-2 py-0.5 text-xs text-[var(--text-secondary)] hover:border-[var(--baseline)]"
             >
-              {open ? "Hide verifier" : "🛡️ Verify"}
+              {open ? "Hide verifier" : "Verify"}
             </button>
           )}
           {task.link && (
@@ -66,8 +82,8 @@ export function TaskItem({ task }: { task: Task }) {
             </a>
           )}
         </div>
-        {verified && (open || done) && <VerifyPanel task={task} />}
-        {CHECK_TASK_IDS.has(task.id) && <CheckKnowledge taskId={task.id} />}
+        {synced && verified && (open || done) && <VerifyPanel task={task} />}
+        {synced && CHECK_TASK_IDS.has(task.id) && <CheckKnowledge taskId={task.id} />}
       </div>
     </li>
   );
