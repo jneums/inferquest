@@ -42,7 +42,7 @@ export function Landing() {
       {/* Hero */}
       <section className="pt-8 text-center">
         <p className="text-sm font-medium uppercase tracking-wide text-[var(--accent-strong)]">
-          The verified path into LLM serving
+          InferQuest — the verified path into LLM serving
         </p>
         <h1 className="mx-auto mt-3 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
           Become an inference engineer.
@@ -68,6 +68,33 @@ export function Landing() {
         <p className="mt-3 text-xs text-[var(--text-muted)]">
           The full curriculum is open to browse — sign in (free) to track
           progress, take the drills, and unlock the verifiers.
+        </p>
+      </section>
+
+      {/* What is InferQuest — explicit purpose statement (also required by
+          Google OAuth verification: the home page must name the app and
+          describe what it does) */}
+      <section className="mx-auto max-w-2xl text-center">
+        <h2 className="text-2xl font-semibold tracking-tight">
+          What is InferQuest?
+        </h2>
+        <p className="mt-3 text-[var(--text-secondary)]">
+          <strong>InferQuest</strong> is a free, open, non-commercial web
+          application for learning inference engineering — the craft of
+          serving large language models fast and cheaply. It organizes a
+          complete curriculum into quests and tasks, tracks your progress
+          with XP, levels, and streaks, drills you with graded quizzes and
+          spaced-repetition reviews, and automatically verifies major
+          milestones like deployed endpoints, GPU kernels, and merged
+          open-source pull requests. Signing in (with Google or email) is
+          used only to save that progress to your account — see the{" "}
+          <a
+            href="/privacy"
+            className="text-[var(--accent-strong)] underline underline-offset-2"
+          >
+            privacy policy
+          </a>
+          .
         </p>
       </section>
 
