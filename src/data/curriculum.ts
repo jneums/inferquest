@@ -256,6 +256,10 @@ export const QUESTS: Quest[] = [
     tagline: "MHA → MQA → GQA → MLA, RoPE, and MoE — through the serving lens.",
     phaseId: "p1",
     prereqs: ["gpt-from-scratch"],
+    briefing: [
+      "Read every architecture in this zoo through one lens: what it does to KV bytes per token. MQA and GQA exist because the cache, not the weights, is what caps batch size — so actually do the arithmetic per variant; that arithmetic is the content, not a chore attached to it. MLA is the one to slow down on: latent compression changes both the cache math and what an attention kernel has to do, and it's table stakes now that DeepSeek-shaped models are everywhere.",
+      "EleutherAI's RoPE explainer is assigned alongside RoFormer because the paper's notation is heavier than the idea deserves; YaRN matters because context extension is a serving-time concern, not a training curiosity. Read the MoE material as systems papers — routing is an all-to-all communication problem wearing an ML costume, and it returns with force in the disaggregation quest. The build task is the checkpoint: verifying logits against a real Llama-family model catches the head-interleaving and rotation details that prose lets you gloss over.",
+    ],
     tasks: [
       {
         id: "zoo-mqa",
@@ -453,6 +457,10 @@ export const QUESTS: Quest[] = [
     tagline: "When the cache can't hold everything, something has to give.",
     phaseId: "p2",
     prereqs: ["kv-cache"],
+    briefing: [
+      "StreamingLLM and H2O are paired because they stake out the two poles of the retention question: keep positions (the start plus a sliding window) or keep what attention actually uses (the heavy hitters). The attention-sink finding is worth internalizing on its own — the model dumps attention mass on the first tokens because softmax has to put it somewhere, and evicting them collapses quality. That's the kind of empirical quirk that separates people who've read the papers from people who've read the tweets.",
+      "The vLLM hybrid-KV doc is the production counterweight: sliding-window and Mamba-style layers break the uniform-block assumption from PagedAttention, and someone has to make the block tables cope. The through-line to watch in the survey: every eviction and compression scheme trades quality for capacity somewhere invisible, which is why the eval discipline from the quantization phase applies here verbatim.",
+    ],
     tasks: [
       {
         id: "lc-sinks",
@@ -489,6 +497,10 @@ export const QUESTS: Quest[] = [
     tagline: "The capstone: a real serving engine, probed live by InferQuest.",
     phaseId: "p2",
     prereqs: ["batching-scheduling"],
+    briefing: [
+      "nano-vllm is the blueprint because it's the rare codebase small enough to read end-to-end yet honest enough to contain the real ideas — prefix caching, tensor parallelism, CUDA graphs, in about 1.2k lines. Read it before writing a line of yours, then resist copying it: the point of the build is discovering why each piece exists by needing it.",
+      "The details the probe grades are chosen deliberately — SSE framing with [DONE], usage accounting, max_tokens cutoffs, error shapes — because that's where real engines leak. Give per-request cancellation particular respect: a client disconnecting mid-stream has to free its KV blocks and leave the batch cleanly, and “streaming token generator with cancellation” shows up as a literal coding exercise at serving companies. This capstone is also load-bearing later: the flash-attention quest asks you to swap your own kernel into this engine and keep the probe green.",
+    ],
     tasks: [
       {
         id: "engine-nano",
@@ -533,6 +545,10 @@ export const QUESTS: Quest[] = [
     tagline: "PMPP + GPU MODE: the canonical on-ramp.",
     phaseId: "p3",
     prereqs: ["kv-cache"],
+    briefing: [
+      "PMPP is the one true textbook here, and chapters 1–6 are the load-bearing ones: the execution model (grids, blocks, warps) and the memory hierarchy are the two mental models every kernel you'll ever write leans on. GPU MODE rides alongside because it's the closest thing this niche has to a guild — practitioner lectures that recap PMPP with war stories, and a Discord that posts jobs. The Stephen Jones talks are the sleeper pick: nobody explains why GPUs are shaped this way — latency hiding through massive oversubscription — better, and that “why” is what survives after API details fade.",
+      "Watch for the occupancy trap early: occupancy is a means (enough warps in flight to hide latency), not a score to maximize, and chasing it produces slow kernels with beautiful occupancy numbers. And don't skip the humble vector-add task — the load_inline workflow it teaches is how you'll iterate on every kernel through Phase 4.",
+    ],
     tasks: [
       {
         id: "cuda-pmpp-1",
@@ -581,6 +597,10 @@ export const QUESTS: Quest[] = [
     tagline: "The rite of passage: chase cuBLAS.",
     phaseId: "p3",
     prereqs: ["cuda-foundations"],
+    briefing: [
+      "Boehm's worklog is the rite of passage because it teaches the method, not just the kernel: change one thing, profile, explain the delta, repeat. Each rung has a name you'll reuse forever — coalescing, shared-memory tiling, vectorized loads, warp tiling — and the biggest single jump is coalescing, which is why memory-access patterns, not FLOPs, are the first thing to check in any slow kernel. The flash-attention quest will ask you to produce a worklog of your own in exactly this genre; it's a known door-opener.",
+      "The 40%-of-cuBLAS bar is set where it is on purpose: reachable with tiling done right, unreachable by accident. Don't skip the reduction/scan/histogram patterns afterward — reductions are the skeleton of softmax, layernorm, and RMSNorm, which is to say most of what an inference kernel engineer actually ships.",
+    ],
     tasks: [
       {
         id: "matmul-boehm",
@@ -619,6 +639,10 @@ export const QUESTS: Quest[] = [
     tagline: "Nsight is your microscope; the roofline is your map.",
     phaseId: "p3",
     prereqs: ["cuda-foundations"],
+    briefing: [
+      "The two Nsight tools answer different questions, and people conflate them constantly: Systems shows the timeline — where the GPU sits idle between kernels, the silent killer in inference — while Compute shows the inside of one kernel. Learn to read the SOL section and the memory charts; that screenshot is the lingua franca of every performance discussion. The roofline drill is here because it's the most reliable interview filter in the field: given a workload's arithmetic intensity, say which side of the ridge it lands on and what that implies. Prefill and decode land on opposite sides — that's the entire field in one picture.",
+      "CUDA graphs close the loop on the overhead bottleneck from the very first quest: a decode step launches hundreds of tiny kernels, launch overhead swamps them, so engines capture the step once and replay it. And do the memory-snapshot task for real — the caching allocator and fragmentation OOMs are genuine on-call work, not curriculum filler.",
+    ],
     tasks: [
       {
         id: "prof-nsys",
@@ -676,6 +700,10 @@ export const QUESTS: Quest[] = [
     tagline: "torch.compile is load-bearing in vLLM V1 — stop treating it as magic.",
     phaseId: "p3",
     prereqs: ["cuda-foundations"],
+    briefing: [
+      "This quest exists because vLLM V1 made torch.compile part of the engine: the model graph is compiled piecewise, split at the attention ops, and the pieces get captured into CUDA graphs — so “the compiler is magic” stops being a tenable position for anyone who wants to work on the engine. Trigger a recompile on purpose and watch the logs, because unexpected recompiles from dynamic shapes are the production footgun: a latency spike with no visible cause until you know where to look.",
+      "The Inductor task is the best demystification trick in the stack: TORCH_LOGS=output_code shows you the Triton the compiler writes, fusion and tiling decisions laid bare. Reading generated kernels right before Phase 4 asks you to write your own is deliberate sequencing — you arrive with a working example of what good pointer math looks like.",
+    ],
     tasks: [
       {
         id: "compile-basics",
@@ -713,6 +741,10 @@ export const QUESTS: Quest[] = [
     tagline: "Python-first kernels are how 2026 writes them.",
     phaseId: "p4",
     prereqs: ["matmul-mastery"],
+    briefing: [
+      "Leaning on the official tutorials isn't laziness — they're maintained by the compiler's own authors and sequenced exactly right: vector add teaches the programming model, fused softmax teaches the fusion win, matmul teaches block-level tiling, and fused attention previews the next quest. Triton's bargain is that you think in blocks and pointer arithmetic while the compiler handles warp-level details — which is why the stride math from Under the Tensor comes back here as code you literally write.",
+      "The grader's two failure modes are taken from real life: odd shapes (masking has to be right when the row doesn't divide the block) and large logits (the max-subtraction trick from your from-scratch attention — it never stops mattering). Landing within 1.25× of torch.softmax proves you actually fused the passes rather than transliterated numpy.",
+    ],
     tasks: [
       {
         id: "triton-tutorials",
@@ -753,6 +785,10 @@ export const QUESTS: Quest[] = [
     tagline: "Online softmax, IO-awareness, and the kernel that defined the era.",
     phaseId: "p4",
     prereqs: ["triton-track"],
+    briefing: [
+      "The UW note beats the FlashAttention paper as the entry point because the whole kernel falls out of one algebraic trick — the online-softmax rescaling — and the note derives it in a few pages where the paper assumes it. Do the algebra by hand; the Triton kernel is that algebra transcribed, plus tiling. The CS149 CPU rung in between is the best pedagogical bridge anyone has built: watching the N×N intermediate shrink from megabytes to kilobytes turns “IO-awareness” from a slogan into something you saw happen. That is the paper's actual claim — fewer HBM reads, not fewer FLOPs.",
+      "In the lineage, read FA2 the most carefully (the work-partitioning fixes are where the practical speedup lives) and FA3 for what Hopper-era hardware demands: warp specialization and TMA. The back half of the quest is deliberately portfolio-shaped — your kernel inside your engine with the probe still green, a Boehm-style worklog, a leaderboard submission — because this is the phase whose artifacts kernel-team interviews actually ask to see.",
+    ],
     tasks: [
       {
         id: "fa-derivation",
@@ -852,6 +888,10 @@ export const QUESTS: Quest[] = [
     tagline: "GPTQ → AWQ → FP8 default → NVFP4/MXFP4 frontier.",
     phaseId: "p5",
     prereqs: ["kv-cache"],
+    briefing: [
+      "The GPTQ/AWQ/SmoothQuant trio is assigned together because the field's real content is the comparison: three different answers to the same enemy, activation outliers. Once you see that outliers are the whole story — GPTQ repairs the damage with second-order information, AWQ protects the channels activations say are salient, SmoothQuant migrates the difficulty from activations into weights — three algorithms to memorize collapse into one argument. Interviews ask exactly this compare-and-contrast.",
+      "Hold the two-tier frame from the formats task: FP8 W8A8 is the boring production default; block-scaled 4-bit (NVFP4, MXFP4) is where the frontier moved with Blackwell, and frontier models now ship natively in it. KIVI's asymmetry is the memorable detail — keys have channel-wise outlier structure and values don't, hence per-channel keys and per-token values — and FP8 KV is the nearest-to-free 2× capacity win in serving, which plugs this quest straight back into the cache arithmetic.",
+    ],
     tasks: [
       {
         id: "quant-visual",
@@ -911,6 +951,10 @@ export const QUESTS: Quest[] = [
     tagline: "Quantization without evals is vandalism.",
     phaseId: "p5",
     prereqs: ["quant-theory"],
+    briefing: [
+      "The from-scratch quantizer comes first because scale-and-zero-point per group is trivial to describe and instructive to get exactly right — the grader's outlier-heavy weights show you precisely why per-tensor fails, which is the entire motivation of the theory quest made concrete. The sensitivity scan is the professional habit hiding in the middle: measure where the model is fragile and spend precision there, before reaching for anyone's uniform recipe.",
+      "llm-compressor and lm-eval-harness are the production pairing — one produces the checkpoint vLLM actually loads, the other tells you what it cost you. The discipline this quest teaches is the tagline: a speedup number without a quality delta next to it is not a result. Publish the regressions too — honest numbers are rarer than good ones, and hiring managers can tell the difference.",
+    ],
     tasks: [
       {
         id: "quant-scratch-harness",
@@ -975,6 +1019,10 @@ export const QUESTS: Quest[] = [
     tagline: "Not 'can use it' — 'has read it'.",
     phaseId: "p6",
     prereqs: ["build-an-engine"],
+    briefing: [
+      "The Anatomy post is the closest thing to a textbook chapter on a production engine, and the task's V1 warning is load-bearing: the internet is thick with V0-era posts describing a scheduler that no longer exists, and repeating them in an interview is a tell. The request-trace task is the real work of this quest — writing down every file and class one request touches is the difference between “has used vLLM” and “has read it,” and it's the exact preparation for landing PRs in the Arena phase.",
+      "When you tune the fleet deployment, one-knob-at-a-time with a results table isn't pedantry: several knobs interact (chunked-prefill budget against prefix-cache hit rate, quantized KV against batch capacity), and the table of what each did on your hardware is both how you'll genuinely understand them and a good interview artifact in its own right.",
+    ],
     tasks: [
       {
         id: "vllm-anatomy",
@@ -1018,6 +1066,10 @@ export const QUESTS: Quest[] = [
     tagline: "Two engines, one methodology, publishable numbers.",
     phaseId: "p6",
     prereqs: ["vllm-deep"],
+    briefing: [
+      "SGLang earns co-billing because job postings list it as vLLM's equal and because RadixAttention is a genuinely different idea: the KV cache as a prefix tree shared across requests, which turns multi-turn and agentic traffic — everyone's traffic now — into a cache-hit problem. The methodology reading sits before the head-to-head on purpose: most published LLM benchmarks are subtly wrong, usually through unrealistic length distributions or a single conflated latency number, and the goal of this quest is to make you incapable of producing one of those.",
+      "Report the head-to-head as Pareto curves with TTFT and ITL separated, and goodput at a stated SLO — a bare tokens/sec claim with no latency constraint is the field's most common lie. That framing carries straight into the observability phase, and the published post at the end is the artifact a laptop-bound candidate cannot fake: your numbers, your hardware, reproducible configs.",
+    ],
     tasks: [
       {
         id: "sgl-paper",
@@ -1082,6 +1134,10 @@ export const QUESTS: Quest[] = [
     tagline: "Where production bugs actually live: templates, tools, adapters, modalities.",
     phaseId: "p6",
     prereqs: ["vllm-deep"],
+    briefing: [
+      "This is the least glamorous quest on the map and the one most correlated with being useful on day one: templates, tool parsing, and adapter management are where production incidents actually come from. Take the render-by-hand-and-diff exercise seriously — a chat-template mismatch doesn't error, it silently degrades quality, which makes it the worst class of bug to find. Tool calling is the same story one layer up: model-specific markup turned into OpenAI tool_calls JSON by per-model parsers, streaming deltas included, and every parser is a place things break.",
+      "The multi-LoRA and multimodal tasks are here to break the one-model-one-server mental model — batched adapters share a base, and an embedding server is a different serving profile entirely (no KV cache, latency-critical). The security task's prefix-cache timing side channel is worth the read on its own: a shared cache leaks whether someone else's prompt shared your prefix, which is why cache salting exists. Raising that unprompted reads as senior in a design interview.",
+    ],
     tasks: [
       {
         id: "surf-templates",
@@ -1147,6 +1203,10 @@ export const QUESTS: Quest[] = [
     tagline: "TP, PP, EP — and the math of when each wins.",
     phaseId: "p7",
     prereqs: ["vllm-deep"],
+    briefing: [
+      "“How To Scale Your Model” is the best thing written on this subject, and the inference chapter is why the quest exists — it's TPU-flavored, but the communication math transfers to NVLink unchanged. Megatron is the concrete instantiation: column-parallel then row-parallel means one all-reduce per attention block and one per MLP, and knowing exactly where those land is what the drill (and interviews) test. TP versus PP is an interconnect-bandwidth question with a numeric answer, not a preference.",
+      "The ring all-reduce build looks like a toy and isn't: reduce-scatter plus all-gather over point-to-point sends is the algorithm inside NCCL, and implementing it once is how bandwidth-optimal collectives stop being folklore. The fleet measurement completes the argument — TP=2 will not give you 2×, and the decomposed explanation of why, per-layer all-reduce cost against your actual interconnect, is the lesson rather than the disappointment.",
+    ],
     tasks: [
       {
         id: "par-scaling-book",
@@ -1216,6 +1276,10 @@ export const QUESTS: Quest[] = [
     tagline: "The 2025-26 production frontier.",
     phaseId: "p7",
     prereqs: ["parallelism"],
+    briefing: [
+      "DistServe supplies the frame the industry adopted: colocated prefill and decode contaminate each other's latency, so split them and optimize each against its own SLO — “goodput per GPU” is the phrase that survived. Mooncake is the proof at production scale, with the further idea that the KV cache is the center of the architecture, tiered across DRAM and SSD. The LMSYS expert-parallelism writeup is the single best account of modern MoE serving, and it's what makes the TP-vs-EP build meaningful: implement both, find the crossover, and the all-to-all pattern from the MoE papers becomes muscle memory.",
+      "The infrastructure survey — Dynamo, NIXL, LMCache, llm-d — is here because KV movement grew into a subsystem with job requisitions attached; be able to say what each piece does in one sentence. Same logic for the Kubernetes task: KV-aware load balancing is a GA gateway primitive now, and the K8s layer has stopped being someone else's problem.",
+    ],
     tasks: [
       {
         id: "dis-distserve",
@@ -1283,6 +1347,10 @@ export const QUESTS: Quest[] = [
     tagline: "If it isn't graphed, it isn't served.",
     phaseId: "p8",
     prereqs: ["vllm-deep"],
+    briefing: [
+      "This quest is short because the skill is a discipline, not a literature. The vLLM metrics doc tells you what the engine already exports — KV utilization, queue depth, TTFT histograms — and the work is wiring it up so the fleet alerts before OOM, not after. The OTel GenAI conventions are a quick read with a career-shaped reason attached: the standard is young enough that knowing it puts you ahead of most incumbents, and naming conventions are how your observability work stays legible to other teams.",
+      "Over-invest in the SLO task: define TTFT/ITL targets, run load, report the percentage of requests meeting both. That's goodput — the DistServe framing made operational — and it appears nearly verbatim in serving-team job postings, Anthropic's included.",
+    ],
     tasks: [
       {
         id: "obs-metrics",
@@ -1315,6 +1383,10 @@ export const QUESTS: Quest[] = [
     tagline: "GPU-hour → tokens → margin, from first principles.",
     phaseId: "p8",
     prereqs: ["observability"],
+    briefing: [
+      "The tensoreconomics piece is the best published derivation of cost per token from first principles — it connects the bandwidth arithmetic from the KV-cache quest to dollars, a translation most engineers never learn to make. InferenceMAX is the methodology reference: cost claims as Pareto frontiers across hardware with stated assumptions, no single-number cherry-picking. Read it as a template for making a cost claim you'd defend under cross-examination.",
+      "Then the assignment only you can do: the cost model for your own fleet — amortized hardware and power, through measured throughput, to $/M tokens per model and quantization. You have what almost no candidate has, your own GPUs and real bills, and the resulting write-up is your single best piece of interview evidence. This is the quest where the founder story and the job hunt become the same project.",
+    ],
     tasks: [
       {
         id: "econ-first-principles",
@@ -1360,6 +1432,10 @@ export const QUESTS: Quest[] = [
     tagline: "Cold starts, autoscaling signals, and the build-vs-buy math.",
     phaseId: "p8",
     prereqs: ["observability"],
+    briefing: [
+      "The cold-start task teaches the method that generalizes: measure the whole path — provision, image pull, weight load, engine init — as a stacked bar, then attack the biggest bar. On most stacks that's weight loading, which is why streaming loaders and snapshotting techniques exist. The autoscaling reading has a one-sentence takeaway worth the whole task: CPU/GPU utilization and QPS are the wrong scaling signals for LLM workloads, in-flight concurrency is the right one, and Little's Law is the queueing intuition that says why.",
+      "The last two tasks are the architecture-interview layer: serverless-versus-self-hosted crossovers, GPU selection, routing that knows about prefix caches and KV utilization, and the standing fact that offline batch inference is the cheapest tokens you'll ever serve. None of it is deep individually — the skill is having the whole decision tree loaded when a design prompt opens with “you have a spiky workload and a budget.”",
+    ],
     tasks: [
       {
         id: "elas-coldstart",
@@ -1405,6 +1481,10 @@ export const QUESTS: Quest[] = [
     tagline: "Merged PRs into the engines everyone runs.",
     phaseId: "p9",
     prereqs: ["vllm-deep"],
+    briefing: [
+      "The repo allowlist is the hiring-signal list — vLLM above all (Red Hat, which employs much of its core team, literally lists contribution familiarity as a plus), with SGLang and FlashInfer counting equally. The request trace you wrote in vLLM, Deeply is your map here: the best first issues are the ones you can locate in that trace within minutes. Expect the social half — CI, review latency, maintainer taste — to be half the work, and budget patience for it; that isn't friction around the skill, it is the skill.",
+      "The three verified PRs escalate deliberately: the first proves you can land anything at all, the second — performance or correctness, benchmark numbers in the description — proves you can do the actual job, and the third turns a data point into a pattern. A hiring manager scanning your GitHub sees exactly that progression, which is why the ladder is shaped this way.",
+    ],
     tasks: [
       {
         id: "oss-first-issue",
@@ -1482,6 +1562,10 @@ export const QUESTS: Quest[] = [
     tagline: "The interview, drilled until it's boring.",
     phaseId: "p9",
     prereqs: ["parallelism", "economics"],
+    briefing: [
+      "Everything here is reverse-engineered from real reported loops, and the structural fact to plan around is that they're bimodal: NVIDIA-style rounds still ask timed LeetCode while Baseten/Modal-style rounds hand you practical infrastructure, so drill both — plus the rising buggy-file round, where you get 300 lines with a planted bug in masking or sampling and thirty minutes to find it. The gauntlet quiz's 80% bar is interview calibration, not course calibration; passing it bored is the goal, per the tagline.",
+      "Do the design drills literally out loud, alone, timed — the gap between understanding a batching system and narrating one against a clock is exactly what the real round measures. And rehearse the attribution question until it's reflexive: “what percentage of the total improvement came from the thing YOU optimized?” Every speedup claimed in the resume rewrite needs that decomposition ready.",
+    ],
     tasks: [
       {
         id: "gauntlet-quiz",
@@ -1533,6 +1617,10 @@ export const QUESTS: Quest[] = [
     tagline: "Convert the work into the title.",
     phaseId: "p9",
     prereqs: ["open-source-arena", "interview-gauntlet"],
+    briefing: [
+      "The archetype ordering in the target list is deliberate: engine, platform, and field teams hire against exactly the artifacts this roadmap produced — verified endpoints, benchmark posts, merged PRs, a cost model from your own fleet — while kernel-specialist roles want a deeper Phase 4 portfolio, so they wait until those artifacts are strong. Apply in batches rather than serially: loops run for weeks, and parallel processes are offer leverage at the end.",
+      "Treat the first loop as a calibration exercise you expect to fumble. Write down every question you couldn't nail and feed it back into the gauntlet before the loops you actually care about — that feedback cycle, not any single prep session, is what converts the work into the title.",
+    ],
     tasks: [
       {
         id: "offer-targets",
