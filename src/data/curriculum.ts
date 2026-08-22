@@ -1021,7 +1021,7 @@ export const QUESTS: Quest[] = [
     prereqs: ["build-an-engine"],
     briefing: [
       "The Anatomy post is the closest thing to a textbook chapter on a production engine, and the task's V1 warning is load-bearing: the internet is thick with V0-era posts describing a scheduler that no longer exists, and repeating them in an interview is a tell. The request-trace task is the real work of this quest — writing down every file and class one request touches is the difference between “has used vLLM” and “has read it,” and it's the exact preparation for landing PRs in the Arena phase.",
-      "When you tune the fleet deployment, one-knob-at-a-time with a results table isn't pedantry: several knobs interact (chunked-prefill budget against prefix-cache hit rate, quantized KV against batch capacity), and the table of what each did on your hardware is both how you'll genuinely understand them and a good interview artifact in its own right.",
+      "When you tune your deployment, one-knob-at-a-time with a results table isn't pedantry: several knobs interact (chunked-prefill budget against prefix-cache hit rate, quantized KV against batch capacity), and the table of what each did on your hardware is both how you'll genuinely understand them and a good interview artifact in its own right.",
     ],
     tasks: [
       {
@@ -1042,7 +1042,7 @@ export const QUESTS: Quest[] = [
       },
       {
         id: "vllm-deploy",
-        title: "Deploy vLLM on the fleet and tune it",
+        title: "Deploy vLLM on your fleet and tune it",
         kind: "build",
         xp: 150,
         link: "https://docs.vllm.ai",
@@ -1164,7 +1164,7 @@ export const QUESTS: Quest[] = [
         xp: 90,
         link: "https://docs.vllm.ai/en/latest/features/reasoning_outputs.html",
         detail:
-          "Deploy one reasoning model on the fleet: separate reasoning_content, cap thinking budgets, and measure what long decodes do to your ITL and cost math.",
+          "Deploy one reasoning model on your fleet: separate reasoning_content, cap thinking budgets, and measure what long decodes do to your ITL and cost math.",
       },
       {
         id: "surf-lora",
@@ -1205,7 +1205,7 @@ export const QUESTS: Quest[] = [
     prereqs: ["vllm-deep"],
     briefing: [
       "“How To Scale Your Model” is the best thing written on this subject, and the inference chapter is why the quest exists — it's TPU-flavored, but the communication math transfers to NVLink unchanged. Megatron is the concrete instantiation: column-parallel then row-parallel means one all-reduce per attention block and one per MLP, and knowing exactly where those land is what the drill (and interviews) test. TP versus PP is an interconnect-bandwidth question with a numeric answer, not a preference.",
-      "The ring all-reduce build looks like a toy and isn't: reduce-scatter plus all-gather over point-to-point sends is the algorithm inside NCCL, and implementing it once is how bandwidth-optimal collectives stop being folklore. The fleet measurement completes the argument — TP=2 will not give you 2×, and the decomposed explanation of why, per-layer all-reduce cost against your actual interconnect, is the lesson rather than the disappointment.",
+      "The ring all-reduce build looks like a toy and isn't: reduce-scatter plus all-gather over point-to-point sends is the algorithm inside NCCL, and implementing it once is how bandwidth-optimal collectives stop being folklore. The scaling measurement completes the argument — TP=2 will not give you 2×, and the decomposed explanation of why, per-layer all-reduce cost against your actual interconnect, is the lesson rather than the disappointment.",
     ],
     tasks: [
       {
@@ -1255,7 +1255,7 @@ export const QUESTS: Quest[] = [
       },
       {
         id: "par-tp-run",
-        title: "Run TP≥2 on the fleet and measure scaling efficiency",
+        title: "Run TP≥2 on your fleet and measure scaling efficiency",
         kind: "bench",
         xp: 150,
         detail: "It will not be 2×. Explaining exactly why (NVLink vs PCIe, all-reduce cost per layer) is the lesson.",
@@ -1348,13 +1348,13 @@ export const QUESTS: Quest[] = [
     phaseId: "p8",
     prereqs: ["vllm-deep"],
     briefing: [
-      "This quest is short because the skill is a discipline, not a literature. The vLLM metrics doc tells you what the engine already exports — KV utilization, queue depth, TTFT histograms — and the work is wiring it up so the fleet alerts before OOM, not after. The OTel GenAI conventions are a quick read with a career-shaped reason attached: the standard is young enough that knowing it puts you ahead of most incumbents, and naming conventions are how your observability work stays legible to other teams.",
+      "This quest is short because the skill is a discipline, not a literature. The vLLM metrics doc tells you what the engine already exports — KV utilization, queue depth, TTFT histograms — and the work is wiring it up so your fleet alerts before OOM, not after. The OTel GenAI conventions are a quick read with a career-shaped reason attached: the standard is young enough that knowing it puts you ahead of most incumbents, and naming conventions are how your observability work stays legible to other teams.",
       "Over-invest in the SLO task: define TTFT/ITL targets, run load, report the percentage of requests meeting both. That's goodput — the DistServe framing made operational — and it appears nearly verbatim in serving-team job postings, Anthropic's included.",
     ],
     tasks: [
       {
         id: "obs-metrics",
-        title: "Wire vLLM /metrics into Prometheus + Grafana on the fleet",
+        title: "Wire vLLM /metrics into Prometheus + Grafana on your fleet",
         kind: "build",
         xp: 150,
         link: "https://docs.vllm.ai/en/latest/design/metrics.html",
@@ -1385,7 +1385,7 @@ export const QUESTS: Quest[] = [
     prereqs: ["observability"],
     briefing: [
       "The tensoreconomics piece is the best published derivation of cost per token from first principles — it connects the bandwidth arithmetic from the KV-cache quest to dollars, a translation most engineers never learn to make. InferenceMAX is the methodology reference: cost claims as Pareto frontiers across hardware with stated assumptions, no single-number cherry-picking. Read it as a template for making a cost claim you'd defend under cross-examination.",
-      "Then the assignment only you can do: the cost model for your own fleet — amortized hardware and power, through measured throughput, to $/M tokens per model and quantization. You have what almost no candidate has, your own GPUs and real bills, and the resulting write-up is your single best piece of interview evidence. This is the quest where the founder story and the job hunt become the same project.",
+      "Then the capstone: a cost model for the hardware you actually run — amortized hardware and power, through measured throughput, to $/M tokens per model and quantization. Almost nobody walks into an interview with a cost model built from real bills and real measured throughput, which is what makes the write-up at the end one of the strongest artifacts on this roadmap.",
     ],
     tasks: [
       {
@@ -1410,14 +1410,14 @@ export const QUESTS: Quest[] = [
         kind: "build",
         xp: 150,
         detail:
-          "Amortized hardware + power → $/M tokens at measured throughput, per model and quantization. This spreadsheet is interview gold for a founder.",
+          "Amortized hardware + power → $/M tokens at measured throughput, per model and quantization. This spreadsheet is interview gold.",
       },
       {
         id: "econ-writeup",
-        title: "VERIFIED: publish “How we cut cost per token at Portal Labs”",
+        title: "VERIFIED: publish “How I cut my cost per token”",
         kind: "write",
         xp: 250,
-        detail: "The founder story with real numbers. Your single best piece of evidence.",
+        detail: "The cost story with real numbers from your own hardware. Your single best piece of evidence.",
         verifier: {
           type: "url",
           mustContainAny: ["cost", "token", "inference", "gpu"],
@@ -1444,7 +1444,7 @@ export const QUESTS: Quest[] = [
         xp: 120,
         link: "https://modal.com/docs/guide/cold-start",
         detail:
-          "Time vLLM vs SGLang from process start to first token on the fleet, break it down by stage, then attack the biggest bar (weight loading, compile time, snapshotting techniques).",
+          "Time vLLM vs SGLang from process start to first token on your fleet, break it down by stage, then attack the biggest bar (weight loading, compile time, snapshotting techniques).",
       },
       {
         id: "elas-autoscale",
