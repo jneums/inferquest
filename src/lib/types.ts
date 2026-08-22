@@ -52,6 +52,12 @@ export interface Quest {
   phaseId: string;
   /** Quest ids that must each be ≥50% complete before this quest unlocks. */
   prereqs: string[];
+  /**
+   * Editorial paragraphs: why these sources over the alternatives, what to
+   * look out for in them, how the quest connects to the rest of the map.
+   * Not a summary of the material — the sources speak for themselves.
+   */
+  briefing?: string[];
   tasks: Task[];
 }
 

@@ -104,6 +104,10 @@ export const QUESTS: Quest[] = [
     tagline: "The three-bottleneck worldview: compute, memory, overhead.",
     phaseId: "p0",
     prereqs: [],
+    briefing: [
+      "Everything in this curriculum reduces to one question: which of the three bottlenecks are you hitting — compute, memory bandwidth, or overhead? Horace He's post is the canonical statement of that taxonomy, and the factory-and-warehouse framing makes arithmetic intensity an intuition instead of a formula to memorize. Pay special attention to the operator-fusion section: it explains why a chain of pointwise ops can be nearly free, and why eager-mode PyTorch sometimes isn't.",
+      "Keep the taxonomy loaded for the rest of the map. The punchline of this whole field is that decode is memory-bandwidth-bound — generating one token streams every weight, plus the entire KV cache, through HBM to do comparatively little math. Batching, quantization, paged KV, speculative decoding: each later quest is an attack on one of the three bottlenecks, and you should always be able to name which one.",
+    ],
     tasks: [
       {
         id: "mm-brrr",
@@ -138,6 +142,10 @@ export const QUESTS: Quest[] = [
     tagline: "What a tensor actually is, and where Python time goes.",
     phaseId: "p0",
     prereqs: [],
+    briefing: [
+      "ezyang's post is years of PyTorch core knowledge in one read, but the sleeper concept is strides: a tensor is a flat buffer plus indexing math, and view/permute/slice never copy anything. That single idea returns later as paged-KV block tables, Triton pointer arithmetic, and coalesced-access analysis — which is why the strided-tensor build is here and isn't skippable, even though it feels like a detour.",
+      "py-spy earns its slot because the third bottleneck — overhead — is usually Python. In a real engine, the model runs on GPU but the scheduler, API server, and detokenizer are host code, and profiling is how you find out when they're the actual ceiling. Run it against something real you own, not a toy.",
+    ],
     tasks: [
       {
         id: "pt-ezyang",
@@ -183,6 +191,10 @@ export const QUESTS: Quest[] = [
     tagline: "Build GPT-2 from nothing, load real weights, sample text.",
     phaseId: "p1",
     prereqs: ["mental-models"],
+    briefing: [
+      "Karpathy's video is the on-ramp of choice because he doesn't present a transformer — he derives one, starting from a bigram model, so every block exists to solve a problem you've already felt. When you build yours, two details sink most re-implementations: layernorm placement (GPT-2 is pre-LN, plus a final layernorm after the last block) and softmax stability (subtract the row max — the attention grader feeds you large logits on purpose). And when real weights produce rambling text, check transposes before anything else: the HF GPT-2 checkpoint stores its linear layers Conv1D-style.",
+      "The tokenizer video looks optional and isn't. BPE explains half of all “weird LLM behavior,” and streaming detokenization — why an engine can't just emit one string per token — is a genuine serving problem you'll meet again in the engine-building phase. The sampling zoo, meanwhile, is verbatim interview material at multiple serving companies.",
+    ],
     tasks: [
       {
         id: "fp-karpathy",
@@ -296,6 +308,10 @@ export const QUESTS: Quest[] = [
     tagline: "The single most important idea in LLM serving.",
     phaseId: "p2",
     prereqs: ["gpt-from-scratch"],
+    briefing: [
+      "kipply's post is the highest-leverage read on the whole map: half a dozen small formulas — KV bytes per token, FLOPs per token, bandwidth-implied latency floors — that turn “inference is slow” from vibes into arithmetic. The reason the task says do the math by hand is that the derived numbers (how many concurrent sequences fit next to the weights on an 80 GB card, why decode saturates bandwidth long before compute) are exactly what the sizing drill and a remarkable share of real interviews ask.",
+      "The cached-decoder build makes the core asymmetry visceral: prefill is compute-bound and parallel, decode is bandwidth-bound and one-token-at-a-time. Every scheduling paper in the next quest exists because of that asymmetry — arrive there with it in your bones.",
+    ],
     tasks: [
       {
         id: "kv-arithmetic",
@@ -338,6 +354,10 @@ export const QUESTS: Quest[] = [
     tagline: "Continuous batching is why serving companies exist.",
     phaseId: "p2",
     prereqs: ["kv-cache"],
+    briefing: [
+      "Read these in order — they're a three-act story. Orca's act: schedule at iteration granularity instead of request granularity, so a finished sequence leaves the batch immediately instead of holding its slot (the Anyscale explainer has the diagrams the paper lacks). PagedAttention's act: apply the OS virtual-memory playbook to the KV cache — fixed-size blocks and a block table kill the fragmentation Orca-style batching creates, and the same indirection later buys prefix caching almost for free. Sarathi's act: chunk long prefills so one fat prompt can't stall everyone else's decode — now default behavior in vLLM.",
+      "The thread to watch across all three is the TTFT-versus-ITL tension: every scheduling choice trades time-to-first-token for someone against inter-token latency for someone else. The drill leans on that tension hard.",
+    ],
     tasks: [
       {
         id: "batch-orca",
@@ -379,6 +399,10 @@ export const QUESTS: Quest[] = [
     tagline: "Free tokens, provably distribution-preserving.",
     phaseId: "p2",
     prereqs: ["kv-cache"],
+    briefing: [
+      "Leviathan et al. is short, and the entire value is the proof: accept a draft token with probability min(1, p/q), resample from the normalized residual on rejection, and the output distribution is exactly the target model's — not approximately, exactly. Work it until you can reproduce it on a whiteboard; that precise question gets asked, and hand-waving it is the tell interviewers look for.",
+      "The lineage task is there because EAGLE won — drafting from the target's own hidden features beat separate draft models, and EAGLE-3 now ships as the default speculative method in the major engines, with DeepSeek-V3's MTP showing the idea migrating into the base model itself. The judgment call to look out for: speculation spends spare bandwidth, so at high batch sizes — where decode is no longer leaving bandwidth on the table — it can make throughput worse. Knowing when not to speculate is the senior answer.",
+    ],
     tasks: [
       {
         id: "spec-leviathan",

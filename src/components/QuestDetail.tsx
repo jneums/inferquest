@@ -63,6 +63,24 @@ export function QuestDetail({ id }: { id: string }) {
         </Card>
       )}
 
+      {quest.briefing && quest.briefing.length > 0 && (
+        <div className="border-t-[3px] border-[var(--ink)] pt-6">
+          <div className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+            Briefing
+          </div>
+          <div className="mt-5 max-w-2xl space-y-4">
+            {quest.briefing.map((p) => (
+              <p
+                key={p.slice(0, 40)}
+                className="text-base leading-relaxed text-[var(--text-secondary)]"
+              >
+                {p}
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="border-t-[3px] border-[var(--ink)] pt-6">
         <div className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
           Tasks
