@@ -23,7 +23,7 @@ export function Nav() {
 
   return (
     <header className="sticky top-0 z-10 border-b-[3px] border-[var(--ink)] bg-[var(--page)]/95 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-4xl items-center gap-4 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 sm:px-6">
         <Link
           href="/"
           className="flex items-center gap-2 text-base font-extrabold tracking-tight"
@@ -31,7 +31,7 @@ export function Nav() {
           <span aria-hidden className="h-3 w-3 bg-[var(--accent)]" />
           InferQuest
         </Link>
-        <nav className="flex gap-1 text-sm font-medium">
+        <nav className="order-last -mx-2 w-full flex gap-1 text-sm font-medium sm:order-none sm:mx-0 sm:w-auto">
           {LINKS.map((l) => {
             const active =
               l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
@@ -40,7 +40,7 @@ export function Nav() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`px-2.5 py-1 transition-colors ${
+                className={`px-2 py-1 transition-colors sm:px-2.5 ${
                   active
                     ? "font-bold text-[var(--text-primary)] underline decoration-[var(--accent)] decoration-2 underline-offset-4"
                     : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
