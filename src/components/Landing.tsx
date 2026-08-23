@@ -24,18 +24,18 @@ const VERIFIERS = [
   },
   {
     icon: IconBolt,
-    title: "GPU-graded kernels",
-    body: "A local harness grades your attention, KV cache, Triton softmax, tiled matmul, flash attention, quantizer, and ring all-reduce on your own hardware — correctness against references AND measured speed.",
+    title: "GPU-graded kernels & training runs",
+    body: "A local harness grades your kernels — attention, KV cache, Triton softmax, flash attention, quantizer, ring all-reduce — AND your training runs: first convergence, a measured ≥1.5× speedup, an adapter fine-tune that must not forget, all under fixed token budgets on your own hardware.",
   },
   {
     icon: IconMerge,
     title: "Merged-PR checks",
-    body: "The open-source milestones verify against the GitHub API that your PRs into vLLM, SGLang, FlashInfer & co. actually exist, actually merged, and aren't typo fixes.",
+    body: "The open-source milestones verify against the GitHub API that your PRs into vLLM, SGLang, FlashInfer, TRL, torchtitan, nanochat & co. actually exist, actually merged, and aren't typo fixes.",
   },
   {
     icon: IconGrad,
     title: "Graded interview drills",
-    body: "KV-cache sizing math, rooflines, speculative-decoding acceptance, parallelism tradeoffs — graded server-side, answers never shipped to your browser.",
+    body: "KV-cache sizing math, rooflines, speculative-decoding acceptance, scaling-laws and data-curation calls, parallelism tradeoffs — graded server-side, answers never shipped to your browser.",
   },
 ];
 
@@ -77,14 +77,20 @@ export function Landing() {
           InferQuest — verified paths into LLM serving and training
         </p>
         <h1 className="mt-5 max-w-3xl text-5xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-6xl">
-          Become an inference engineer<span className="text-[var(--accent)]">.</span>
+          Serve LLMs. Train LLMs. Prove it
+          <span className="text-[var(--accent)]">.</span>
         </h1>
         <p className="mt-7 max-w-xl text-lg leading-relaxed text-[var(--text-secondary)]">
-          Two free, open roadmaps built from real job-market research:{" "}
-          <strong className="text-[var(--text-primary)]">serve LLMs</strong> fast
-          and cheap, or <strong className="text-[var(--text-primary)]">train
-          them</strong> as good as possible on the cheapest hardware — with
-          milestones that are{" "}
+          Two free, open roadmaps built from real job-market research: make
+          models{" "}
+          <strong className="text-[var(--text-primary)]">
+            fast and cheap
+          </strong>{" "}
+          in production, or make them{" "}
+          <strong className="text-[var(--text-primary)]">
+            as good as possible
+          </strong>{" "}
+          on the cheapest hardware — with milestones that are{" "}
           <span className="text-[var(--accent-strong)]">verified</span>, not
           checked off.
         </p>

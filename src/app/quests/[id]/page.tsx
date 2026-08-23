@@ -20,7 +20,7 @@ export async function generateMetadata({
   const verified = quest.tasks.filter((t) => t.verifier).length;
   return {
     title: `${quest.title} — Phase ${phase?.number}: ${phase?.title}`,
-    description: `${quest.tagline} ${quest.tasks.length} tasks worth ${totalXP} XP${verified > 0 ? `, ${verified} auto-verified` : ""}, in the free InferQuest inference engineering roadmap.`,
+    description: `${quest.tagline} ${quest.tasks.length} tasks worth ${totalXP} XP${verified > 0 ? `, ${verified} auto-verified` : ""}, in InferQuest's free LLM inference & training roadmaps.`,
     alternates: { canonical: `/quests/${id}` },
   };
 }

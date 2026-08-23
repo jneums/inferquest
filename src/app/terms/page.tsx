@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service",
   description:
-    "The terms for using InferQuest: a free, open, as-is learning platform for inference engineering.",
+    "The terms for using InferQuest: a free, open, as-is learning platform for LLM inference and training engineering.",
   alternates: { canonical: "/terms" },
 };
 

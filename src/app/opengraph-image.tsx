@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { PHASES } from "@/data/curriculum";
 import { TOTAL_TASKS, VERIFIED_TASKS } from "@/lib/seo";
 
-export const alt = "InferQuest — Become an Inference Engineer";
+export const alt = "InferQuest — verified paths into LLM serving and training";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -41,7 +41,7 @@ export default function Image() {
               color: "#c23c00",
             }}
           >
-            The verified path into LLM serving
+            Verified paths into LLM serving & training
           </div>
           <div
             style={{
@@ -51,7 +51,7 @@ export default function Image() {
               lineHeight: 1.1,
             }}
           >
-            Become an inference engineer.
+            Serve LLMs. Train LLMs. Prove it.
           </div>
         </div>
         <div style={{ display: "flex", gap: 48, fontSize: 28, color: "#6f6f6a" }}>

@@ -6,7 +6,7 @@ export const SITE_URL =
 
 export const SITE_NAME = "InferQuest";
 
-export const SITE_TITLE = "InferQuest — Become an Inference Engineer";
+export const SITE_TITLE = "InferQuest — Become an Inference or Training Engineer";
 
 export const TOTAL_TASKS = QUESTS.reduce((s, q) => s + q.tasks.length, 0);
 
@@ -22,7 +22,7 @@ export function courseJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Course",
-    name: "InferQuest: The Inference Engineering Roadmap",
+    name: "InferQuest: LLM Inference & Training Engineering Roadmaps",
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     provider: {
@@ -85,7 +85,7 @@ export function questJsonLd(questId: string) {
     teaches: quest.tasks.map((t) => t.title),
     isPartOf: {
       "@type": "Course",
-      name: "InferQuest: The Inference Engineering Roadmap",
+      name: "InferQuest: LLM Inference & Training Engineering Roadmaps",
       url: SITE_URL,
       ...(phase ? { hasPart: `Phase ${phase.number}: ${phase.title}` } : {}),
     },
@@ -111,16 +111,16 @@ export const FAQ: { q: string; a: string }[] = [
     a: "The core inference engineering skills are transformer internals (attention, KV caching, sampling), GPU architecture and CUDA or Triton kernel writing, quantization, continuous batching and paged attention, distributed serving (tensor and pipeline parallelism), and profiling with tools like Nsight. InferQuest's roadmap covers all of these in order, with a verifier gating each major skill.",
   },
   {
+    q: "Can InferQuest teach me to train my own LLM?",
+    a: "Yes — the Model Training path covers exactly that: backprop and optimizers from scratch, data curation with real Common Crawl pipelines, scaling-laws math, the NanoGPT-speedrun efficiency toolkit (Muon, FP8, fused kernels), a GPT-2-class pretraining capstone you can run on one consumer GPU or ~$50 of rented compute, then SFT, LoRA, DPO, and GRPO post-training on a single GPU. It leads to the pretraining, post-training, and RL engineering roles labs are actively hiring for.",
+  },
+  {
     q: "Is InferQuest free? Do I get a certificate?",
     a: "InferQuest is completely free and open. There is no paper certificate — instead, milestones are auto-verified: live probes against your deployed endpoint, GPU-graded kernel submissions, and merged-PR checks against real open-source repos. The result is a portfolio of receipts, which hiring teams weigh far more than a certificate.",
   },
   {
     q: "How long does the roadmap take?",
     a: `Both paths together span ${TOTAL_TASKS} tasks across ${QUESTS.length} quests (${TOTAL_XP.toLocaleString()} XP), sharing a common trunk of fundamentals. An experienced software engineer studying part-time should expect roughly six months to a year for one path end to end — less if you already know PyTorch and CUDA, since early phases are skimmable.`,
-  },
-  {
-    q: "Can InferQuest teach me to train my own LLM?",
-    a: "Yes — the Model Training path covers exactly that: backprop and optimizers from scratch, data curation with real Common Crawl pipelines, scaling-laws math, the NanoGPT-speedrun efficiency toolkit (Muon, FP8, fused kernels), a GPT-2-class pretraining capstone you can run on one consumer GPU or ~$50 of rented compute, then SFT, LoRA, DPO, and GRPO post-training on a single GPU. It leads to the pretraining, post-training, and RL engineering roles labs are actively hiring for.",
   },
   {
     q: "Do I need my own GPU?",
