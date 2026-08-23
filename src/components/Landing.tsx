@@ -3,7 +3,16 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
-import { PATHS, PHASES_BY_ID, QUESTS, TOTAL_XP } from "@/data/curriculum";
+import {
+  PATHS,
+  PHASES,
+  PHASES_BY_ID,
+  QUESTS,
+  TOTAL_XP,
+  exclusiveQuestsForPathPhase,
+  isSharedQuest,
+  questsForPhase,
+} from "@/data/curriculum";
 import { LEVELS } from "@/lib/levels";
 import { FAQ } from "@/lib/seo";
 import { IconPlug, IconBolt, IconMerge, IconGrad } from "@/components/icons";
@@ -169,15 +178,42 @@ export function Landing() {
         </div>
       </Section>
 
-      {/* 03 — The journey: both paths, shared XP ladder */}
-      <Section n="03" title="Two paths, one trunk">
+      {/* 03 — The journey: Foundations trunk, then the two paths */}
+      <Section n="03" title="One trunk, two paths">
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
-          Level up from <strong>{LEVELS[0].title}</strong> to{" "}
+          Everyone starts in <strong>Foundations</strong> — transformer
+          internals, GPU architecture, kernels — then branches. Level up from{" "}
+          <strong>{LEVELS[0].title}</strong> to{" "}
           <strong>{LEVELS[LEVELS.length - 1].title}</strong> on one shared XP
-          ladder; the path titles — Inference Engineer, Training Engineer — are
-          earned as certificates. The fundamentals (GPU architecture, kernels,
-          transformer internals) are one trunk that counts for both.
+          ladder; the path titles — Inference Engineer, Training Engineer —
+          are earned as certificates.
         </p>
+        <div className="mt-8 max-w-2xl">
+          <div className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
+            Foundations — counts for both paths
+          </div>
+          <ol className="mt-3">
+            {PHASES.filter(
+              (p) => !p.pathId && questsForPhase(p.id).every(isSharedQuest),
+            ).map((p, i) => (
+              <li key={p.id}>
+                <Link href="/quests" className="block">
+                  <Card
+                    className={`flex items-baseline gap-4 px-4 py-2.5 transition-colors hover:border-[var(--accent)] ${i > 0 ? "border-t-0" : ""}`}
+                  >
+                    <span className="w-8 shrink-0 text-right text-lg font-extrabold tracking-tight text-[var(--border)]">
+                      {String(p.number).padStart(2, "0")}
+                    </span>
+                    <span className="font-medium">{p.title}</span>
+                    <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] sm:inline">
+                      {p.theme}
+                    </span>
+                  </Card>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </div>
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           {PATHS.map((path) => (
             <div key={path.id}>
@@ -185,30 +221,29 @@ export function Landing() {
                 {path.title}
               </div>
               <ol className="mt-3">
-                {path.phaseIds.map((phaseId, i) => {
-                  const p = PHASES_BY_ID.get(phaseId);
-                  if (!p) return null;
-                  const shared = !p.pathId && path.id !== "inference";
-                  return (
-                    <li key={`${path.id}-${phaseId}`}>
-                      <Link href="/quests" className="block">
-                        <Card
-                          className={`flex items-baseline gap-4 px-4 py-2.5 transition-colors hover:border-[var(--accent)] ${i > 0 ? "border-t-0" : ""}`}
-                        >
-                          <span className="w-8 shrink-0 text-right text-lg font-extrabold tracking-tight text-[var(--border)]">
-                            {String(p.number).padStart(2, "0")}
-                          </span>
-                          <span className={`font-medium ${shared ? "text-[var(--text-muted)]" : ""}`}>
-                            {p.title}
-                          </span>
-                          <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] sm:inline">
-                            {shared ? "shared" : p.theme}
-                          </span>
-                        </Card>
-                      </Link>
-                    </li>
-                  );
-                })}
+                {path.phaseIds
+                  .filter((pid) => exclusiveQuestsForPathPhase(path.id, pid).length > 0)
+                  .map((phaseId, i) => {
+                    const p = PHASES_BY_ID.get(phaseId);
+                    if (!p) return null;
+                    return (
+                      <li key={`${path.id}-${phaseId}`}>
+                        <Link href="/quests" className="block">
+                          <Card
+                            className={`flex items-baseline gap-4 px-4 py-2.5 transition-colors hover:border-[var(--accent)] ${i > 0 ? "border-t-0" : ""}`}
+                          >
+                            <span className="w-8 shrink-0 text-right text-lg font-extrabold tracking-tight text-[var(--border)]">
+                              {String(p.number).padStart(2, "0")}
+                            </span>
+                            <span className="font-medium">{p.title}</span>
+                            <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] sm:inline">
+                              {p.theme}
+                            </span>
+                          </Card>
+                        </Link>
+                      </li>
+                    );
+                  })}
               </ol>
             </div>
           ))}

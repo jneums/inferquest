@@ -2427,6 +2427,35 @@ export function phaseLabel(phase: Phase): string {
     : `Phase ${phase.number}`;
 }
 
+/** Shared-trunk (Foundations) quest: belongs to more than one path. */
+export function isSharedQuest(quest: Quest): boolean {
+  return questPaths(quest).length > 1;
+}
+
+/** Phases containing Foundations quests, in inference-path order. */
+export const FOUNDATION_PHASE_IDS = PATHS_BY_ID
+  .get("inference")!
+  .phaseIds.filter((pid) =>
+    QUESTS.some((q) => q.phaseId === pid && isSharedQuest(q)),
+  );
+
+export function foundationQuestsForPhase(phaseId: string): Quest[] {
+  return QUESTS.filter((q) => q.phaseId === phaseId && isSharedQuest(q));
+}
+
+/** Quests exclusive to one path within a phase (Foundations excluded). */
+export function exclusiveQuestsForPathPhase(
+  pathId: PathId,
+  phaseId: string,
+): Quest[] {
+  return QUESTS.filter(
+    (q) =>
+      q.phaseId === phaseId &&
+      !isSharedQuest(q) &&
+      questPaths(q)[0] === pathId,
+  );
+}
+
 export const QUEST_ID_BY_TASK = new Map(
   QUESTS.flatMap((q) => q.tasks.map((t) => [t.id, q.id] as const)),
 );

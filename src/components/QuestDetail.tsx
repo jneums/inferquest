@@ -31,7 +31,7 @@ export function QuestDetail({ id }: { id: string }) {
         <div className="mt-6 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
           {phase?.pathId === "training" ? "Model Training · " : ""}
           Phase {phase?.number} · {phase?.theme}
-          {questPaths(quest).length > 1 ? " · Shared trunk" : ""}
+          {questPaths(quest).length > 1 ? " · Foundations" : ""}
         </div>
         <h1 className="mt-2 text-4xl font-extrabold tracking-tight">
           {quest.title}
