@@ -1788,7 +1788,7 @@ export const QUESTS: Quest[] = [
         verifier: {
           type: "harness",
           script: "first-convergence",
-          metrics: { val_loss: { op: "<=", value: 2.14 } },
+          metrics: { val_loss: { op: "<=", value: 2.0 } },
         },
       },
     ],
@@ -2148,11 +2148,19 @@ export const QUESTS: Quest[] = [
       },
       {
         id: "chat-m5",
-        title: "MILESTONE: adapter lift without regression",
+        title: "Pass the grader: adapter lift without forgetting",
         kind: "build",
         xp: 200,
         detail:
-          "Produce a rank-capped LoRA that lifts a held-out task without regressing a small suite. Auto-verifier (secret split + regression suite) is in calibration — self-check with your own held-out split for now.",
+          "The harness trains its own base model, then hands it to you frozen with a budget of “language B” — 8 tokens the base has never seen. Return a rank-≤8 LoRA (the harness applies it to ITS base): language B must reach the calibrated band while language A regresses ≤0.1. The two lessons are rehearsal and learning-rate discipline — skip either and watch A collapse.",
+        verifier: {
+          type: "harness",
+          script: "adapter-lift",
+          metrics: {
+            val_loss_b: { op: "<=", value: 1.84 },
+            regression: { op: "<=", value: 0.1 },
+          },
+        },
       },
       {
         id: "chat-nanochat-full",

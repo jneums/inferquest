@@ -11,4 +11,5 @@ SCRIPTS = {
     "ring-allreduce": ("par-allreduce-harness", "ring_allreduce"),
     "first-convergence": ("bp-first-convergence", "first_convergence"),
     "train-speedup": ("fast-m3", "train_speedup"),
+    "adapter-lift": ("chat-m5", "adapter_lift"),
 }

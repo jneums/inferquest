@@ -105,17 +105,17 @@ def entropy_floor():
     return -sum(p * math.log(p) for p in _BRANCH_PROBS)
 
 
-def _successor_table(gen):
-    """For each state, k pseudo-random distinct successor tokens."""
+def _successor_table(gen, lo, hi):
+    """For each state, k pseudo-random distinct successor tokens drawn from
+    [lo, hi). A chain seeded inside that range never leaves it."""
     v = TRAIN_CONFIG["vocab_size"]
-    return [torch.randperm(v, generator=gen)[: len(_BRANCH_PROBS)].tolist() for _ in range(v)]
+    return [
+        (lo + torch.randperm(hi - lo, generator=gen)[: len(_BRANCH_PROBS)]).tolist()
+        for _ in range(v)
+    ]
 
 
-def token_stream(n_tokens, seed=DATA_SEED, offset_choices=0):
-    """Deterministic Markov chain of n_tokens. offset_choices skips ahead in
-    the choice stream so train/val come from disjoint sections."""
-    gen = torch.Generator().manual_seed(seed)
-    table = _successor_table(gen)
+def _walk(table, gen, n_tokens, offset_choices):
     cdf = torch.tensor(_BRANCH_PROBS).cumsum(0)
     total = offset_choices + n_tokens + 1
     u = torch.rand(total, generator=gen)
@@ -127,6 +127,33 @@ def token_stream(n_tokens, seed=DATA_SEED, offset_choices=0):
         if i >= offset_choices:
             out.append(state)
     return torch.tensor(out, dtype=torch.long)
+
+
+def token_stream(n_tokens, seed=DATA_SEED, offset_choices=0):
+    """Deterministic Markov chain of n_tokens — “language A”, which occupies
+    the LOWER half of the vocab. The upper half is reserved for the adapter
+    grader's language B, so adapting to B never has to contradict A.
+    offset_choices skips ahead so train/val come from disjoint sections."""
+    gen = torch.Generator().manual_seed(seed)
+    v = TRAIN_CONFIG["vocab_size"]
+    table = _successor_table(gen, 0, v // 2)
+    return _walk(table, gen, n_tokens, offset_choices)
+
+
+B_SEED_SHIFT = 7919
+B_TOKENS = 8  # sized to the rank cap: rank-8 deltas can represent 8 new
+              # embedding/head rows exactly — like learning new special tokens
+
+
+def language_b_stream(n_tokens, seed=DATA_SEED, offset_choices=0):
+    """“Language B” for the adapter-lift grader: the same generative family
+    on B_TOKENS tokens just above the vocab midpoint — tokens the base model
+    has never seen. Disjoint from A by construction, so a disciplined adapter
+    learns B with (almost) no forgetting of A."""
+    gen = torch.Generator().manual_seed(seed + B_SEED_SHIFT)
+    v = TRAIN_CONFIG["vocab_size"]
+    table = _successor_table(gen, v // 2, v // 2 + B_TOKENS)
+    return _walk(table, gen, n_tokens, offset_choices)
 
 
 def _to_batches(stream, n_batches, seq):
@@ -157,6 +184,42 @@ def val_loss(model, device="cpu", seed=DATA_SEED, seq=SEQ, after_steps=STEPS):
     model.eval()
     losses = []
     for x, y in val_batches(device=device, seed=seed, seq=seq, after_steps=after_steps):
+        logits = model(x)
+        losses.append(F.cross_entropy(logits.view(-1, logits.size(-1)), y.view(-1)).item())
+    model.train()
+    return sum(losses) / len(losses)
+
+
+ADAPT_STEPS = 64  # 64*32*128 = 262,144 adaptation tokens
+
+
+def adapt_batches(device="cpu", steps=ADAPT_STEPS, seed=DATA_SEED):
+    """Language-B budget for the adapter-lift grader. One pass, as ever."""
+    stream = language_b_stream(steps * BATCH * SEQ + 1, seed=seed)
+    for x, y in _to_batches(stream, steps, SEQ):
+        yield x.to(device), y.to(device)
+
+
+def replay_batches(device="cpu", steps=ADAPT_STEPS, seed=DATA_SEED):
+    """Fresh language-A text (same language, past the val shard) for
+    rehearsal during adaptation. Replaying A alongside the B budget is not
+    cheating — preventing forgetting with rehearsal IS the lesson."""
+    stream = token_stream(
+        steps * BATCH * SEQ + 1, seed=seed, offset_choices=(STEPS + 24) * BATCH * SEQ
+    )
+    for x, y in _to_batches(stream, steps, SEQ):
+        yield x.to(device), y.to(device)
+
+
+@torch.no_grad()
+def val_loss_b(model, device="cpu", seed=DATA_SEED):
+    """Held-out language-B shard, disjoint from the adaptation budget."""
+    model.eval()
+    n = VAL_BATCHES * BATCH * SEQ + 1
+    stream = language_b_stream(n, seed=seed, offset_choices=(ADAPT_STEPS + 4) * BATCH * SEQ)
+    losses = []
+    for x, y in _to_batches(stream, VAL_BATCHES, SEQ):
+        x, y = x.to(device), y.to(device)
         logits = model(x)
         losses.append(F.cross_entropy(logits.view(-1, logits.size(-1)), y.view(-1)).item())
     model.train()

@@ -29,12 +29,12 @@ from . import traindata
 
 
 # Calibrated pass band for val loss after the fixed 1M-token budget.
-# From 20-seed reference runs (harness/calibrate.py) on both CPU and an
-# RTX Pro 6000: mean 2.0821, sigma 0.0077, identical across devices —
-# band = mean + max(5*sigma, 0.05) rounded up. The corpus entropy floor
-# is ~1.698; a working AdamW-class loop lands ~2.08, a broken schedule
-# or plain-SGD plateau does not get under the band.
-VAL_LOSS_BAND = 2.14
+# From 20-seed reference runs (harness/calibrate.py) on an RTX Pro 6000
+# (CPU-identical — the fp32 workload reproduces across devices):
+# mean 1.9464, sigma 0.0051, band = mean + max(5*sigma, 0.05) rounded up.
+# The corpus entropy floor is ~1.698; a working AdamW-class loop lands
+# ~1.95, a broken schedule or plain-SGD plateau does not get under.
+VAL_LOSS_BAND = 2.0
 
 
 def grade():
