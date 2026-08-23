@@ -1780,11 +1780,16 @@ export const QUESTS: Quest[] = [
       },
       {
         id: "bp-first-convergence",
-        title: "MILESTONE: first convergence — fixed config, fixed token budget",
+        title: "Pass the grader: first convergence on a fixed token budget",
         kind: "build",
         xp: 150,
         detail:
-          "Train the reference small config on a fixed TinyStories-class token budget to the target val-loss band (20–60 min on an 8 GB GPU). Auto-verifier is in calibration (multi-seed loss bands) — self-check for now; this task converts to a graded harness run.",
+          "The harness owns the workload — a ~1M-param GPT with fixed init on a synthetic corpus with a known entropy floor — and YOUR loop (your optimizer, your schedule) must reach the calibrated val-loss band on exactly one pass of the 1M-token budget. Token budgets, not wall-clock: any GPU passes in under a minute, CPU in ~10.",
+        verifier: {
+          type: "harness",
+          script: "first-convergence",
+          metrics: { val_loss: { op: "<=", value: 2.14 } },
+        },
       },
     ],
   },
@@ -1974,11 +1979,19 @@ export const QUESTS: Quest[] = [
       },
       {
         id: "fast-m3",
-        title: "MILESTONE: make your loop ≥1.5× faster, loss-matched",
+        title: "Pass the grader: train ≥1.5× faster than the baseline, loss-matched",
         kind: "build",
         xp: 200,
         detail:
-          "Same device, interleaved A/B against your own baseline, final loss within the band. Auto-verifier is in calibration — self-check with honest timing for now; this converts to a graded harness run.",
+          "The harness trains its own plain fp32 AdamW baseline on a fixed 1M-token workload, then times YOUR loop on an identical model and budget — same device, so any GPU can pass. ≥1.5× wall-clock with final val loss within 0.05 nats. compile, bf16, fused optimizers, Muon — earn it however you like.",
+        verifier: {
+          type: "harness",
+          script: "train-speedup",
+          metrics: {
+            speedup: { op: ">=", value: 1.5 },
+            loss_gap: { op: "<=", value: 0.05 },
+          },
+        },
       },
     ],
   },

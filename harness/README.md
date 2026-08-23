@@ -12,6 +12,12 @@ python harness/run.py --list        # see the graders
 python harness/run.py softmax-triton
 ```
 
+The Model Training path's graders (`first-convergence`, `train-speedup`) run a
+fixed ~1M-token training workload on a small GPT over a synthetic corpus with
+a known entropy floor — self-contained, no downloads, CPU-tolerable, fast on
+any GPU. `harness/calibrate.py` reproduces the first-convergence pass band
+from multi-seed reference runs.
+
 Each grader's docstring (open `harness/graders/<name>.py`) is the task
 contract: the exact file to create under `harness/solutions/` and the
 function/class signature to implement. The website task says the same thing.

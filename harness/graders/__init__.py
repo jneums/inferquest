@@ -9,4 +9,6 @@ SCRIPTS = {
     "flash-attention-triton": ("triton-flash-harness", "flash_attention_triton"),
     "weight-quantizer": ("quant-scratch-harness", "weight_quantizer"),
     "ring-allreduce": ("par-allreduce-harness", "ring_allreduce"),
+    "first-convergence": ("bp-first-convergence", "first_convergence"),
+    "train-speedup": ("fast-m3", "train_speedup"),
 }
