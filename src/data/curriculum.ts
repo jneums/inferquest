@@ -20,7 +20,7 @@ import type { LearningPath, PathId, Phase, Quest } from "@/lib/types";
 export const PHASES: Phase[] = [
   {
     id: "p0",
-    number: 0,
+    number: 1,
     section: "foundations" as const,
     title: "Bedrock",
     theme: "Mental Models",
@@ -29,7 +29,7 @@ export const PHASES: Phase[] = [
   },
   {
     id: "p1",
-    number: 1,
+    number: 2,
     section: "foundations" as const,
     title: "Transformer Internals",
     theme: "Foundations",
@@ -47,7 +47,7 @@ export const PHASES: Phase[] = [
   },
   {
     id: "p3",
-    number: 2,
+    number: 3,
     section: "foundations" as const,
     title: "GPU Architecture & CUDA",
     theme: "The Metal",
@@ -56,7 +56,7 @@ export const PHASES: Phase[] = [
   },
   {
     id: "p4",
-    number: 3,
+    number: 4,
     section: "foundations" as const,
     title: "Kernel Engineering",
     theme: "Kernelcraft",
@@ -113,7 +113,7 @@ export const PHASES: Phase[] = [
   //    both paths need, with the practice halves staying path-exclusive. ──
   {
     id: "f4",
-    number: 4,
+    number: 5,
     title: "Quantization Theory",
     theme: "Precision",
     section: "foundations" as const,
@@ -122,7 +122,7 @@ export const PHASES: Phase[] = [
   },
   {
     id: "f5",
-    number: 5,
+    number: 6,
     title: "Parallelism",
     theme: "Many GPUs",
     section: "foundations" as const,
@@ -198,7 +198,7 @@ export const PATHS: LearningPath[] = [
 ];
 
 export const QUESTS: Quest[] = [
-  // ═════════════════════════ Phase 0 — Bedrock ═════════════════════════
+  // ═════════════════════════ p0 — Bedrock ═════════════════════════
   {
     id: "mental-models",
     title: "Go Brrrr",
