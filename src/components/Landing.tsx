@@ -10,8 +10,6 @@ import {
   QUESTS,
   TOTAL_XP,
   exclusiveQuestsForPathPhase,
-  isSharedQuest,
-  questsForPhase,
 } from "@/data/curriculum";
 import { LEVELS } from "@/lib/levels";
 import { FAQ } from "@/lib/seo";
@@ -193,9 +191,7 @@ export function Landing() {
             Foundations — counts for both paths
           </div>
           <ol className="mt-3">
-            {PHASES.filter(
-              (p) => !p.pathId && questsForPhase(p.id).every(isSharedQuest),
-            ).map((p, i) => (
+            {PHASES.filter((p) => p.section === "foundations").map((p, i) => (
               <li key={p.id}>
                 <Link href="/quests" className="block">
                   <Card

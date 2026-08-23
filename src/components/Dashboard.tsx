@@ -150,13 +150,7 @@ export function Dashboard() {
           Phases — Foundations
         </h2>
         <div className="space-y-3">
-          {PHASES.filter(
-            (p) =>
-              !p.pathId &&
-              QUESTS.filter((q) => q.phaseId === p.id).every(
-                (q) => (q.paths ?? ["inference"]).length > 1,
-              ),
-          ).map((phase) => {
+          {PHASES.filter((p) => p.section === "foundations").map((phase) => {
             const quests = QUESTS.filter((q) => q.phaseId === phase.id);
             const total = quests.reduce((s, q) => s + q.tasks.length, 0);
             const done = quests.reduce(
@@ -184,13 +178,7 @@ export function Dashboard() {
           Phases — Inference Engineering
         </h2>
         <div className="space-y-3">
-          {PHASES.filter(
-            (p) =>
-              !p.pathId &&
-              QUESTS.filter((q) => q.phaseId === p.id).some(
-                (q) => (q.paths ?? ["inference"]).length === 1,
-              ),
-          ).map((phase) => {
+          {PHASES.filter((p) => p.section === "inference").map((phase) => {
             const quests = QUESTS.filter((q) => q.phaseId === phase.id);
             const total = quests.reduce((s, q) => s + q.tasks.length, 0);
             const done = quests.reduce(
@@ -218,7 +206,7 @@ export function Dashboard() {
           Phases — Model Training
         </h2>
         <div className="space-y-3">
-          {PHASES.filter((p) => p.pathId === "training").map((phase) => {
+          {PHASES.filter((p) => p.section === "training").map((phase) => {
             const quests = QUESTS.filter((q) => q.phaseId === phase.id);
             const total = quests.reduce((s, q) => s + q.tasks.length, 0);
             const done = quests.reduce(

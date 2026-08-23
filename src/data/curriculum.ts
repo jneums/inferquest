@@ -21,6 +21,7 @@ export const PHASES: Phase[] = [
   {
     id: "p0",
     number: 0,
+    section: "foundations" as const,
     title: "Bedrock",
     theme: "Mental Models",
     description:
@@ -29,6 +30,7 @@ export const PHASES: Phase[] = [
   {
     id: "p1",
     number: 1,
+    section: "foundations" as const,
     title: "Transformer Internals",
     theme: "Foundations",
     description:
@@ -36,7 +38,8 @@ export const PHASES: Phase[] = [
   },
   {
     id: "p2",
-    number: 2,
+    number: 1,
+    section: "inference" as const,
     title: "The Inference Engine",
     theme: "Engine Core",
     description:
@@ -44,7 +47,8 @@ export const PHASES: Phase[] = [
   },
   {
     id: "p3",
-    number: 3,
+    number: 2,
+    section: "foundations" as const,
     title: "GPU Architecture & CUDA",
     theme: "The Metal",
     description:
@@ -52,7 +56,8 @@ export const PHASES: Phase[] = [
   },
   {
     id: "p4",
-    number: 4,
+    number: 3,
+    section: "foundations" as const,
     title: "Kernel Engineering",
     theme: "Kernelcraft",
     description:
@@ -60,15 +65,17 @@ export const PHASES: Phase[] = [
   },
   {
     id: "p5",
-    number: 5,
+    number: 2,
+    section: "inference" as const,
     title: "Quantization",
     theme: "Compression",
     description:
-      "From GPTQ/AWQ to the FP8-default, NVFP4/MXFP4 present. Quantize real models with llm-compressor and prove quality with lm-eval.",
+      "Quantization put to work: compress real models with llm-compressor, prove quality with lm-eval, and publish the study. The theory lives in Foundations.",
   },
   {
     id: "p6",
-    number: 6,
+    number: 3,
+    section: "inference" as const,
     title: "Production Serving",
     theme: "Production",
     description:
@@ -76,15 +83,17 @@ export const PHASES: Phase[] = [
   },
   {
     id: "p7",
-    number: 7,
+    number: 4,
+    section: "inference" as const,
     title: "Distributed Inference",
     theme: "Datacenter Scale",
     description:
-      "TP/PP/EP, disaggregated prefill-decode, KV-cache tiering and transfer, MoE serving at scale, and the Kubernetes layer (llm-d, Gateway API, DRA).",
+      "Disaggregated prefill-decode, KV-cache tiering and transfer, MoE serving at scale, and the Kubernetes layer (llm-d, Gateway API, DRA) — built on the Parallelism foundation.",
   },
   {
     id: "p8",
-    number: 8,
+    number: 5,
+    section: "inference" as const,
     title: "Observability & Economics",
     theme: "SLOs & Cost",
     description:
@@ -92,11 +101,33 @@ export const PHASES: Phase[] = [
   },
   {
     id: "p9",
-    number: 9,
+    number: 6,
+    section: "inference" as const,
     title: "The Arena",
     theme: "Proof of Work",
     description:
       "Merged PRs into the engines everyone runs, public benchmarks nobody can argue with, interview gauntlets, and the offer.",
+  },
+
+  // ── Foundations phases carved out of the old mixed phases: theory that
+  //    both paths need, with the practice halves staying path-exclusive. ──
+  {
+    id: "f4",
+    number: 4,
+    title: "Quantization Theory",
+    theme: "Precision",
+    section: "foundations" as const,
+    description:
+      "GPTQ, AWQ and SmoothQuant as one argument about outliers; FP8 as the production default; NVFP4/MXFP4 as the frontier; KV quantization. The theory both serving and training compress with.",
+  },
+  {
+    id: "f5",
+    number: 5,
+    title: "Parallelism",
+    theme: "Many GPUs",
+    section: "foundations" as const,
+    description:
+      "Collectives from scratch, Megatron TP by hand, and the communication math — the shared foundation under both distributed serving and distributed training.",
   },
 
   // ─────────────── Model Training path — its own phases ───────────────
@@ -105,7 +136,7 @@ export const PHASES: Phase[] = [
     number: 1,
     title: "Learning to Learn",
     theme: "Optimization",
-    pathId: "training",
+    section: "training" as const,
     description:
       "The other half of the transformer: gradients, optimizers, and a loop that converges — plus data curation and the scaling-laws math that decides every training run.",
   },
@@ -114,7 +145,7 @@ export const PHASES: Phase[] = [
     number: 2,
     title: "The Speedrun",
     theme: "Efficiency",
-    pathId: "training",
+    section: "training" as const,
     description:
       "The modded-nanoGPT lineage: Muon, FP8, fused kernels, multi-GPU training — then the capstone: pretrain a real GPT-2-class model on your own hardware or fifty dollars.",
   },
@@ -123,7 +154,7 @@ export const PHASES: Phase[] = [
     number: 3,
     title: "Post-Training",
     theme: "SFT & RL",
-    pathId: "training",
+    section: "training" as const,
     description:
       "From base model to assistant to reasoner: SFT, LoRA, DPO, then GRPO/RLVR on a single consumer GPU — the skills the largest training-side hiring category wants.",
   },
@@ -132,7 +163,7 @@ export const PHASES: Phase[] = [
     number: 4,
     title: "Proof",
     theme: "Evals",
-    pathId: "training",
+    section: "training" as const,
     description:
       "Evals are the training world's observability: harnesses, contamination, small-model pitfalls, and publishing models with honest numbers.",
   },
@@ -141,7 +172,7 @@ export const PHASES: Phase[] = [
     number: 5,
     title: "The Open Ladder",
     theme: "Receipts",
-    pathId: "training",
+    section: "training" as const,
     description:
       "Merged PRs into the training stack, the training-flavored interview drilled boring, and the target list for pretraining, post-training, and RL roles.",
   },
@@ -156,13 +187,13 @@ export const PATHS: LearningPath[] = [
     id: "inference",
     title: "Inference Engineering",
     tagline: "Serve LLMs fast and cheap — from KV caches and kernels to production fleets.",
-    phaseIds: ["p0", "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9"],
+    phaseIds: ["p0", "p1", "p2", "p3", "p4", "f4", "p5", "p6", "f5", "p7", "p8", "p9"],
   },
   {
     id: "training",
     title: "Model Training",
     tagline: "Build LLMs and make them as good as possible on the cheapest hardware available.",
-    phaseIds: ["p0", "p1", "t1", "p3", "p4", "p5", "p7", "t2", "t3", "t4", "t5"],
+    phaseIds: ["p0", "p1", "t1", "p3", "p4", "f4", "f5", "t2", "t3", "t4", "t5"],
   },
 ];
 
@@ -966,7 +997,7 @@ export const QUESTS: Quest[] = [
     id: "quant-theory",
     title: "Precision Games",
     tagline: "GPTQ → AWQ → FP8 default → NVFP4/MXFP4 frontier.",
-    phaseId: "p5",
+    phaseId: "f4",
     paths: ["inference", "training"],
     prereqs: ["kv-cache"],
     briefing: [
@@ -1282,7 +1313,7 @@ export const QUESTS: Quest[] = [
     id: "parallelism",
     title: "Parallelism",
     tagline: "TP, PP, EP — and the math of when each wins.",
-    phaseId: "p7",
+    phaseId: "f5",
     paths: ["inference", "training"],
     prereqs: ["vllm-deep"],
     briefing: [
@@ -2420,11 +2451,12 @@ export function questsForPathPhase(pathId: PathId, phaseId: string): Quest[] {
   );
 }
 
-/** Display label that disambiguates per-path phase numbering. */
+/** Display label carrying the section — numbering is per-section. */
 export function phaseLabel(phase: Phase): string {
-  return phase.pathId === "training"
-    ? `Training Phase ${phase.number}`
-    : `Phase ${phase.number}`;
+  const prefix = { foundations: "Foundations", inference: "Inference", training: "Training" }[
+    phase.section
+  ];
+  return `${prefix} Phase ${phase.number}`;
 }
 
 /** Shared-trunk (Foundations) quest: belongs to more than one path. */
@@ -2432,12 +2464,10 @@ export function isSharedQuest(quest: Quest): boolean {
   return questPaths(quest).length > 1;
 }
 
-/** Phases containing Foundations quests, in inference-path order. */
-export const FOUNDATION_PHASE_IDS = PATHS_BY_ID
-  .get("inference")!
-  .phaseIds.filter((pid) =>
-    QUESTS.some((q) => q.phaseId === pid && isSharedQuest(q)),
-  );
+/** Foundations phases in display order. */
+export const FOUNDATION_PHASE_IDS = PHASES.filter(
+  (p) => p.section === "foundations",
+).map((p) => p.id);
 
 export function foundationQuestsForPhase(phaseId: string): Quest[] {
   return QUESTS.filter((q) => q.phaseId === phaseId && isSharedQuest(q));

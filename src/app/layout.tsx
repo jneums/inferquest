@@ -83,8 +83,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </main>
             <footer className="border-t border-[var(--hairline)] py-6 text-center text-sm text-[var(--text-muted)]">
               <p>
-                InferQuest — an open, gamified path into inference
-                engineering, with verified quests.
+                InferQuest — open, gamified paths into LLM inference and
+                training engineering, with verified quests.
               </p>
               <p className="mt-2 space-x-4">
                 <a href="/privacy" className="hover:text-[var(--text-secondary)]">

@@ -41,11 +41,11 @@ function pathComplete(done: Set<string>, pathId: PathId): boolean {
   return questsForPath(pathId).every((q) => q.tasks.every((t) => done.has(t.id)));
 }
 
-const PHASE_EMOJI = [
-  "🪨", "🏛️", "⚙️", "🔩", "⚡", "🗜️", "🏭", "🌐", "📈", "🏆",
-  // Model Training path phases
-  "📉", "🏎️", "💬", "⚖️", "🪜",
-];
+const PHASE_EMOJI: Record<string, string> = {
+  p0: "🪨", p1: "🏛️", p2: "⚙️", p3: "🔩", p4: "⚡", p5: "🗜️",
+  p6: "🏭", p7: "🌐", p8: "📈", p9: "🏆", f4: "🎚️", f5: "🕸️",
+  t1: "📉", t2: "🏎️", t3: "💬", t4: "⚖️", t5: "🪜",
+};
 
 export const ACHIEVEMENTS: AchievementDef[] = [
   {
@@ -192,11 +192,11 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     emoji: "🚀",
     earned: ({ xp }) => levelForXP(xp).n >= 6,
   },
-  ...PHASES.map((phase, i) => ({
+  ...PHASES.map((phase) => ({
     id: `phase-${phase.id}`,
     title: `${phase.theme} Cleared`,
     description: `Complete every task in ${phaseLabel(phase)}: ${phase.title}.`,
-    emoji: PHASE_EMOJI[i] ?? "🏅",
+    emoji: PHASE_EMOJI[phase.id] ?? "🏅",
     earned: ({ doneTaskIds }: AchievementContext) =>
       phaseComplete(doneTaskIds, phase.id),
   })),

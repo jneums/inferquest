@@ -75,15 +75,18 @@ export interface Quest {
   tasks: Task[];
 }
 
+/** Top-level grouping on the quest map. Foundations phases hold the shared
+ * trunk; the other two hold each path's exclusive phases. Numbering is
+ * contiguous WITHIN a section. */
+export type PhaseSection = "foundations" | "inference" | "training";
+
 export interface Phase {
   id: string;
   number: number;
   title: string;
   theme: string;
   description: string;
-  /** Set when a phase is exclusive to one path; omitted = original inference
-   * numbering (these phases may still be shared into other paths' orderings). */
-  pathId?: PathId;
+  section: PhaseSection;
 }
 
 export interface XPEvent {
