@@ -54,7 +54,7 @@ export default async function Image({
               color: "#c23c00",
             }}
           >
-            {`Phase ${phase?.number} · ${phase?.theme}`}
+            {`${phase?.pathId === "training" ? "Model Training · " : ""}Phase ${phase?.number} · ${phase?.theme}`}
           </div>
           <div
             style={{

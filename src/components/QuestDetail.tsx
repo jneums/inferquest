@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PHASES, QUESTS_BY_ID } from "@/data/curriculum";
+import { PHASES, QUESTS_BY_ID, questPaths } from "@/data/curriculum";
 import { useProgress } from "@/lib/progress";
 import { IconEye, IconLock } from "@/components/icons";
 import { TaskItem } from "@/components/TaskItem";
@@ -29,7 +29,9 @@ export function QuestDetail({ id }: { id: string }) {
           ← Quest map
         </Link>
         <div className="mt-6 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
+          {phase?.pathId === "training" ? "Model Training · " : ""}
           Phase {phase?.number} · {phase?.theme}
+          {questPaths(quest).length > 1 ? " · Shared trunk" : ""}
         </div>
         <h1 className="mt-2 text-4xl font-extrabold tracking-tight">
           {quest.title}

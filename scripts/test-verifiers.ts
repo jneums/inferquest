@@ -7,7 +7,7 @@ import { verifyOpenAICompat, verifyLatency } from "../src/server/verifiers/opena
 import { verifyGithubPr } from "../src/server/verifiers/githubPr";
 import { verifyUrl } from "../src/server/verifiers/urlCheck";
 import { verifyHarnessReport } from "../src/server/verifiers/harness";
-import { gradeQuiz } from "../src/server/quizBank";
+import { QUIZZES, gradeQuiz, publicQuiz, servedAnswerKey } from "../src/server/quizBank";
 
 let failures = 0;
 function expect(name: string, cond: boolean, extra = "") {
@@ -186,13 +186,21 @@ async function main() {
   const h4 = verifyHarnessReport({ nonsense: true }, "kv-harness", {});
   expect("harness: malformed report rejected", !h4.passed);
 
-  // Quiz grading
-  const qPass = gradeQuiz("kv-cache-math", [2, 1, 2, 1], 75);
+  // Quiz grading — answers are indexes into the SERVED (shuffled) order
+  const qPass = gradeQuiz("kv-cache-math", servedAnswerKey("kv-cache-math")!, 75);
   expect("quiz: all-correct passes", qPass.passed, JSON.stringify(qPass.evidence));
-  const qFail = gradeQuiz("kv-cache-math", [0, 0, 0, 0], 75);
+  const wrongKey = servedAnswerKey("kv-cache-math")!.map((a) => (a + 1) % 4);
+  const qFail = gradeQuiz("kv-cache-math", wrongKey, 75);
   expect("quiz: all-wrong fails", !qFail.passed);
-  const gauntlet = gradeQuiz("interview-gauntlet", [1, 1, 1, 1, 1, 1, 1, 1], 80);
-  expect("quiz: gauntlet answer key sane", gauntlet.passed, JSON.stringify(gauntlet.evidence));
+  for (const quizId of Object.keys(QUIZZES)) {
+    const g = gradeQuiz(quizId, servedAnswerKey(quizId)!, 80);
+    expect(`quiz: ${quizId} key round-trips through shuffle`, g.passed, JSON.stringify(g.evidence));
+    const served = publicQuiz(quizId)!;
+    const okShuffle = served.questions.every(
+      (q, i) => new Set(q.choices).size === new Set(QUIZZES[quizId].questions[i].choices).size,
+    );
+    expect(`quiz: ${quizId} shuffle preserves choices`, okShuffle);
+  }
 
   console.log(failures === 0 ? "\nALL VERIFIER TESTS PASSED" : `\n${failures} FAILURES`);
   process.exit(failures === 0 ? 0 : 1);

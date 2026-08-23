@@ -1,12 +1,16 @@
-import type { Phase, Quest } from "@/lib/types";
+import type { LearningPath, PathId, Phase, Quest } from "@/lib/types";
 
 /**
- * The complete path: senior SWE → employable inference engineer.
+ * Two paths, one trunk:
+ *  - Inference Engineering: senior SWE → employable inference engineer.
+ *  - Model Training: build LLMs as good as possible on cheap hardware →
+ *    pretraining / post-training / RL engineering roles.
  *
  * Built from 2025–26 job-posting research (Together, Fireworks, Baseten,
- * NVIDIA, OpenAI, Anthropic, xAI, Red Hat/vLLM…), the open curricula the
- * field actually uses (GPU MODE, PMPP, Stanford CS336, CMU MLSys), and the
- * modern serving stack (vLLM V1, SGLang, TensorRT-LLM, Dynamo).
+ * NVIDIA, OpenAI, Anthropic, xAI, Red Hat/vLLM, Liquid, Zyphra, Prime
+ * Intellect, AI2…), the open curricula the field actually uses (GPU MODE,
+ * PMPP, Stanford CS336, CMU MLSys, the HF playbooks), and the modern stacks
+ * (vLLM V1, SGLang, TensorRT-LLM, Dynamo; TRL v1, torchtitan, OLMo 3).
  *
  * Tasks with a `verifier` are completed by automated verification only:
  * server-side endpoint probes, GitHub merge checks, published-URL checks,
@@ -94,6 +98,72 @@ export const PHASES: Phase[] = [
     description:
       "Merged PRs into the engines everyone runs, public benchmarks nobody can argue with, interview gauntlets, and the offer.",
   },
+
+  // ─────────────── Model Training path — its own phases ───────────────
+  {
+    id: "t1",
+    number: 1,
+    title: "Learning to Learn",
+    theme: "Optimization",
+    pathId: "training",
+    description:
+      "The other half of the transformer: gradients, optimizers, and a loop that converges — plus data curation and the scaling-laws math that decides every training run.",
+  },
+  {
+    id: "t2",
+    number: 2,
+    title: "The Speedrun",
+    theme: "Efficiency",
+    pathId: "training",
+    description:
+      "The modded-nanoGPT lineage: Muon, FP8, fused kernels, multi-GPU training — then the capstone: pretrain a real GPT-2-class model on your own hardware or fifty dollars.",
+  },
+  {
+    id: "t3",
+    number: 3,
+    title: "Post-Training",
+    theme: "SFT & RL",
+    pathId: "training",
+    description:
+      "From base model to assistant to reasoner: SFT, LoRA, DPO, then GRPO/RLVR on a single consumer GPU — the skills the largest training-side hiring category wants.",
+  },
+  {
+    id: "t4",
+    number: 4,
+    title: "Proof",
+    theme: "Evals",
+    pathId: "training",
+    description:
+      "Evals are the training world's observability: harnesses, contamination, small-model pitfalls, and publishing models with honest numbers.",
+  },
+  {
+    id: "t5",
+    number: 5,
+    title: "The Open Ladder",
+    theme: "Receipts",
+    pathId: "training",
+    description:
+      "Merged PRs into the training stack, the training-flavored interview drilled boring, and the target list for pretraining, post-training, and RL roles.",
+  },
+];
+
+/**
+ * The two learning paths. Shared phases appear in both orderings; quest
+ * membership is the source of truth (Quest.paths), phase order is display.
+ */
+export const PATHS: LearningPath[] = [
+  {
+    id: "inference",
+    title: "Inference Engineering",
+    tagline: "Serve LLMs fast and cheap — from KV caches and kernels to production fleets.",
+    phaseIds: ["p0", "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9"],
+  },
+  {
+    id: "training",
+    title: "Model Training",
+    tagline: "Build LLMs and make them as good as possible on the cheapest hardware available.",
+    phaseIds: ["p0", "p1", "t1", "p3", "p4", "p5", "p7", "t2", "t3", "t4", "t5"],
+  },
 ];
 
 export const QUESTS: Quest[] = [
@@ -103,6 +173,7 @@ export const QUESTS: Quest[] = [
     title: "Go Brrrr",
     tagline: "The three-bottleneck worldview: compute, memory, overhead.",
     phaseId: "p0",
+    paths: ["inference", "training"],
     prereqs: [],
     briefing: [
       "Everything in this curriculum reduces to one question: which of the three bottlenecks are you hitting — compute, memory bandwidth, or overhead? Horace He's post is the canonical statement of that taxonomy, and the factory-and-warehouse framing makes arithmetic intensity an intuition instead of a formula to memorize. Pay special attention to the operator-fusion section: it explains why a chain of pointwise ops can be nearly free, and why eager-mode PyTorch sometimes isn't.",
@@ -141,6 +212,7 @@ export const QUESTS: Quest[] = [
     title: "Under the Tensor",
     tagline: "What a tensor actually is, and where Python time goes.",
     phaseId: "p0",
+    paths: ["inference", "training"],
     prereqs: [],
     briefing: [
       "ezyang's post is years of PyTorch core knowledge in one read, but the sleeper concept is strides: a tensor is a flat buffer plus indexing math, and view/permute/slice never copy anything. That single idea returns later as paged-KV block tables, Triton pointer arithmetic, and coalesced-access analysis — which is why the strided-tensor build is here and isn't skippable, even though it feels like a detour.",
@@ -190,6 +262,7 @@ export const QUESTS: Quest[] = [
     title: "The Forward Pass",
     tagline: "Build GPT-2 from nothing, load real weights, sample text.",
     phaseId: "p1",
+    paths: ["inference", "training"],
     prereqs: ["mental-models"],
     briefing: [
       "Karpathy's video is the on-ramp of choice because he doesn't present a transformer — he derives one, starting from a bigram model, so every block exists to solve a problem you've already felt. When you build yours, two details sink most re-implementations: layernorm placement (GPT-2 is pre-LN, plus a final layernorm after the last block) and softmax stability (subtract the row max — the attention grader feeds you large logits on purpose). And when real weights produce rambling text, check transposes before anything else: the HF GPT-2 checkpoint stores its linear layers Conv1D-style.",
@@ -255,6 +328,7 @@ export const QUESTS: Quest[] = [
     title: "The Architecture Zoo",
     tagline: "MHA → MQA → GQA → MLA, RoPE, and MoE — through the serving lens.",
     phaseId: "p1",
+    paths: ["inference", "training"],
     prereqs: ["gpt-from-scratch"],
     briefing: [
       "Read every architecture in this zoo through one lens: what it does to KV bytes per token. MQA and GQA exist because the cache, not the weights, is what caps batch size — so actually do the arithmetic per variant; that arithmetic is the content, not a chore attached to it. MLA is the one to slow down on: latent compression changes both the cache math and what an attention kernel has to do, and it's table stakes now that DeepSeek-shaped models are everywhere.",
@@ -544,6 +618,7 @@ export const QUESTS: Quest[] = [
     title: "CUDA Foundations",
     tagline: "PMPP + GPU MODE: the canonical on-ramp.",
     phaseId: "p3",
+    paths: ["inference", "training"],
     prereqs: ["kv-cache"],
     briefing: [
       "PMPP is the one true textbook here, and chapters 1–6 are the load-bearing ones: the execution model (grids, blocks, warps) and the memory hierarchy are the two mental models every kernel you'll ever write leans on. GPU MODE rides alongside because it's the closest thing this niche has to a guild — practitioner lectures that recap PMPP with war stories, and a Discord that posts jobs. The Stephen Jones talks are the sleeper pick: nobody explains why GPUs are shaped this way — latency hiding through massive oversubscription — better, and that “why” is what survives after API details fade.",
@@ -596,6 +671,7 @@ export const QUESTS: Quest[] = [
     title: "Matmul Mastery",
     tagline: "The rite of passage: chase cuBLAS.",
     phaseId: "p3",
+    paths: ["inference", "training"],
     prereqs: ["cuda-foundations"],
     briefing: [
       "Boehm's worklog is the rite of passage because it teaches the method, not just the kernel: change one thing, profile, explain the delta, repeat. Each rung has a name you'll reuse forever — coalescing, shared-memory tiling, vectorized loads, warp tiling — and the biggest single jump is coalescing, which is why memory-access patterns, not FLOPs, are the first thing to check in any slow kernel. The flash-attention quest will ask you to produce a worklog of your own in exactly this genre; it's a known door-opener.",
@@ -638,6 +714,7 @@ export const QUESTS: Quest[] = [
     title: "Profiling & the Roofline",
     tagline: "Nsight is your microscope; the roofline is your map.",
     phaseId: "p3",
+    paths: ["inference", "training"],
     prereqs: ["cuda-foundations"],
     briefing: [
       "The two Nsight tools answer different questions, and people conflate them constantly: Systems shows the timeline — where the GPU sits idle between kernels, the silent killer in inference — while Compute shows the inside of one kernel. Learn to read the SOL section and the memory charts; that screenshot is the lingua franca of every performance discussion. The roofline drill is here because it's the most reliable interview filter in the field: given a workload's arithmetic intensity, say which side of the ridge it lands on and what that implies. Prefill and decode land on opposite sides — that's the entire field in one picture.",
@@ -699,6 +776,7 @@ export const QUESTS: Quest[] = [
     title: "The Compiler Stack",
     tagline: "torch.compile is load-bearing in vLLM V1 — stop treating it as magic.",
     phaseId: "p3",
+    paths: ["inference", "training"],
     prereqs: ["cuda-foundations"],
     briefing: [
       "This quest exists because vLLM V1 made torch.compile part of the engine: the model graph is compiled piecewise, split at the attention ops, and the pieces get captured into CUDA graphs — so “the compiler is magic” stops being a tenable position for anyone who wants to work on the engine. Trigger a recompile on purpose and watch the logs, because unexpected recompiles from dynamic shapes are the production footgun: a latency spike with no visible cause until you know where to look.",
@@ -740,6 +818,7 @@ export const QUESTS: Quest[] = [
     title: "The Triton Track",
     tagline: "Python-first kernels are how 2026 writes them.",
     phaseId: "p4",
+    paths: ["inference", "training"],
     prereqs: ["matmul-mastery"],
     briefing: [
       "Leaning on the official tutorials isn't laziness — they're maintained by the compiler's own authors and sequenced exactly right: vector add teaches the programming model, fused softmax teaches the fusion win, matmul teaches block-level tiling, and fused attention previews the next quest. Triton's bargain is that you think in blocks and pointer arithmetic while the compiler handles warp-level details — which is why the stride math from Under the Tensor comes back here as code you literally write.",
@@ -784,6 +863,7 @@ export const QUESTS: Quest[] = [
     title: "Flash Attention",
     tagline: "Online softmax, IO-awareness, and the kernel that defined the era.",
     phaseId: "p4",
+    paths: ["inference", "training"],
     prereqs: ["triton-track"],
     briefing: [
       "The UW note beats the FlashAttention paper as the entry point because the whole kernel falls out of one algebraic trick — the online-softmax rescaling — and the note derives it in a few pages where the paper assumes it. Do the algebra by hand; the Triton kernel is that algebra transcribed, plus tiling. The CS149 CPU rung in between is the best pedagogical bridge anyone has built: watching the N×N intermediate shrink from megabytes to kilobytes turns “IO-awareness” from a slogan into something you saw happen. That is the paper's actual claim — fewer HBM reads, not fewer FLOPs.",
@@ -887,6 +967,7 @@ export const QUESTS: Quest[] = [
     title: "Precision Games",
     tagline: "GPTQ → AWQ → FP8 default → NVFP4/MXFP4 frontier.",
     phaseId: "p5",
+    paths: ["inference", "training"],
     prereqs: ["kv-cache"],
     briefing: [
       "The GPTQ/AWQ/SmoothQuant trio is assigned together because the field's real content is the comparison: three different answers to the same enemy, activation outliers. Once you see that outliers are the whole story — GPTQ repairs the damage with second-order information, AWQ protects the channels activations say are salient, SmoothQuant migrates the difficulty from activations into weights — three algorithms to memorize collapse into one argument. Interviews ask exactly this compare-and-contrast.",
@@ -1202,6 +1283,7 @@ export const QUESTS: Quest[] = [
     title: "Parallelism",
     tagline: "TP, PP, EP — and the math of when each wins.",
     phaseId: "p7",
+    paths: ["inference", "training"],
     prereqs: ["vllm-deep"],
     briefing: [
       "“How To Scale Your Model” is the best thing written on this subject, and the inference chapter is why the quest exists — it's TPU-flavored, but the communication math transfers to NVLink unchanged. Megatron is the concrete instantiation: column-parallel then row-parallel means one all-reduce per attention block and one per MLP, and knowing exactly where those land is what the drill (and interviews) test. TP versus PP is an interconnect-bandwidth question with a numeric answer, not a preference.",
@@ -1646,6 +1728,646 @@ export const QUESTS: Quest[] = [
       },
     ],
   },
+
+  // ═══════════════ MODEL TRAINING PATH ═══════════════
+  // ─────────── Training Phase 1 — Learning to Learn ───────────
+  {
+    id: "backward-pass",
+    title: "The Backward Pass",
+    tagline: "Gradients, optimizers, and a loop that converges.",
+    phaseId: "t1",
+    paths: ["training"],
+    prereqs: ["gpt-from-scratch"],
+    briefing: [
+      "You built the forward pass in Phase 1; this quest is the other half, and it's anchored on Stanford CS336 because that course is the strongest from-scratch training curriculum in the open — its first assignment is essentially this quest with a grader. Backprop by hand isn't nostalgia: deriving the attention and cross-entropy gradients yourself, then checking against autograd, is the difference between using an optimizer and understanding one — and backprop-from-scratch is a reported ML-fundamentals round at OpenAI.",
+      "The AdamW-from-scratch task exists because the optimizer state is where training memory actually goes (two moments per parameter — the arithmetic that makes ZeRO necessary later), and the schedule details — warmup, cosine decay, gradient clipping — are exactly the knobs you'll watch when a run diverges. Finish with mixed precision measured, not assumed: bf16 autocast is the unquestioned default, and knowing what it does to throughput and loss on your own hardware is the habit this whole path drills.",
+    ],
+    tasks: [
+      {
+        id: "bp-cs336",
+        title: "Watch CS336's opening lectures and read the Assignment 1 spec",
+        kind: "watch",
+        xp: 60,
+        link: "https://cs336.stanford.edu/",
+        detail:
+          "Stanford's Language Modeling from Scratch (Spring 2026) — public lectures and assignments. Assignment 1 is the reference target for this quest.",
+      },
+      {
+        id: "bp-manual-grad",
+        title: "Derive and implement backprop through attention + cross-entropy by hand",
+        kind: "build",
+        xp: 120,
+        detail:
+          "On paper first, then in code without autograd; verify gradients against torch.autograd.gradcheck-style comparisons. A reported OpenAI ML-fundamentals interview round, verbatim.",
+      },
+      {
+        id: "bp-adamw",
+        title: "Implement AdamW + warmup-cosine schedule + gradient clipping from scratch",
+        kind: "build",
+        xp: 100,
+        link: "https://arxiv.org/abs/1711.05101",
+        detail:
+          "No torch.optim. Train your Phase-1 GPT on TinyStories with it. Count the optimizer-state bytes per parameter — that number is why ZeRO exists.",
+      },
+      {
+        id: "bp-mixed-precision",
+        title: "Turn on bf16 mixed precision and measure what it buys",
+        kind: "bench",
+        xp: 60,
+        link: "https://arxiv.org/abs/1710.03740",
+        detail:
+          "Autocast your loop, compare throughput and final loss vs fp32, and know why bf16 doesn't need the loss-scaling dance fp16 did.",
+      },
+      {
+        id: "bp-first-convergence",
+        title: "MILESTONE: first convergence — fixed config, fixed token budget",
+        kind: "build",
+        xp: 150,
+        detail:
+          "Train the reference small config on a fixed TinyStories-class token budget to the target val-loss band (20–60 min on an 8 GB GPU). Auto-verifier is in calibration (multi-seed loss bands) — self-check for now; this task converts to a graded harness run.",
+      },
+    ],
+  },
+  {
+    id: "feeding-the-beast",
+    title: "Feeding the Beast",
+    tagline: "Data quality is a research problem — the job postings say so verbatim.",
+    phaseId: "t1",
+    paths: ["training"],
+    prereqs: ["backward-pass"],
+    briefing: [
+      "The FineWeb blogpost is the central text here not for the dataset but for the method: every filtering decision ablated with real training runs, which is what “data quality as a research problem” (OpenAI's posting language) actually looks like in practice. Its counterintuitive findings are the value — per-snapshot dedup beat global dedup, and more aggressive cleaning is not monotonically better. DCLM matters as the benchmark formulation and the origin of the CORE metric you'll meet again in evals.",
+      "The pipeline build is the employable skill: run a real Common Crawl slice through datatrove's extract → filter → dedup stages and report what each stage kills. And TinyStories is the cheapest profound result in the field — restrict the data distribution and coherent English emerges in models a thousandth the size — which is the intellectual ancestor of the whole synthetic-data arc (Cosmopedia → SYNTH) now feeding production small models.",
+    ],
+    tasks: [
+      {
+        id: "feed-fineweb",
+        title: "Read the FineWeb blogpost end to end — ablations included",
+        kind: "read",
+        xp: 80,
+        link: "https://huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1",
+        detail:
+          "The methodology is the content: how each filter and dedup decision was validated with training runs, and which intuitive cleanups turned out to hurt.",
+      },
+      {
+        id: "feed-dclm",
+        title: "Read DCLM: the data-curation benchmark and the CORE metric",
+        kind: "paper",
+        xp: 60,
+        link: "https://arxiv.org/abs/2406.11794",
+        detail:
+          "Fixed token pool, fixed training recipe, curation as the only variable — plus the low-noise CORE eval used by nanochat and the speedruns.",
+      },
+      {
+        id: "feed-pipeline",
+        title: "Build a real curation pipeline over a Common Crawl slice",
+        kind: "build",
+        xp: 150,
+        link: "https://github.com/huggingface/datatrove",
+        detail:
+          "datatrove: extraction → Gopher/C4 quality filters → MinHash dedup. Report document survival rates per stage and inspect what died — the inspection is the skill.",
+      },
+      {
+        id: "feed-tinystories",
+        title: "Read TinyStories, then run the experiment yourself",
+        kind: "paper",
+        xp: 70,
+        link: "https://arxiv.org/abs/2305.07759",
+        detail:
+          "Train your loop on TinyStories vs a same-budget raw-web sample and compare generations. Then skim the synthetic-data arc: Cosmopedia → SYNTH.",
+      },
+      {
+        id: "feed-quiz",
+        title: "Pass the data curation drill",
+        kind: "quiz",
+        xp: 80,
+        detail: "Dedup, filtering rules, FineWeb-Edu's classifier, CORE, synthetic data. 75% to pass.",
+        verifier: { type: "quiz", quizId: "data-curation-drill", passPct: 75 },
+      },
+    ],
+  },
+  {
+    id: "the-recipe",
+    title: "The Recipe",
+    tagline: "Scaling laws are the interview math of the training world.",
+    phaseId: "t1",
+    paths: ["training"],
+    prereqs: ["backward-pass"],
+    briefing: [
+      "Chinchilla plus the Epoch replication is the assigned pair because the replication is how you learn to read scaling-laws papers critically — it corrected the original's parametric fit and strengthened the ~20-tokens-per-parameter headline. Then Beyond Chinchilla-Optimal breaks the spell: once you serve a model at volume, compute-optimal is the wrong target, and training small models far past it (SmolLM3: 3B parameters, 11.2T tokens) is the industry default. Being able to argue both sides with arithmetic is precisely what xAI lists as a basic qualification.",
+      "The Smol Training Playbook is the modern synthesis — the SmolLM team's actual decisions with their reasoning — and the closest thing to shadowing a pretraining team. μP is deliberately framed as the optional deep end: know what hyperparameter transfer buys and who uses it, and know that the flagship open recipes mostly don't. The drill at the end is pure arithmetic, like the KV-cache math on the other path: 6ND, token budgets, epoch limits, precision effects.",
+    ],
+    tasks: [
+      {
+        id: "recipe-chinchilla",
+        title: "Read Chinchilla and the Epoch replication together",
+        kind: "paper",
+        xp: 70,
+        link: "https://arxiv.org/abs/2203.15556",
+        detail:
+          "Then the replication (arxiv.org/abs/2404.10102) — how the Approach-3 fit was corrected, and why ~20 tokens/param survived the audit.",
+      },
+      {
+        id: "recipe-overtraining",
+        title: "Read Beyond Chinchilla-Optimal: inference-aware scaling",
+        kind: "paper",
+        xp: 50,
+        link: "https://arxiv.org/abs/2401.00448",
+        detail:
+          "Why deployable small models train 100×+ past compute-optimal — Llama 3 8B at ~1,875 tok/param, SmolLM3 at ~3,700.",
+      },
+      {
+        id: "recipe-smol-playbook",
+        title: "Read The Smol Training Playbook",
+        kind: "read",
+        xp: 100,
+        link: "https://huggingface.co/spaces/HuggingFaceTB/smol-training-playbook",
+        detail:
+          "The SmolLM team's decision log for building world-class small models: architecture, data mixture, schedule — with reasons attached.",
+      },
+      {
+        id: "recipe-precision",
+        title: "Read Scaling Laws for Precision",
+        kind: "paper",
+        xp: 50,
+        link: "https://arxiv.org/abs/2411.04330",
+        detail:
+          "Low-precision training as an effective-parameter discount — and the finding that overtrained models quantize worse afterward, which ties back to Precision Games.",
+      },
+      {
+        id: "recipe-mup",
+        title: "Learn what μP buys: hyperparameter transfer (optional deep end)",
+        kind: "paper",
+        xp: 50,
+        link: "https://arxiv.org/abs/2203.03466",
+        detail:
+          "Tune on a small proxy, transfer the LR to the big run. Know the idea and its successors (u-μP, CompleteP) — and that most flagship open recipes ship without it.",
+      },
+      {
+        id: "recipe-quiz",
+        title: "Pass the scaling-laws drill",
+        kind: "quiz",
+        xp: 80,
+        detail: "6ND arithmetic, Chinchilla vs overtraining, epochs on limited data, precision effects. 75% to pass.",
+        verifier: { type: "quiz", quizId: "scaling-laws-drill", passPct: 75 },
+      },
+    ],
+  },
+
+  // ─────────── Training Phase 2 — The Speedrun ───────────
+  {
+    id: "go-faster",
+    title: "Go Faster",
+    tagline: "The modded-nanoGPT lineage: 45 minutes to 74 seconds, one trick at a time.",
+    phaseId: "t2",
+    paths: ["training"],
+    prereqs: ["the-recipe", "triton-track"],
+    briefing: [
+      "The NanoGPT speedrun is this path's Boehm worklog: 89 records that turned 45 minutes of GPT-2 training into 74 seconds, each one a named, measured technique — and its biggest export, Muon, went from speedrun trick to torch.optim to training Kimi K2 at a trillion parameters. Read the record history as a method, then earn the ideas by A/B-ing Muon against your own AdamW: the speedrun's discipline (one change, measured, statistically defended) is the actual curriculum.",
+      "The skeptic's paper is assigned right next to the hype on purpose: under fair tuning, most claimed 2× optimizer speedups shrink to ~1.1× at even modest scale — hold both facts at once. The capstone milestone is the same discipline pointed at your own loop: make it measurably faster without losing loss, graded as a same-device A/B so your hardware doesn't matter.",
+    ],
+    tasks: [
+      {
+        id: "fast-speedrun-study",
+        title: "Study the NanoGPT speedrun record history",
+        kind: "read",
+        xp: 80,
+        link: "https://github.com/KellerJordan/modded-nanogpt",
+        detail:
+          "All 89 records and what each changed: Muon, QK-norm, ReLU², untied embeddings, FP8 matmuls, window schedules. The method matters more than any single trick.",
+      },
+      {
+        id: "fast-muon",
+        title: "Implement Muon and A/B it against your AdamW",
+        kind: "build",
+        xp: 120,
+        link: "https://kellerjordan.github.io/posts/muon/",
+        detail:
+          "Newton-Schulz orthogonalization on the momentum of 2D weights; embeddings/head stay on AdamW. It ships in PyTorch 2.13 as torch.optim.Muon — implement it first, then check yours against the real one.",
+      },
+      {
+        id: "fast-kernels",
+        title: "Adopt Liger kernels + sequence packing, measure the delta",
+        kind: "bench",
+        xp: 80,
+        link: "https://github.com/linkedin/Liger-Kernel",
+        detail:
+          "Fused RMSNorm/RoPE/CE Triton kernels (~20% throughput, big memory cuts) and FlashAttention-2 document-masked packing. Measure, don't trust the README.",
+      },
+      {
+        id: "fast-fp8",
+        title: "Try FP8 training with torchao and know when it pays",
+        kind: "bench",
+        xp: 60,
+        link: "https://github.com/pytorch/ao",
+        detail:
+          "float8 matmuls compose with torch.compile and FSDP2 (1.3–1.5× on real pretraining). On consumer GPUs support varies — knowing where it does and doesn't apply is the point.",
+      },
+      {
+        id: "fast-skeptic",
+        title: "Read “Fantastic Pretraining Optimizers and Where to Find Them”",
+        kind: "paper",
+        xp: 50,
+        link: "https://arxiv.org/abs/2509.02046",
+        detail:
+          "The reality check: under fair tuning, matrix-preconditioner gains shrink toward 1.1× as models grow. Speedrun claims need this next to them.",
+      },
+      {
+        id: "fast-m3",
+        title: "MILESTONE: make your loop ≥1.5× faster, loss-matched",
+        kind: "build",
+        xp: 200,
+        detail:
+          "Same device, interleaved A/B against your own baseline, final loss within the band. Auto-verifier is in calibration — self-check with honest timing for now; this converts to a graded harness run.",
+      },
+    ],
+  },
+  {
+    id: "many-gpus",
+    title: "Many GPUs, One Model",
+    tagline: "DDP, ZeRO, FSDP2 — what training adds to the parallelism you already know.",
+    phaseId: "t2",
+    paths: ["training"],
+    prereqs: ["backward-pass", "parallelism"],
+    briefing: [
+      "You already built ring all-reduce and Megatron TP in the shared Parallelism quest; this quest adds what's training-specific. Data parallelism looks trivial (average the gradients) until you build real DDP: gradient bucketing and overlapping communication with the still-running backward pass are where the actual engineering lives, and building it from your own ring all-reduce closes the loop on that whole arc.",
+      "ZeRO is the memory argument you set up in The Backward Pass made structural: optimizer state, gradients, and parameters sharded in three stages — and FSDP2 is its PyTorch-native present, with torchtitan as the reference open stack that shows how FSDP2, TP, and float8 compose in a real pretraining codebase. The Ultra-Scale Playbook is the text that holds it all together; read it end to end here even though you met its appendices earlier.",
+    ],
+    tasks: [
+      {
+        id: "mg-ddp",
+        title: "Build DDP from scratch on your ring all-reduce",
+        kind: "build",
+        xp: 150,
+        detail:
+          "Gradient buckets, comm/compute overlap with backward hooks, 2–4 CPU processes (gloo). Logits must match single-process training — same bar as the Megatron task.",
+      },
+      {
+        id: "mg-zero",
+        title: "Read ZeRO, then shard your loop with FSDP2",
+        kind: "build",
+        xp: 100,
+        link: "https://arxiv.org/abs/1910.02054",
+        detail:
+          "The three sharding stages and their memory math, then fully_shard on your model. Verify the per-rank memory drop matches the arithmetic.",
+      },
+      {
+        id: "mg-titan",
+        title: "Read torchtitan: the reference open pretraining stack",
+        kind: "read",
+        xp: 60,
+        link: "https://github.com/pytorch/torchtitan",
+        detail:
+          "How FSDP2 + TP + PP + float8 compose in one production-shaped codebase. The training-side analog of reading nano-vllm.",
+      },
+      {
+        id: "mg-ultrascale",
+        title: "Read the Ultra-Scale Playbook end to end",
+        kind: "read",
+        xp: 100,
+        link: "https://huggingface.co/spaces/nanotron/ultrascale-playbook",
+        detail:
+          "5D parallelism, ZeRO, kernels, and the comm/compute overlap math — the training analog of the scaling book, and the interview text for training-infra roles.",
+      },
+    ],
+  },
+  {
+    id: "the-124m",
+    title: "The 124M",
+    tagline: "Pretrain a real GPT-2. Yours. On your hardware or fifty dollars.",
+    phaseId: "t2",
+    paths: ["training"],
+    prereqs: ["go-faster", "feeding-the-beast"],
+    briefing: [
+      "This is the Paul Graham artifact made literal: a GPT-2-class model, trained by you, as good as you can make it on the cheapest hardware you can get. nanochat is the blueprint (Karpathy's ~$100 full stack; its leaderboard drove time-to-GPT-2 from OpenAI's 168 hours to 1.65), and llm.c's discussions carry the cost math. Both honest routes are first-class here: ~$50 of rented 8×H100 time, or a multi-day run on your own card — ~28 hours on a 4090, a patient week on smaller — with checkpoint/resume discipline doing the work a cluster babysitter would.",
+      "Write the run plan before you spend a token: data shard, config, token budget, checkpoint cadence, cost both ways. That document is the difference between training a model and having trained one — and the public worklog at the end is the genre (per the speedrun-to-OpenAI pipeline) that training-side hiring actually reads.",
+    ],
+    tasks: [
+      {
+        id: "capstone-nanochat",
+        title: "Read nanochat's speedrun script and the “Beating GPT-2 for <<$100” thread",
+        kind: "read",
+        xp: 80,
+        link: "https://github.com/karpathy/nanochat",
+        detail:
+          "The full pipeline in one hackable repo, and the community discussions where the real cost/quality tradeoffs live — including single-5090 runs.",
+      },
+      {
+        id: "capstone-plan",
+        title: "Write the run plan: data, config, budget, checkpoints, cost",
+        kind: "write",
+        xp: 60,
+        detail:
+          "FineWeb-Edu shard choice, model config, token budget vs the scaling math from The Recipe, checkpoint cadence, and the cost estimate for both routes (own GPU vs rented node).",
+      },
+      {
+        id: "capstone-train",
+        title: "CAPSTONE: pretrain your 124M-class model on ~10B tokens",
+        kind: "build",
+        xp: 400,
+        detail:
+          "To the GPT-2 loss band, with resumable checkpoints and full telemetry kept. Auto-verifier (loss band + downstream probe + checkpoint chain) is in calibration — this converts to the path's flagship graded milestone.",
+      },
+      {
+        id: "capstone-writeup",
+        title: "VERIFIED: publish the pretraining worklog",
+        kind: "write",
+        xp: 200,
+        detail:
+          "The run plan, the curves, what broke, what it cost, and honest evals. The training-side analog of the kernel worklog — a known door-opener.",
+        verifier: {
+          type: "url",
+          mustContainAny: ["pretrain", "gpt-2", "fineweb", "val loss", "tokens"],
+          minWords: 800,
+        },
+      },
+    ],
+  },
+
+  // ─────────── Training Phase 3 — Post-Training ───────────
+  {
+    id: "teach-it-to-chat",
+    title: "Teach It to Chat",
+    tagline: "Base model → assistant: SFT, LoRA, DPO on one consumer GPU.",
+    phaseId: "t3",
+    paths: ["training"],
+    prereqs: ["backward-pass"],
+    briefing: [
+      "Deliberately reachable without the pretraining capstone: post-training starts from open base models, and it's where the most jobs are. TRL v1.0 is the stack — its 2026 shape is itself a lesson (SFT/DPO/GRPO/Distillation stable, PPO demoted to experimental). “LoRA Without Regret” is the modern citation that changed default practice: adapters on all layers including MLPs at ~10× the full-FT learning rate match full fine-tuning for post-training workloads, which is what makes one consumer GPU a legitimate post-training rig.",
+      "Read LIMA critically — its thousand-example minimalism is true for style and format, not for capabilities (reasoning SFT uses six-figure trace counts). DPO survives as the preference stage in every serious open recipe (Tulu 3, OLMo 3) while RL owns capabilities — that division of labor is a favorite interview probe. The chat-template rigor from the serving path applies here in reverse: you're now the one whose template bugs everyone else inherits.",
+    ],
+    tasks: [
+      {
+        id: "chat-trl-sft",
+        title: "SFT a small open base model with TRL, template done right",
+        kind: "build",
+        xp: 100,
+        link: "https://huggingface.co/docs/trl/sft_trainer",
+        detail:
+          "SmolLM-class base, a real instruct dataset, the chat template applied and hand-verified (render one example yourself and diff it). Compare before/after generations.",
+      },
+      {
+        id: "chat-lora",
+        title: "Read LoRA + QLoRA + “LoRA Without Regret”, then fine-tune on one GPU",
+        kind: "build",
+        xp: 120,
+        link: "https://thinkingmachines.ai/blog/lora/",
+        detail:
+          "All layers including MLP, ~10× LR, modest rank — the Thinking Machines recipe. QLoRA (arxiv.org/abs/2305.14314) puts 7B-class fine-tuning inside 8 GB.",
+      },
+      {
+        id: "chat-lima",
+        title: "Read LIMA critically",
+        kind: "paper",
+        xp: 40,
+        link: "https://arxiv.org/abs/2305.11206",
+        detail:
+          "“Quality over quantity” — now understood as true for style/format, false for capabilities. Knowing the 2026 read on it beats knowing the abstract.",
+      },
+      {
+        id: "chat-dpo",
+        title: "Run DPO on a preference dataset and eval before/after",
+        kind: "build",
+        xp: 120,
+        link: "https://arxiv.org/abs/2305.18290",
+        detail:
+          "TRL DPOTrainer on your SFT checkpoint. Understand the implicit-reward derivation well enough to whiteboard it — it gets asked.",
+      },
+      {
+        id: "chat-m5",
+        title: "MILESTONE: adapter lift without regression",
+        kind: "build",
+        xp: 200,
+        detail:
+          "Produce a rank-capped LoRA that lifts a held-out task without regressing a small suite. Auto-verifier (secret split + regression suite) is in calibration — self-check with your own held-out split for now.",
+      },
+      {
+        id: "chat-nanochat-full",
+        title: "Run the full nanochat pipeline end to end at small depth",
+        kind: "build",
+        xp: 150,
+        link: "https://github.com/karpathy/nanochat",
+        detail:
+          "Tokenizer → pretrain → SFT → chat UI, one repo, small enough to finish. The integrative build: every stage you've now studied, touched in sequence.",
+      },
+    ],
+  },
+  {
+    id: "reasoning-engine",
+    title: "The Reasoning Engine",
+    tagline: "RLVR on one GPU — the skill the biggest hiring category wants.",
+    phaseId: "t3",
+    paths: ["training"],
+    prereqs: ["teach-it-to-chat"],
+    briefing: [
+      "RL post-training is now the largest training-side hiring category (Anthropic alone lists ~10 RL reqs), and GRPO is why it's learnable on your hardware: no value network, no reward model for verifiable tasks — sample groups, score against a checker, normalize within the group. Read the lineage in order (DeepSeekMath invents it, R1 proves it at scale, DAPO/Dr. GRPO/GSPO fix its biases) and then run it: documented setups get reasoning RL from 5 GB of VRAM, and a 0.5B model gains ~10 GSM8K points in an epoch.",
+      "The bridge task is the punchline of the whole two-path platform: measure how much of your RL wall-clock is rollout generation — it dominates, which is why TRL runs vLLM inside the trainer and why RL-infra postings require inference skills. Your serving-path knowledge is a hiring edge here, not a detour. On-policy distillation closes the quest because it's the cost/quality frontier for small models: teacher grades student tokens by reverse KL, delivering RL-grade gains at a tenth of the compute.",
+    ],
+    tasks: [
+      {
+        id: "rl-grpo-lineage",
+        title: "Read the GRPO lineage: DeepSeekMath → R1 → DAPO/Dr. GRPO/GSPO",
+        kind: "paper",
+        xp: 100,
+        link: "https://arxiv.org/abs/2402.03300",
+        detail:
+          "The algorithm, the scale proof (arxiv.org/abs/2501.12948), then the fixes: DAPO (2503.14476), Dr. GRPO's length-bias correction (2503.20783), GSPO for MoE stability (2507.18071).",
+      },
+      {
+        id: "rl-run",
+        title: "Run GRPO on your own GPU and move a benchmark",
+        kind: "build",
+        xp: 180,
+        link: "https://huggingface.co/docs/trl/grpo_trainer",
+        detail:
+          "TRL or Unsloth, ≤1.5B model, GSM8K-style verifiable tasks. Documented from 5 GB VRAM; log reward curves and watch for length hacking.",
+      },
+      {
+        id: "rl-m6",
+        title: "MILESTONE: verified RL lift",
+        kind: "build",
+        xp: 200,
+        detail:
+          "≥8–10 point pass@1 lift on a held-out problem split. Auto-verifier (secret 500-problem split, disjoint from public sets) is in calibration — self-check on your own holdout for now.",
+      },
+      {
+        id: "rl-bridge",
+        title: "Measure the rollout share of your RL wall-clock",
+        kind: "bench",
+        xp: 60,
+        detail:
+          "Instrument a GRPO run: what fraction is generation vs gradient steps? This number is why RL teams hire inference engineers — and why your serving-path skills compound here.",
+      },
+      {
+        id: "rl-distill",
+        title: "Read on-policy distillation, then distill a teacher into your model",
+        kind: "build",
+        xp: 120,
+        link: "https://thinkingmachines.ai/blog/on-policy-distillation/",
+        detail:
+          "Student samples, teacher grades per-token (reverse KL) — RL-grade gains at ~1/10 the compute. TRL's DistillationTrainer is stable; also read Apple's distillation scaling laws (2502.08606).",
+      },
+    ],
+  },
+
+  // ─────────── Training Phase 4 — Proof ───────────
+  {
+    id: "prove-it",
+    title: "Prove It",
+    tagline: "Evals are the training world's observability.",
+    phaseId: "t4",
+    paths: ["training"],
+    prereqs: ["teach-it-to-chat"],
+    briefing: [
+      "Every claim this path produces — the capstone, the adapters, the RL lift — is only as good as its eval, so this quest is the discipline that makes the rest credible. Run both harnesses (lm-eval-harness is the de facto standard; lighteval is what HF's own projects use) on the same model and same benchmark, and let the discrepancies teach you how much implementation details move scores. That lesson generalizes to every leaderboard you'll ever read.",
+      "GSM1k is the contamination result to internalize — up to 8-point drops when models meet genuinely fresh problems — and OLMES exists because small base models are especially easy to mis-measure (cloze vs multiple-choice formulation changes rankings). The verified finale is the artifact that matters: a model on the Hub with an honest card, and a writeup whose numbers you can defend. Honest regressions included — same rule as the quantization path, same reason.",
+    ],
+    tasks: [
+      {
+        id: "prove-harnesses",
+        title: "Run lm-eval-harness AND lighteval on the same model — compare",
+        kind: "bench",
+        xp: 100,
+        link: "https://github.com/EleutherAI/lm-evaluation-harness",
+        detail:
+          "Same benchmark, both harnesses, note every discrepancy and find its cause (prompt format, few-shot selection, normalization). The discrepancy IS the lesson.",
+      },
+      {
+        id: "prove-contamination",
+        title: "Read GSM1k and the decontamination practice around it",
+        kind: "paper",
+        xp: 50,
+        link: "https://arxiv.org/abs/2405.00332",
+        detail:
+          "Fresh GSM8K-style problems, up to 8-point drops. Then look at how OLMo 3 ships decontamination tooling as part of the release.",
+      },
+      {
+        id: "prove-olmes",
+        title: "Read OLMES: how to eval small models without fooling yourself",
+        kind: "paper",
+        xp: 50,
+        link: "https://arxiv.org/abs/2406.08446",
+        detail:
+          "Cloze vs multiple-choice formulations, curated few-shots — the standardization that makes sub-7B comparisons meaningful. Pair with “The Leaderboard Illusion” (2504.20879).",
+      },
+      {
+        id: "prove-publish",
+        title: "VERIFIED: publish your model + an honest eval writeup",
+        kind: "write",
+        xp: 150,
+        detail:
+          "Model on the HF Hub with a real card, and a public writeup with the numbers, the methodology, and the regressions. The writeup is URL-verified now; Hub-checking becomes its own verifier later.",
+        verifier: {
+          type: "url",
+          mustContainAny: ["eval", "benchmark", "fine-tun", "lora", "dpo", "grpo"],
+          minWords: 600,
+        },
+      },
+    ],
+  },
+
+  // ─────────── Training Phase 5 — The Open Ladder ───────────
+  {
+    id: "open-weights",
+    title: "Open Weights, Open Doors",
+    tagline: "Merged PRs into the training stack, and the interview drilled boring.",
+    phaseId: "t5",
+    paths: ["training"],
+    prereqs: ["reasoning-engine", "prove-it"],
+    briefing: [
+      "The allowlist here is the training stack's hiring-signal list: TRL, Unsloth, Axolotl, torchtitan, OLMo-core, datatrove, the eval harnesses, verl, nanochat. The documented precedent is stronger on this path than anywhere: Keller Jordan was hired onto OpenAI pretraining off the NanoGPT speedrun, Maxime Labonne went from open finetunes to shipping Liquid's production models, and training postings at Anthropic, Liquid, and Prime Intellect list open-source contributions as preferred quals or acceptable in lieu of publications. The honest counterweight: another record-holder writes “I don't work in AI” — the artifact opens doors; the interview leg still has to carry you through them.",
+      "The drills mirror the reported rounds: backprop live in Python, scaling arithmetic on demand, debugging a diverging run, designing a post-training pipeline (data → SFT → preference → RL → evals). Anthropic interviews in Colab with references allowed and states half its technical staff had no prior ML experience — the bar is what you can do, which is exactly what this path spent five phases building receipts for.",
+    ],
+    tasks: [
+      {
+        id: "ow-first-issue",
+        title: "Claim and fix a good-first-issue in the training stack",
+        kind: "oss",
+        xp: 100,
+        link: "https://github.com/huggingface/trl/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%91%B6+good+first+issue%22",
+        detail:
+          "TRL, Unsloth, Axolotl, torchtitan, OLMo-core, datatrove, lm-eval — pick the repo whose internals you already walked in this path.",
+      },
+      {
+        id: "ow-pr1",
+        title: "VERIFIED: first merged PR in a major training repo",
+        kind: "oss",
+        xp: 300,
+        detail: "Checked live against the GitHub API: exists, merged, non-trivial.",
+        verifier: {
+          type: "github-pr",
+          repoAllowlist: [
+            "huggingface/trl",
+            "huggingface/transformers",
+            "huggingface/datatrove",
+            "huggingface/lighteval",
+            "unslothai/unsloth",
+            "axolotl-ai-cloud/axolotl",
+            "pytorch/torchtitan",
+            "pytorch/pytorch",
+            "allenai/OLMo-core",
+            "allenai/open-instruct",
+            "EleutherAI/lm-evaluation-harness",
+            "volcengine/verl",
+            "karpathy/nanochat",
+            "KellerJordan/modded-nanogpt",
+          ],
+        },
+      },
+      {
+        id: "ow-pr2",
+        title: "VERIFIED: merged PR with ablation or benchmark numbers",
+        kind: "oss",
+        xp: 350,
+        detail:
+          "A training-quality or performance change with measured evidence in the description. Same allowlist, same live verification.",
+        verifier: {
+          type: "github-pr",
+          repoAllowlist: [
+            "huggingface/trl",
+            "huggingface/transformers",
+            "huggingface/datatrove",
+            "huggingface/lighteval",
+            "unslothai/unsloth",
+            "axolotl-ai-cloud/axolotl",
+            "pytorch/torchtitan",
+            "pytorch/pytorch",
+            "allenai/OLMo-core",
+            "allenai/open-instruct",
+            "EleutherAI/lm-evaluation-harness",
+            "volcengine/verl",
+            "karpathy/nanochat",
+            "KellerJordan/modded-nanogpt",
+          ],
+        },
+      },
+      {
+        id: "ow-gauntlet",
+        title: "Drill the training interview out loud",
+        kind: "build",
+        xp: 100,
+        detail:
+          "Backprop from scratch in Python against a clock, 6ND/scaling arithmetic on demand, “this run is diverging — debug it”, and the post-training pipeline design (data → SFT → preference → RL → evals). Timed, alone, spoken.",
+      },
+      {
+        id: "ow-speedrun",
+        title: "Attempt a speedrun: NanoGPT record chase or nanochat leaderboard",
+        kind: "build",
+        xp: 150,
+        link: "https://www.gpumode.com",
+        detail:
+          "A serious attempt at modded-nanogpt's optimization track (hardware-agnostic, step-count-scored) or a nanochat time-to-GPT-2 entry. The artifact channel with the strongest documented precedent.",
+      },
+      {
+        id: "ow-targets",
+        title: "Build the training-side target list and apply",
+        kind: "build",
+        xp: 150,
+        detail:
+          "From the researched archetypes: RL/post-training first (largest category, lowest experience bar — xAI says “relevant experience is not required”), then pretraining and data roles; frontier labs, Liquid/Zyphra/Prime Intellect, AI2, Apple Foundation Models.",
+      },
+    ],
+  },
 ];
 
 export const TASKS_BY_ID = new Map(
@@ -1654,8 +2376,34 @@ export const TASKS_BY_ID = new Map(
 
 export const QUESTS_BY_ID = new Map(QUESTS.map((q) => [q.id, q]));
 
+export const PHASES_BY_ID = new Map(PHASES.map((p) => [p.id, p]));
+
+export const PATHS_BY_ID = new Map(PATHS.map((p) => [p.id, p]));
+
 export function questsForPhase(phaseId: string): Quest[] {
   return QUESTS.filter((q) => q.phaseId === phaseId);
+}
+
+/** A quest's path memberships; omitted `paths` means the original path. */
+export function questPaths(quest: Quest): PathId[] {
+  return quest.paths ?? ["inference"];
+}
+
+export function questsForPath(pathId: PathId): Quest[] {
+  return QUESTS.filter((q) => questPaths(q).includes(pathId));
+}
+
+export function questsForPathPhase(pathId: PathId, phaseId: string): Quest[] {
+  return QUESTS.filter(
+    (q) => q.phaseId === phaseId && questPaths(q).includes(pathId),
+  );
+}
+
+/** Display label that disambiguates per-path phase numbering. */
+export function phaseLabel(phase: Phase): string {
+  return phase.pathId === "training"
+    ? `Training Phase ${phase.number}`
+    : `Phase ${phase.number}`;
 }
 
 export const QUEST_ID_BY_TASK = new Map(

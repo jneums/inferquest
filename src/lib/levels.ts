@@ -12,7 +12,9 @@ export const LEVELS: Level[] = [
   { n: 9, title: "Tensor Parallelist", minXP: 9500 },
   { n: 10, title: "Speculative Decoder", minXP: 11500 },
   { n: 11, title: "Goodput Guardian", minXP: 13500 },
-  { n: 12, title: "Inference Engineer", minXP: 15000 },
+  // Path titles (Inference Engineer, Training Engineer) are earned as
+  // certificates in achievements, not levels — the XP ladder is shared.
+  { n: 12, title: "Foundation Model", minXP: 15000 },
 ];
 
 export function levelForXP(xp: number): Level {

@@ -1,4 +1,4 @@
-import { PHASES, QUESTS, QUESTS_BY_ID, TOTAL_XP } from "@/data/curriculum";
+import { PATHS, PHASES, QUESTS, QUESTS_BY_ID, TOTAL_XP, phaseLabel } from "@/data/curriculum";
 
 /** Canonical origin. Override via env when a custom domain lands. */
 export const SITE_URL =
@@ -10,7 +10,7 @@ export const SITE_TITLE = "InferQuest — Become an Inference Engineer";
 
 export const TOTAL_TASKS = QUESTS.reduce((s, q) => s + q.tasks.length, 0);
 
-export const SITE_DESCRIPTION = `A free, gamified inference engineering roadmap: ${PHASES.length} phases and ${TOTAL_TASKS} tasks of training from KV caches and CUDA kernels to production vLLM serving — with auto-verified milestones instead of a paper certificate.`;
+export const SITE_DESCRIPTION = `Free, gamified roadmaps for LLM engineering: an Inference Engineering path (KV caches, CUDA kernels, production vLLM serving) and a Model Training path (pretraining on a budget, scaling laws, SFT/DPO/GRPO) — ${TOTAL_TASKS} tasks with auto-verified milestones instead of a paper certificate.`;
 
 export const VERIFIED_TASKS = QUESTS.reduce(
   (s, q) => s + q.tasks.filter((t) => t.verifier).length,
@@ -43,10 +43,14 @@ export function courseJsonLd() {
       "Production serving with vLLM and SGLang",
       "Distributed inference and tensor parallelism",
       "Inference observability and economics",
+      "LLM pretraining on a budget",
+      "Scaling laws and data curation",
+      "Fine-tuning and post-training (SFT, LoRA, DPO, GRPO)",
+      "LLM evaluation methodology",
     ],
     syllabusSections: PHASES.map((p) => ({
       "@type": "Syllabus",
-      name: `Phase ${p.number}: ${p.title}`,
+      name: `${phaseLabel(p)}: ${p.title}`,
       description: p.description,
     })),
     offers: {
@@ -112,7 +116,11 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "How long does the roadmap take?",
-    a: `The full path is ${TOTAL_TASKS} tasks across ${QUESTS.length} quests and ${PHASES.length} phases (${TOTAL_XP.toLocaleString()} XP). An experienced software engineer studying part-time should expect roughly six months to a year end to end — less if you already know PyTorch and CUDA, since early phases are skimmable.`,
+    a: `Both paths together span ${TOTAL_TASKS} tasks across ${QUESTS.length} quests (${TOTAL_XP.toLocaleString()} XP), sharing a common trunk of fundamentals. An experienced software engineer studying part-time should expect roughly six months to a year for one path end to end — less if you already know PyTorch and CUDA, since early phases are skimmable.`,
+  },
+  {
+    q: "Can InferQuest teach me to train my own LLM?",
+    a: "Yes — the Model Training path covers exactly that: backprop and optimizers from scratch, data curation with real Common Crawl pipelines, scaling-laws math, the NanoGPT-speedrun efficiency toolkit (Muon, FP8, fused kernels), a GPT-2-class pretraining capstone you can run on one consumer GPU or ~$50 of rented compute, then SFT, LoRA, DPO, and GRPO post-training on a single GPU. It leads to the pretraining, post-training, and RL engineering roles labs are actively hiring for.",
   },
   {
     q: "Do I need my own GPU?",

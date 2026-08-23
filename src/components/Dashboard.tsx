@@ -144,13 +144,41 @@ export function Dashboard() {
         </Card>
       </section>
 
-      {/* Phase progress */}
+      {/* Phase progress, grouped by path (trunk phases shown under Inference) */}
       <section className="border-t-[3px] border-[var(--ink)] pt-5">
         <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-          Phases
+          Phases — Inference Engineering
         </h2>
         <div className="space-y-3">
-          {PHASES.map((phase) => {
+          {PHASES.filter((p) => !p.pathId).map((phase) => {
+            const quests = QUESTS.filter((q) => q.phaseId === phase.id);
+            const total = quests.reduce((s, q) => s + q.tasks.length, 0);
+            const done = quests.reduce(
+              (s, q) => s + q.tasks.filter((t) => doneTaskIds.has(t.id)).length,
+              0,
+            );
+            return (
+              <Link key={phase.id} href="/quests" className="block">
+                <Card className="px-4 py-3 transition-colors hover:border-[var(--accent)]">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="font-medium">
+                      {phase.number}. {phase.title}
+                    </div>
+                    <span className="text-xs text-[var(--text-muted)]">
+                      {done}/{total}
+                    </span>
+                  </div>
+                  <Meter value={done} max={total} className="mt-2" />
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
+        <h2 className="mb-4 mt-8 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+          Phases — Model Training
+        </h2>
+        <div className="space-y-3">
+          {PHASES.filter((p) => p.pathId === "training").map((phase) => {
             const quests = QUESTS.filter((q) => q.phaseId === phase.id);
             const total = quests.reduce((s, q) => s + q.tasks.length, 0);
             const done = quests.reduce(

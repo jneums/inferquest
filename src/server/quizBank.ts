@@ -586,9 +586,213 @@ QUIZZES["system-design-drill"] = {
   ],
 };
 
+QUIZZES["scaling-laws-drill"] = {
+    title: "Scaling-laws drill",
+    questions: [
+      {
+        prompt:
+          "Chinchilla's compute-optimal rule of thumb is ~20 tokens per parameter. Roughly how many training tokens does a 1B-parameter model want under it?",
+        choices: ["2B tokens", "20B tokens", "200B tokens", "1T tokens"],
+        answerIndex: 1,
+        explanation: "20 tokens/param × 1e9 params = 2e10 = 20B tokens.",
+      },
+      {
+        prompt:
+          "Using the standard C ≈ 6ND approximation, what does training a 124M-parameter model on 10B tokens cost in FLOPs?",
+        choices: ["~7.4e16", "~7.4e18", "~7.4e20", "~1.2e22"],
+        answerIndex: 1,
+        explanation:
+          "6 × 1.24e8 × 1e10 ≈ 7.4e18 FLOPs. The 6 counts forward (2) plus backward (4) FLOPs per parameter per token.",
+      },
+      {
+        prompt:
+          "SmolLM3 trained a 3B model on 11.2T tokens — roughly 3,700 tokens/param, ~185× past Chinchilla-optimal. Why is this standard practice rather than a mistake?",
+        choices: [
+          "Chinchilla was refuted, so token counts no longer matter",
+          "Small models can't overfit, so more data is always free",
+          "Inference-aware scaling: at high serving volume, overtraining a smaller model minimizes TOTAL cost, because the smaller model is cheaper on every future request",
+          "It was a data-availability accident",
+        ],
+        answerIndex: 2,
+        explanation:
+          "Beyond Chinchilla-Optimal (Sardana et al.): compute-optimal ignores inference. Amortized over billions of served requests, train-longer-deploy-smaller wins — which is why every deployable small model is heavily overtrained.",
+      },
+      {
+        prompt:
+          "Chinchilla's core prescription: given 10× more training compute, how should you scale the model?",
+        choices: [
+          "10× the parameters, same tokens",
+          "10× the tokens, same parameters",
+          "Roughly √10 ≈ 3.2× the parameters AND ~3.2× the tokens",
+          "It depends only on the learning rate",
+        ],
+        answerIndex: 2,
+        explanation:
+          "Parameters and tokens scale roughly equally with compute at the optimum — the whole point of the paper (and what GPT-3-era models got wrong by under-training).",
+      },
+      {
+        prompt:
+          "You have a fixed compute budget but only 50B unique tokens — a quarter of what Chinchilla suggests. The data-constrained scaling result (Muennighoff et al.) says:",
+        choices: [
+          "Stop training when unique data runs out — repeated data is worthless",
+          "Repeat the data: up to ~4 epochs, repeated tokens are worth almost as much as fresh ones",
+          "Switch to a 10× smaller model",
+          "Random synthetic tokens fill the gap equally well",
+        ],
+        answerIndex: 1,
+        explanation:
+          "Up to ~4 epochs, the value of repeated data decays only mildly; beyond that, returns diminish sharply. Multi-epoch training on curated data beats single-epoch on junk.",
+      },
+      {
+        prompt: "The practical payoff of μP (maximal update parametrization) is:",
+        choices: [
+          "It makes training run faster on the same hardware",
+          "Hyperparameters (especially LR) tuned on a small proxy model transfer to the large model without re-sweeping",
+          "It removes the need for warmup",
+          "It guarantees convergence for any learning rate",
+        ],
+        answerIndex: 1,
+        explanation:
+          "μP reparametrizes init and per-layer LRs so the optimal LR stays stable across width — tune small, train big once. Successors (u-μP, CompleteP) extend the idea; many flagship open recipes still ship without it.",
+      },
+      {
+        prompt:
+          "“Scaling Laws for Precision” (Kumar et al.) found that training a model on MORE tokens makes it:",
+        choices: [
+          "Easier to quantize afterward — more data means more robustness",
+          "Harder to quantize afterward — post-training quantization degrades overtrained models more",
+          "Impossible to quantize below 8 bits",
+          "Unaffected by quantization",
+        ],
+        answerIndex: 1,
+        explanation:
+          "One of the paper's headline results: quantization degradation grows with the token/parameter ratio. Heavily overtrained small models pay a larger quality tax under PTQ — a real tension with inference-aware overtraining.",
+      },
+    ],
+};
+
+QUIZZES["data-curation-drill"] = {
+    title: "Data curation drill",
+    questions: [
+      {
+        prompt: "MinHash deduplication, as used in the FineWeb pipeline, is designed to catch:",
+        choices: [
+          "Exact byte-identical documents only",
+          "Near-duplicate documents (same content, small edits/boilerplate differences)",
+          "Repeated n-grams inside one document",
+          "Documents in the wrong language",
+        ],
+        answerIndex: 1,
+        explanation:
+          "MinHash approximates Jaccard similarity over shingles, catching near-duplicates that exact hashing misses — the dominant form of duplication in web crawls.",
+      },
+      {
+        prompt: "FineWeb's dedup ablations reached a counterintuitive conclusion:",
+        choices: [
+          "Global dedup across all crawl snapshots was strictly best",
+          "Dedup doesn't affect model quality at all",
+          "Per-snapshot dedup beat global dedup — aggressive global dedup removed good content while what survived skewed worse",
+          "Only exact dedup helps; fuzzy dedup always hurts",
+        ],
+        answerIndex: 2,
+        explanation:
+          "Globally deduping everything upweighted low-quality residue and threw away useful text; deduplicating within each snapshot trained better models. More cleaning is not monotonically better — that's the blogpost's core lesson.",
+      },
+      {
+        prompt: "FineWeb-Edu was built by:",
+        choices: [
+          "Keeping only pages from .edu domains",
+          "Training a classifier on LLM-annotated educational-quality scores, then keeping high-scoring pages",
+          "Manual review of every document",
+          "Keeping only pages containing math",
+        ],
+        answerIndex: 1,
+        explanation:
+          "Llama-3-70B annotated samples for educational value; a small classifier trained on those labels filtered the corpus (score ≥3 → the 1.3T-token subset). Classifier-based quality filtering is now the standard move.",
+      },
+      {
+        prompt: "Which of these is one of the original C4 cleaning rules?",
+        choices: [
+          "Drop lines that don't end in terminal punctuation",
+          "Drop all documents shorter than 10,000 words",
+          "Translate non-English text to English",
+          "Remove all proper nouns",
+        ],
+        answerIndex: 0,
+        explanation:
+          "C4's heuristics: terminal-punctuation line filter, dropping pages with 'lorem ipsum' or curly braces, the bad-words list. Crude, but still the baseline vocabulary of quality filtering (alongside Gopher's stats-based rules).",
+      },
+      {
+        prompt: "DCLM's CORE metric exists because:",
+        choices: [
+          "A single benchmark score is too noisy at small scale — CORE averages centered accuracy over a suite of tasks that give clean early signal",
+          "MMLU is too easy for small models",
+          "It measures training speed, not quality",
+          "It's required by law for dataset releases",
+        ],
+        answerIndex: 0,
+        explanation:
+          "Small-scale ablations need low-noise, early-signal evals. CORE's centered averaging across many small tasks is that instrument — it's also what nanochat's leaderboard targets.",
+      },
+      {
+        prompt: "TinyStories demonstrated that:",
+        choices: [
+          "Models under 100M parameters cannot produce grammatical English",
+          "1–10M-parameter models produce coherent, grammatical stories when trained on a vocabulary-restricted synthetic distribution — capability tracks data scope, not just scale",
+          "Synthetic data always beats web data at every scale",
+          "Children's stories are the optimal pretraining corpus",
+        ],
+        answerIndex: 1,
+        explanation:
+          "Restrict the distribution (child-vocabulary synthetic stories) and coherence emerges at a thousandth the usual size. The intellectual ancestor of the modern synthetic-curriculum arc (Cosmopedia, SYNTH).",
+      },
+      {
+        prompt:
+          "Nemotron-CC's counterpoint to aggressive quality filtering (relevant at very large token budgets) is:",
+        choices: [
+          "Filtering is always wrong",
+          "Heavy filtering starves long-horizon training of diversity — rephrasing/QA-ifying real web text recovers quality without shrinking the pool",
+          "Only synthetic data should be used past 1T tokens",
+          "Dedup should be skipped entirely at scale",
+        ],
+        answerIndex: 1,
+        explanation:
+          "At 15T-token horizons, aggressively filtered pools run dry; Nemotron-CC showed rephrased/ensembled real text beats discarding it. Filtering intensity is a function of your token budget.",
+      },
+    ],
+};
+
 export interface PublicQuiz {
   title: string;
   questions: Array<{ prompt: string; choices: string[] }>;
+}
+
+/**
+ * Deterministic per-question choice shuffle. Authored banks cluster the
+ * correct answer in predictable positions; serving a stable permutation
+ * (pure function of quizId + question index, identical across deploys)
+ * makes positions uninformative without any session state. gradeQuiz maps
+ * submitted indexes back through the same permutation.
+ */
+function choicePermutation(key: string, len: number): number[] {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < key.length; i++) {
+    h = (h ^ key.charCodeAt(i)) >>> 0;
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  const idx = Array.from({ length: len }, (_, i) => i);
+  for (let i = len - 1; i > 0; i--) {
+    h ^= h << 13; h >>>= 0;
+    h ^= h >>> 17;
+    h ^= h << 5; h >>>= 0;
+    const j = h % (i + 1);
+    [idx[i], idx[j]] = [idx[j], idx[i]];
+  }
+  return idx;
+}
+
+function questionPermutation(quizId: string, qIndex: number, len: number): number[] {
+  return choicePermutation(`${quizId}#${qIndex}`, len);
 }
 
 export function publicQuiz(quizId: string): PublicQuiz | null {
@@ -596,8 +800,20 @@ export function publicQuiz(quizId: string): PublicQuiz | null {
   if (!quiz) return null;
   return {
     title: quiz.title,
-    questions: quiz.questions.map((q) => ({ prompt: q.prompt, choices: q.choices })),
+    questions: quiz.questions.map((q, i) => {
+      const perm = questionPermutation(quizId, i, q.choices.length);
+      return { prompt: q.prompt, choices: perm.map((p) => q.choices[p]) };
+    }),
   };
+}
+
+/** The correct answer indexes in SERVED (shuffled) order — for the test rig. */
+export function servedAnswerKey(quizId: string): number[] | null {
+  const quiz = QUIZZES[quizId];
+  if (!quiz) return null;
+  return quiz.questions.map((q, i) =>
+    questionPermutation(quizId, i, q.choices.length).indexOf(q.answerIndex),
+  );
 }
 
 export function gradeQuiz(
@@ -614,7 +830,9 @@ export function gradeQuiz(
     };
   }
   const checks: CheckResult[] = quiz.questions.map((q, i) => {
-    const given = answers[i];
+    const perm = questionPermutation(quizId, i, q.choices.length);
+    // Answers arrive as indexes into the SERVED (shuffled) choice order.
+    const given = answers[i] !== undefined ? perm[answers[i]] : undefined;
     const correct = given === q.answerIndex;
     return {
       name: `Q${i + 1}`,

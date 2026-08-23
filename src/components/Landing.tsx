@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
-import { PHASES, QUESTS, TOTAL_XP } from "@/data/curriculum";
+import { PATHS, PHASES_BY_ID, QUESTS, TOTAL_XP } from "@/data/curriculum";
 import { LEVELS } from "@/lib/levels";
 import { FAQ } from "@/lib/seo";
 import { IconPlug, IconBolt, IconMerge, IconGrad } from "@/components/icons";
@@ -67,15 +67,17 @@ export function Landing() {
       {/* Hero + numbers strip */}
       <section className="pt-10">
         <p className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-[var(--text-muted)]">
-          InferQuest — the verified path into LLM serving
+          InferQuest — verified paths into LLM serving and training
         </p>
         <h1 className="mt-5 max-w-3xl text-5xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-6xl">
           Become an inference engineer<span className="text-[var(--accent)]">.</span>
         </h1>
         <p className="mt-7 max-w-xl text-lg leading-relaxed text-[var(--text-secondary)]">
-          A free, open inference engineering roadmap from &ldquo;what&rsquo;s a
-          KV cache&rdquo; to a signed offer — built from real job-market
-          research, with milestones that are{" "}
+          Two free, open roadmaps built from real job-market research:{" "}
+          <strong className="text-[var(--text-primary)]">serve LLMs</strong> fast
+          and cheap, or <strong className="text-[var(--text-primary)]">train
+          them</strong> as good as possible on the cheapest hardware — with
+          milestones that are{" "}
           <span className="text-[var(--accent-strong)]">verified</span>, not
           checked off.
         </p>
@@ -99,7 +101,7 @@ export function Landing() {
 
         <div className="mt-16 grid grid-cols-2 gap-x-6 border-t-[3px] border-[var(--ink)] sm:grid-cols-4">
           {[
-            [String(PHASES.length), "phases, bedrock → offer"],
+            [String(PATHS.length), "paths, one shared trunk"],
             [String(totalTasks), "tasks across " + QUESTS.length + " quests"],
             [TOTAL_XP.toLocaleString(), "XP to the final level"],
             [String(verifiedCount), "auto-verified milestones"],
@@ -125,12 +127,13 @@ export function Landing() {
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
           <strong className="text-[var(--text-primary)]">InferQuest</strong> is
           a free, open, non-commercial web application for learning inference
-          engineering — the craft of serving large language models fast and
-          cheaply. It organizes a complete curriculum into quests and tasks,
+          engineering and LLM training. It offers two paths — serving large
+          language models fast and cheaply, and training them as good as
+          possible on minimal hardware — organized into quests and tasks. It
           tracks your progress with XP, levels, and streaks, drills you with
           graded quizzes and spaced-repetition reviews, and automatically
-          verifies major milestones like deployed endpoints, GPU kernels, and
-          merged open-source pull requests.
+          verifies major milestones like deployed endpoints, GPU kernels,
+          training runs, and merged open-source pull requests.
         </p>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
           Signing in (with Google or email) is used only to save that progress
@@ -166,32 +169,50 @@ export function Landing() {
         </div>
       </Section>
 
-      {/* 03 — The journey */}
-      <Section n="03" title="The journey">
+      {/* 03 — The journey: both paths, shared XP ladder */}
+      <Section n="03" title="Two paths, one trunk">
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
           Level up from <strong>{LEVELS[0].title}</strong> to{" "}
-          <strong>{LEVELS[LEVELS.length - 1].title}</strong> through ten phases
-          — each quest unlocks as its prerequisites near completion.
+          <strong>{LEVELS[LEVELS.length - 1].title}</strong> on one shared XP
+          ladder; the path titles — Inference Engineer, Training Engineer — are
+          earned as certificates. The fundamentals (GPU architecture, kernels,
+          transformer internals) are one trunk that counts for both.
         </p>
-        <ol className="mt-8 max-w-2xl">
-          {PHASES.map((p, i) => (
-            <li key={p.id}>
-              <Link href="/quests" className="block">
-                <Card
-                  className={`flex items-baseline gap-5 px-5 py-3 transition-colors hover:border-[var(--accent)] ${i > 0 ? "border-t-0" : ""}`}
-                >
-                  <span className="w-10 shrink-0 text-right text-xl font-extrabold tracking-tight text-[var(--border)]">
-                    {String(p.number).padStart(2, "0")}
-                  </span>
-                  <span className="font-medium">{p.title}</span>
-                  <span className="ml-auto hidden font-mono text-xs uppercase tracking-wider text-[var(--text-muted)] sm:inline">
-                    {p.theme}
-                  </span>
-                </Card>
-              </Link>
-            </li>
+        <div className="mt-8 grid gap-8 lg:grid-cols-2">
+          {PATHS.map((path) => (
+            <div key={path.id}>
+              <div className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
+                {path.title}
+              </div>
+              <ol className="mt-3">
+                {path.phaseIds.map((phaseId, i) => {
+                  const p = PHASES_BY_ID.get(phaseId);
+                  if (!p) return null;
+                  const shared = !p.pathId && path.id !== "inference";
+                  return (
+                    <li key={`${path.id}-${phaseId}`}>
+                      <Link href="/quests" className="block">
+                        <Card
+                          className={`flex items-baseline gap-4 px-4 py-2.5 transition-colors hover:border-[var(--accent)] ${i > 0 ? "border-t-0" : ""}`}
+                        >
+                          <span className="w-8 shrink-0 text-right text-lg font-extrabold tracking-tight text-[var(--border)]">
+                            {String(p.number).padStart(2, "0")}
+                          </span>
+                          <span className={`font-medium ${shared ? "text-[var(--text-muted)]" : ""}`}>
+                            {p.title}
+                          </span>
+                          <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] sm:inline">
+                            {shared ? "shared" : p.theme}
+                          </span>
+                        </Card>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
           ))}
-        </ol>
+        </div>
       </Section>
 
       {/* 04 — FAQ, rendered from the same source as the FAQPage JSON-LD */}

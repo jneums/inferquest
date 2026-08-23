@@ -45,11 +45,25 @@ export interface Task {
   verifier?: Verifier;
 }
 
+export type PathId = "inference" | "training";
+
+/** A learning path: an ordered walk through phases toward one job family.
+ * Phases (and their quests) can be shared between paths; XP is one pool. */
+export interface LearningPath {
+  id: PathId;
+  title: string;
+  tagline: string;
+  /** Display order of phases on this path. Shared phases may appear in both. */
+  phaseIds: string[];
+}
+
 export interface Quest {
   id: string;
   title: string;
   tagline: string;
   phaseId: string;
+  /** Paths this quest belongs to. Omitted = ["inference"] (the original path). */
+  paths?: PathId[];
   /** Quest ids that must each be ≥50% complete before this quest unlocks. */
   prereqs: string[];
   /**
@@ -67,6 +81,9 @@ export interface Phase {
   title: string;
   theme: string;
   description: string;
+  /** Set when a phase is exclusive to one path; omitted = original inference
+   * numbering (these phases may still be shared into other paths' orderings). */
+  pathId?: PathId;
 }
 
 export interface XPEvent {

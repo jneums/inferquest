@@ -1,4 +1,5 @@
-import { PHASES, QUESTS, TASKS_BY_ID } from "./curriculum";
+import { PHASES, QUESTS, TASKS_BY_ID, phaseLabel, questsForPath } from "./curriculum";
+import type { PathId } from "@/lib/types";
 import { levelForXP } from "@/lib/levels";
 import type { Achievement, TaskKind, XPEvent } from "@/lib/types";
 
@@ -36,7 +37,15 @@ function phaseComplete(done: Set<string>, phaseId: string): boolean {
   );
 }
 
-const PHASE_EMOJI = ["🪨", "🏛️", "⚙️", "🔩", "⚡", "🗜️", "🏭", "🌐", "📈", "🏆"];
+function pathComplete(done: Set<string>, pathId: PathId): boolean {
+  return questsForPath(pathId).every((q) => q.tasks.every((t) => done.has(t.id)));
+}
+
+const PHASE_EMOJI = [
+  "🪨", "🏛️", "⚙️", "🔩", "⚡", "🗜️", "🏭", "🌐", "📈", "🏆",
+  // Model Training path phases
+  "📉", "🏎️", "💬", "⚖️", "🪜",
+];
 
 export const ACHIEVEMENTS: AchievementDef[] = [
   {
@@ -130,7 +139,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: "drill-sergeant",
     title: "Drill Sergeant",
-    description: "Pass all 8 graded drills.",
+    description: "Pass all 10 graded drills.",
     emoji: "🎓",
     earned: ({ doneTaskIds }) =>
       [
@@ -142,6 +151,8 @@ export const ACHIEVEMENTS: AchievementDef[] = [
         "par-quiz",
         "gauntlet-quiz",
         "gauntlet-sysdesign",
+        "recipe-quiz",
+        "feed-quiz",
       ].every((id) => doneTaskIds.has(id)),
   },
   {
@@ -184,16 +195,33 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   ...PHASES.map((phase, i) => ({
     id: `phase-${phase.id}`,
     title: `${phase.theme} Cleared`,
-    description: `Complete every task in Phase ${phase.number}: ${phase.title}.`,
+    description: `Complete every task in ${phaseLabel(phase)}: ${phase.title}.`,
     emoji: PHASE_EMOJI[i] ?? "🏅",
     earned: ({ doneTaskIds }: AchievementContext) =>
       phaseComplete(doneTaskIds, phase.id),
   })),
   {
-    id: "ascension",
-    title: "Inference Engineer",
-    description: "Reach level 12. The title is yours — go get paid.",
+    id: "summit",
+    title: "Summit",
+    description: "Reach level 12 — the top of the shared XP ladder.",
     emoji: "👑",
     earned: ({ xp }) => levelForXP(xp).n >= 12,
+  },
+  // Path certificates: the titles are EARNED, per path, like everything here.
+  {
+    id: "cert-inference",
+    title: "Inference Engineer",
+    description:
+      "Certificate: every quest on the Inference Engineering path, 100% complete — verifiers included.",
+    emoji: "🎖️",
+    earned: ({ doneTaskIds }) => pathComplete(doneTaskIds, "inference"),
+  },
+  {
+    id: "cert-training",
+    title: "Training Engineer",
+    description:
+      "Certificate: every quest on the Model Training path, 100% complete — verifiers included.",
+    emoji: "🎖️",
+    earned: ({ doneTaskIds }) => pathComplete(doneTaskIds, "training"),
   },
 ];
