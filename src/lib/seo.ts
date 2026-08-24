@@ -123,6 +123,10 @@ export const FAQ: { q: string; a: string }[] = [
     a: `Both paths together span ${TOTAL_TASKS} tasks across ${QUESTS.length} quests (${TOTAL_XP.toLocaleString()} XP), sharing a common trunk of fundamentals. An experienced software engineer studying part-time should expect roughly six months to a year for one path end to end — less if you already know PyTorch and CUDA, since early phases are skimmable.`,
   },
   {
+    q: "Was this site written by AI?",
+    a: "Substantially, yes. The curriculum is curated and maintained with heavy AI assistance, and much of the site's text was AI-drafted. Two things are not AI: the sources and the verifiers. Every quest points at the field's primary material — the papers, textbooks, and codebases practitioners actually use — and every major milestone is checked for real: live endpoint probes, GPU-graded kernels, calibrated training runs, merged-PR checks against the GitHub API. Treat the prose as connective tissue. The sources and the verifiers are the curriculum.",
+  },
+  {
     q: "Do I need my own GPU?",
     a: "For the kernel-engineering phases, yes — the grading harness runs on your own hardware, and any modern NVIDIA GPU works. Everything before that (transformer internals, the inference-engine capstone, quizzes and drills) runs on CPU or free cloud notebooks.",
   },
