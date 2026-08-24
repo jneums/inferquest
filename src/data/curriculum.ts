@@ -229,13 +229,21 @@ export const QUESTS: Quest[] = [
         detail: "SMs, warps, occupancy, HBM, TMA, NVLink — get the vocabulary loaded before it's needed.",
       },
       {
+        id: "mm-matmul-warmup",
+        title: "Optional: pencil-and-paper matmul reps at Khan Academy",
+        kind: "quiz",
+        xp: 20,
+        link: "https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:matrices",
+        detail:
+          "Only if hand-multiplying two small matrices feels shaky. Do the multiplication exercises in the matrix unit until they're boring — an hour or two of instant-feedback reps. Skip freely if the mechanics are already second nature.",
+      },
+      {
         id: "mm-matmul-drill",
         title: "Implement matmul three ways, then predict attention shapes",
         kind: "build",
         xp: 60,
-        link: "https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:matrices",
         detail:
-          "Triple loop, rows-as-dot-products, weighted-sum-of-columns — all three matching torch.matmul on random inputs. Then compute Q @ K.T / √d for (B, T, C) tensors, writing down every intermediate shape before running. Rusty on the pencil mechanics? Khan Academy's matrix unit is the rep bank. Tensor Puzzles in the next quest continues this in NumPy.",
+          "In a fresh notebook, write matmul three times: (1) three nested loops; (2) each output entry as a dot product of a row of A with a column of B; (3) the output as a weighted sum of A's columns. Check all three against torch.matmul on random shapes. Then make Q and K with torch.randn(4, 128, 64) and — before running each line — write down the shape of Q @ K.transpose(-2, -1), of the scores divided by √64, and of their softmax. Done when the shape predictions stop being guesses. Tensor Puzzles in the next quest continues this in NumPy.",
       },
       {
         id: "mm-linalg",
