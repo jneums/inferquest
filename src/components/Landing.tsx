@@ -81,18 +81,15 @@ export function Landing() {
           <span className="text-[var(--accent)]">.</span>
         </h1>
         <p className="mt-7 max-w-xl text-lg leading-relaxed text-[var(--text-secondary)]">
-          Two free, open roadmaps built from real job-market research: make
-          models{" "}
-          <strong className="text-[var(--text-primary)]">
-            fast and cheap
-          </strong>{" "}
-          in production, or make them{" "}
-          <strong className="text-[var(--text-primary)]">
-            as good as possible
-          </strong>{" "}
-          on the cheapest hardware — with milestones that are{" "}
-          <span className="text-[var(--accent-strong)]">verified</span>, not
-          checked off.
+          InferQuest is two free roadmaps, built from a close read of what
+          labs currently hire for. One teaches you to{" "}
+          <strong className="text-[var(--text-primary)]">serve LLMs</strong>{" "}
+          fast and cheap in production. The other teaches you to{" "}
+          <strong className="text-[var(--text-primary)]">train them</strong>{" "}
+          as well as possible on cheap hardware. You don&rsquo;t check off
+          the big milestones yourself; the site{" "}
+          <span className="text-[var(--accent-strong)]">verifies</span> them
+          against your real endpoints, kernels, and training runs.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-6">
           <SignUpButton mode="modal">
@@ -150,12 +147,13 @@ export function Landing() {
         </p>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
           <strong className="text-[var(--text-primary)]">Who it&rsquo;s for:</strong>{" "}
-          working software engineers moving into ML systems. The material
-          assumes you can already program (Python especially) and have at
-          least brushed against a training loop before &mdash; terms like
-          training loss and overfitting get used before they get defined.
-          PyTorch fluency and the matrix math are refreshed along the way,
-          but not taught from zero. Starting completely fresh? Do Karpathy&rsquo;s{" "}
+          working software engineers who want to move into ML systems. You
+          should be comfortable programming (Python in particular), and you
+          should have seen a training loop at some point, because terms like
+          training loss and overfitting show up early without much
+          introduction. PyTorch and the matrix math get refreshed along the
+          way, but nothing here teaches programming itself. If you&rsquo;re
+          starting from nothing, do Karpathy&rsquo;s{" "}
           <a
             href="https://karpathy.ai/zero-to-hero.html"
             target="_blank"
@@ -164,7 +162,7 @@ export function Landing() {
           >
             Neural Networks: Zero to Hero
           </a>{" "}
-          first; the map will still be here.
+          first and come back.
         </p>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
           Signing in (with Google or email) is used only to save that progress
