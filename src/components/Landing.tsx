@@ -20,22 +20,22 @@ const VERIFIERS = [
   {
     icon: IconPlug,
     title: "Live endpoint probes",
-    body: "Deploy an OpenAI-compatible endpoint — your own engine, then production vLLM — and InferQuest probes it for real: streaming framing, usage accounting, max_tokens cutoffs, error shapes, latency targets.",
+    body: "Deploy an OpenAI-compatible endpoint (your own engine first, then production vLLM) and InferQuest probes it: streaming framing, usage accounting, max_tokens cutoffs, error shapes, latency targets.",
   },
   {
     icon: IconBolt,
     title: "GPU-graded kernels & training runs",
-    body: "A local harness grades your kernels — attention, KV cache, Triton softmax, flash attention, quantizer, ring all-reduce — AND your training runs: first convergence, a measured ≥1.5× speedup, an adapter fine-tune that must not forget, all under fixed token budgets on your own hardware.",
+    body: "A local harness grades your kernels for correctness and measured speed: attention, KV cache, Triton softmax, flash attention, quantizer, ring all-reduce. Training runs get the same treatment — first convergence, a measured ≥1.5× speedup, an adapter fine-tune that keeps its base skills — under fixed token budgets on your own hardware.",
   },
   {
     icon: IconMerge,
     title: "Merged-PR checks",
-    body: "The open-source milestones verify against the GitHub API that your PRs into vLLM, SGLang, FlashInfer, TRL, torchtitan, nanochat & co. actually exist, actually merged, and aren't typo fixes.",
+    body: "The open-source milestones check against the GitHub API that your PRs into vLLM, SGLang, FlashInfer, TRL, torchtitan, nanochat & co. exist, merged, and amount to more than typo fixes.",
   },
   {
     icon: IconGrad,
     title: "Graded interview drills",
-    body: "KV-cache sizing math, rooflines, speculative-decoding acceptance, scaling-laws and data-curation calls, parallelism tradeoffs — graded server-side, answers never shipped to your browser.",
+    body: "KV-cache sizing math, rooflines, speculative-decoding acceptance, scaling-laws and data-curation calls, parallelism tradeoffs. Graded server-side; the answers never reach your browser.",
   },
 ];
 
@@ -182,7 +182,7 @@ export function Landing() {
       {/* 02 — Verifiers */}
       <Section
         n="02"
-        title={<>Checkboxes are cheap. These aren&rsquo;t checkboxes.</>}
+        title={<>What &ldquo;verified&rdquo; means here</>}
       >
         <div className="mt-8 grid gap-5 sm:grid-cols-2">
           {VERIFIERS.map((v) => (
@@ -203,12 +203,13 @@ export function Landing() {
       {/* 03 — The journey: Foundations trunk, then the two paths */}
       <Section n="03" title="One trunk, two paths">
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
-          Everyone starts in <strong>Foundations</strong> — transformer
-          internals, GPU architecture, kernels — then branches. Level up from{" "}
-          <strong>{LEVELS[0].title}</strong> to{" "}
-          <strong>{LEVELS[LEVELS.length - 1].title}</strong> on one shared XP
-          ladder; the path titles — Inference Engineer, Training Engineer —
-          are earned as certificates.
+          Everyone starts in <strong>Foundations</strong> (transformer
+          internals, GPU architecture, kernels), then branches. XP and levels
+          are shared: one ladder from <strong>{LEVELS[0].title}</strong> to{" "}
+          <strong>{LEVELS[LEVELS.length - 1].title}</strong>, whichever path
+          you walk. The titles <strong>Inference Engineer</strong> and{" "}
+          <strong>Training Engineer</strong> are earned separately, as
+          certificates for finishing a path.
         </p>
         <div className="mt-8 max-w-2xl">
           <div className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
@@ -296,12 +297,13 @@ export function Landing() {
       {/* Closing CTA */}
       <section className="border-t-[3px] border-[var(--ink)] pb-6 pt-10">
         <h2 className="max-w-2xl text-3xl font-extrabold tracking-tight">
-          The market pays for proof, not promises.
+          Walk into the interview with receipts.
         </h2>
         <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">
           Every verified milestone leaves a receipt: probe results, harness
-          metrics with your GPU&rsquo;s name on them, merged-PR evidence.
-          That&rsquo;s a portfolio, not a certificate.
+          metrics with your GPU&rsquo;s name on them, merged PRs anyone can
+          look up. By the end you have a portfolio a hiring team can check
+          for themselves.
         </p>
         <div className="mt-8">
           <SignInButton mode="modal">
