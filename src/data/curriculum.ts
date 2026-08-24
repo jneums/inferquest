@@ -229,12 +229,22 @@ export const QUESTS: Quest[] = [
         detail: "SMs, warps, occupancy, HBM, TMA, NVLink — get the vocabulary loaded before it's needed.",
       },
       {
+        id: "mm-matmul-drill",
+        title: "Implement matmul three ways, then predict attention shapes",
+        kind: "build",
+        xp: 60,
+        link: "https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:matrices",
+        detail:
+          "Triple loop, rows-as-dot-products, weighted-sum-of-columns — all three matching torch.matmul on random inputs. Then compute Q @ K.T / √d for (B, T, C) tensors, writing down every intermediate shape before running. Rusty on the pencil mechanics? Khan Academy's matrix unit is the rep bank. Tensor Puzzles in the next quest continues this in NumPy.",
+      },
+      {
         id: "mm-linalg",
-        title: "Refresh linear algebra with 3Blue1Brown's Essence series",
+        title: "Watch Essence of Linear Algebra, chapters 1–4 and 9",
         kind: "watch",
         xp: 30,
         link: "https://www.3blue1brown.com/topics/linear-algebra",
-        detail: "Skip if matmul shapes and FLOP counting are second nature.",
+        detail:
+          "Intuition only, by design — matmul as composition of transformations, dot products as projection. It lands hardest AFTER the drill above, not instead of it. The determinant and eigen chapters can wait until the map actually needs them (low-rank ideas show up with LoRA, much later).",
       },
     ],
   },

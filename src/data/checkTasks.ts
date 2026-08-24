@@ -20,6 +20,7 @@ export const CHECK_TASK_IDS = new Set([
   "vllm-anatomy",
   "econ-first-principles",
   "mm-linalg",
+  "mm-matmul-drill",
   "fp-karpathy",
   "zoo-mla",
   "zoo-moe",

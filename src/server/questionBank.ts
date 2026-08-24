@@ -400,6 +400,32 @@ const CHECK_QUESTIONS: Record<string, CheckQ[]> = {
       explanation: "AB is a composition: B's output space is A's input space, so the dimension B outputs (n) must equal the dimension A consumes (n). This is exactly why chaining neural-net layers requires each layer's output width to equal the next layer's input width — it is not a notational convention.",
     },
   ],
+  "mm-matmul-drill": [
+    {
+      prompt: "Q and K both have shape (B, T, C). What is the shape of the attention-score tensor Q @ K.transpose(-2, -1)?",
+      choices: [
+        "(B, T, C) — matmul preserves the input shape",
+        "(B, C, C) — the shared dimension T contracts away",
+        "(B, T, T) — the batch dim rides along and each (T, C) multiplies a (C, T)",
+        "(T, T) — batched matmul flattens the batch dimension",
+      ],
+      answerIndex: 2,
+      explanation:
+        "Batched matmul treats every leading dim as batch and multiplies the last two: (T, C) @ (C, T) → (T, T) for each batch element — one score per query-key position pair. The dimension that contracts away is C, the feature dim, which is why the scores measure similarity in feature space.",
+    },
+    {
+      prompt: "For y = Wx with W an (m x n) matrix and x an n-vector, which reading of the arithmetic is correct?",
+      choices: [
+        "Each entry of y is the dot product of a row of W with x; equivalently, y is a weighted sum of W's columns",
+        "Each entry of y is the dot product of a column of W with x; equivalently, y is a weighted sum of W's rows",
+        "y is the elementwise product of W's diagonal with x, padded to length m",
+        "The row and column views give different vectors; which one you get depends on storage order",
+      ],
+      answerIndex: 0,
+      explanation:
+        "Both views describe the same arithmetic: entry y_i is row_i · x, and stacking those entries equals summing x_j · column_j over j. The column view — the input's entries selecting how much of each column lands in the output — is what a linear layer geometrically does, and it's the third implementation in the drill.",
+    },
+  ],
   "fp-karpathy": [
     {
       prompt: "In scaled dot-product attention, why are the query-key dot products divided by sqrt(d_k) before the softmax?",
