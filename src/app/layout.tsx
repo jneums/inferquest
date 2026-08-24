@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Schibsted_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { ProgressProvider } from "@/lib/progress";
@@ -111,6 +112,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </ProgressProvider>
         </ClerkProvider>
       </body>
+      {process.env.NODE_ENV === "production" && (
+        <GoogleAnalytics gaId="G-8ZYRM4R24Y" />
+      )}
     </html>
   );
 }

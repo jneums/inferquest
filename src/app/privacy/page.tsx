@@ -52,11 +52,24 @@ export default function PrivacyPage() {
             the public PR URL; for harness submissions, the grading report
             (which includes your GPU model name).
           </li>
+          <li>
+            <strong>Usage analytics.</strong> We use Google Analytics 4 to
+            see aggregate usage — page views, rough geography, how visitors
+            find the site. It sets its own cookies and is governed by{" "}
+            <a
+              href="https://policies.google.com/privacy"
+              className="text-[var(--accent-strong)] underline underline-offset-2"
+            >
+              Google&rsquo;s privacy policy
+            </a>
+            . We look at it in aggregate only and don&rsquo;t connect it to
+            your account.
+          </li>
         </ul>
         <p className="mt-2 text-[var(--text-secondary)]">
-          That&rsquo;s it. There are no analytics trackers, no advertising
-          pixels, and no cookies beyond the session cookies Clerk needs to
-          keep you signed in.
+          That&rsquo;s it. No advertising pixels, and no cookies beyond
+          Clerk&rsquo;s session cookies and the Google Analytics cookies
+          described above.
         </p>
       </section>
 
@@ -83,6 +96,10 @@ export default function PrivacyPage() {
           <li>
             <strong>GitHub</strong> — when you submit a pull request for
             verification, we query GitHub&rsquo;s public API about that PR.
+          </li>
+          <li>
+            <strong>Google</strong> — aggregate usage analytics via Google
+            Analytics 4, as described above.
           </li>
         </ul>
         <p className="mt-2 text-[var(--text-secondary)]">
