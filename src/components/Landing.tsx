@@ -149,6 +149,24 @@ export function Landing() {
           training runs, and merged open-source pull requests.
         </p>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
+          <strong className="text-[var(--text-primary)]">Who it&rsquo;s for:</strong>{" "}
+          working software engineers moving into ML systems. The material
+          assumes you can already program (Python especially) and have at
+          least brushed against a training loop before &mdash; terms like
+          training loss and overfitting get used before they get defined.
+          PyTorch fluency and the matrix math are refreshed along the way,
+          but not taught from zero. Starting completely fresh? Do Karpathy&rsquo;s{" "}
+          <a
+            href="https://karpathy.ai/zero-to-hero.html"
+            target="_blank"
+            rel="noreferrer"
+            className="text-[var(--accent-strong)] underline underline-offset-2"
+          >
+            Neural Networks: Zero to Hero
+          </a>{" "}
+          first; the map will still be here.
+        </p>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
           Signing in (with Google or email) is used only to save that progress
           to your account — see the{" "}
           <a
