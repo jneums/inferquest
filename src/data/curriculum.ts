@@ -1376,6 +1376,15 @@ export const QUESTS: Quest[] = [
         detail: "Ultra-Scale Playbook appendices A0 and A3 — the analytical grounding under everything in this phase.",
       },
       {
+        id: "par-fabric",
+        title: "Read how Meta runs RoCE for distributed training at scale",
+        kind: "read",
+        xp: 40,
+        link: "https://engineering.fb.com/2024/08/05/data-center-engineering/roce-network-distributed-ai-training-at-scale/",
+        detail:
+          "The fabric under the collectives: InfiniBand vs RoCE as a real design decision, rail-optimized topologies, and where GPUDirect RDMA fits. Familiarity-level on purpose — but it's the vocabulary training-infra job posts list by name.",
+      },
+      {
         id: "par-allreduce-harness",
         title: "Pass the grader: ring all-reduce from scratch",
         kind: "build",
@@ -2102,6 +2111,15 @@ export const QUESTS: Quest[] = [
         link: "https://huggingface.co/spaces/nanotron/ultrascale-playbook",
         detail:
           "5D parallelism, ZeRO, kernels, and the comm/compute overlap math — the training analog of the scaling book, and the interview text for training-infra roles.",
+      },
+      {
+        id: "mg-schedulers",
+        title: "Skim Slurm's quickstart and Ray's overview",
+        kind: "read",
+        xp: 40,
+        link: "https://slurm.schedmd.com/quickstart.html",
+        detail:
+          "The two schedulers training fleets actually run; Kubernetes you'll meet on the serving side. Enough to read an sbatch script and to say what a Ray cluster is (docs.ray.io/en/latest/ray-overview/index.html). Job posts ask for exactly this level.",
       },
     ],
   },
