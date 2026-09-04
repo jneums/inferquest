@@ -5,6 +5,7 @@
  */
 import { readFileSync } from "node:fs";
 import { PHASES, QUESTS, TASKS_BY_ID, TOTAL_XP } from "../src/data/curriculum";
+import { LIBRARY, LIBRARY_BY_ID } from "../src/data/library";
 import { QUIZZES } from "../src/server/quizBank";
 import { QUESTION_BANK, TASKS_WITH_CHECKS } from "../src/server/questionBank";
 import { CHECK_TASK_IDS } from "../src/data/checkTasks";
@@ -130,6 +131,28 @@ const ok = (msg: string) => console.log(`ok: ${msg}`);
   ok(`question bank: ${QUESTION_BANK.size} questions, check coverage on ${serverSet.size} tasks, wiring consistent`);
 }
 
+// ── 3c. library wiring ──
+{
+  const ids = new Set<string>();
+  const phaseIds = new Set(PHASES.map((p) => p.id));
+  const questIds = new Set(QUESTS.map((q) => q.id));
+  for (const e of LIBRARY) {
+    if (ids.has(e.id)) flag(`duplicate library id ${e.id}`);
+    ids.add(e.id);
+    for (const p of e.phaseIds)
+      if (!phaseIds.has(p)) flag(`library ${e.id} references unknown phase ${p}`);
+    for (const q of e.questIds ?? [])
+      if (!questIds.has(q)) flag(`library ${e.id} references unknown quest ${q}`);
+    if (!e.url.startsWith("https://")) flag(`library ${e.id} url is not https: ${e.url}`);
+    if (e.why.length === 0 || e.why.some((p) => p.trim() === ""))
+      flag(`library ${e.id} has empty "why" text`);
+  }
+  for (const [id, t] of TASKS_BY_ID)
+    if (t.libraryId && !LIBRARY_BY_ID.has(t.libraryId))
+      flag(`task ${id} references unknown library entry ${t.libraryId}`);
+  ok(`library: ${LIBRARY.length} entries, phase/quest refs and task cross-refs resolve`);
+}
+
 // ── 4. XP / level calibration ──
 {
   const maxLevel = LEVELS[LEVELS.length - 1];
@@ -156,6 +179,8 @@ async function checkLinks() {
     ];
     for (const u of found) urls.set(u, [...(urls.get(u) ?? []), id]);
   }
+  for (const e of LIBRARY)
+    urls.set(e.url, [...(urls.get(e.url) ?? []), `library:${e.id}`]);
   console.log(`\nchecking ${urls.size} unique URLs…`);
   const results = await Promise.allSettled(
     [...urls.keys()].map(async (u) => {

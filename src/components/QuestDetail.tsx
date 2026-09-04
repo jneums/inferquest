@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PHASES, QUESTS_BY_ID, phaseLabel } from "@/data/curriculum";
+import { libraryForQuest } from "@/data/library";
 import { useProgress } from "@/lib/progress";
 import { IconEye, IconLock } from "@/components/icons";
 import { TaskItem } from "@/components/TaskItem";
@@ -18,6 +19,7 @@ export function QuestDetail({ id }: { id: string }) {
   const unlocked = isQuestUnlocked(quest.id);
   const { done, total } = questCompletion(quest.id);
   const totalXP = quest.tasks.reduce((s, t) => s + t.xp, 0);
+  const libraryEntries = libraryForQuest(quest);
 
   return (
     <div className="space-y-10">
@@ -78,6 +80,50 @@ export function QuestDetail({ id }: { id: string }) {
               </p>
             ))}
           </div>
+        </div>
+      )}
+
+      {libraryEntries.length > 0 && (
+        <div className="border-t-[3px] border-[var(--ink)] pt-6">
+          <div className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+            From the library
+          </div>
+          <ul className="mt-5 space-y-2">
+            {libraryEntries.slice(0, 5).map((e) => (
+              <li
+                key={e.id}
+                className="flex flex-wrap items-baseline gap-x-2 text-sm"
+              >
+                <Link
+                  href={`/library#${e.id}`}
+                  className="font-semibold underline decoration-[var(--accent)] decoration-2 underline-offset-4 hover:text-[var(--accent-strong)]"
+                >
+                  {e.title}
+                </Link>
+                <span className="text-[var(--text-muted)]">{e.author}</span>
+                <span className="border border-[var(--border)] px-1.5 font-mono text-[10px] text-[var(--text-secondary)]">
+                  {e.kind}
+                </span>
+                <a
+                  href={e.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Open ${e.title}`}
+                  className="text-[var(--text-muted)] hover:text-[var(--accent-strong)]"
+                >
+                  ↗
+                </a>
+              </li>
+            ))}
+          </ul>
+          {libraryEntries.length > 5 && (
+            <Link
+              href="/library"
+              className="mt-3 inline-block text-xs text-[var(--text-muted)] underline underline-offset-2 hover:text-[var(--text-primary)]"
+            >
+              and {libraryEntries.length - 5} more in the library
+            </Link>
+          )}
         </div>
       )}
 

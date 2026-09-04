@@ -88,7 +88,7 @@ export default function QuestsPage() {
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
             The fundamentals both jobs are built on — performance mental
             models, transformer internals, GPU architecture, kernels,
-            quantization theory, parallelism. Whichever path you're headed
+            quantization theory, parallelism. Whichever path you&rsquo;re headed
             for, this is where it starts; finish a quest here once and it
             counts everywhere.
           </p>

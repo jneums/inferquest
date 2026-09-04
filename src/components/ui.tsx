@@ -6,12 +6,15 @@ import type { TaskKind } from "@/lib/types";
 export function Card({
   children,
   className = "",
+  id,
 }: {
   children: ReactNode;
   className?: string;
+  id?: string;
 }) {
   return (
     <div
+      id={id}
       className={`border border-[var(--border)] bg-[var(--surface-1)] ${className}`}
     >
       {children}

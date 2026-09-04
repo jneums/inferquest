@@ -43,6 +43,39 @@ export interface Task {
   detail?: string;
   link?: string;
   verifier?: Verifier;
+  /** Library entry this task is drawn from, when one exists. Cross-reference
+   *  only — the task keeps its own `link` and renders unchanged. */
+  libraryId?: string;
+}
+
+export type LibraryKind =
+  | "book"
+  | "course" // multi-part video/lecture series
+  | "post" // a single article or blog post
+  | "paper"
+  | "podcast"
+  | "reference"; // glossaries, galleries, docs you consult rather than read
+
+/** A curated source on /library: recommended, never assigned — no XP, no
+ *  checkbox. The curriculum's bibliography with a permanent address. */
+export interface LibraryEntry {
+  id: string; // kebab-case, stable; used as the #anchor and in cross-refs
+  title: string;
+  author: string;
+  kind: LibraryKind;
+  url: string; // canonical outbound link (https)
+  year?: number;
+  access: "free" | "paid";
+  /** Phases this entry serves. Drives filtering and the quest-page strip. */
+  phaseIds: string[];
+  /** Finer targeting: quests that should show this entry. If omitted, the
+   *  entry shows on every quest in its phaseIds. */
+  questIds?: string[];
+  /** Editorial, briefing voice: why this source over the alternatives, what
+   *  to skip, where it pays off on the map. 1–3 short paragraphs. */
+  why: string[];
+  /** Reading guidance, e.g. "Chapters 5–7". Rendered as a mono line. */
+  guidance?: string;
 }
 
 export type PathId = "inference" | "training";

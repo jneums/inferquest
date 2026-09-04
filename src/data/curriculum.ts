@@ -217,6 +217,7 @@ export const QUESTS: Quest[] = [
         kind: "watch",
         xp: 40,
         link: "https://karpathy.ai/zero-to-hero.html",
+        libraryId: "zero-to-hero",
         detail:
           "If training loss, gradients, and overfitting aren't familiar words yet, start here: Karpathy builds neural nets from scratch, ending at a small GPT. Skip it if you've trained anything before — the reading below assumes that background.",
       },
@@ -226,6 +227,7 @@ export const QUESTS: Quest[] = [
         kind: "read",
         xp: 40,
         link: "https://horace.io/brrr_intro.html",
+        libraryId: "brrr",
         detail:
           "Horace He's compute/memory/overhead taxonomy. Every perf conversation in this field silently assumes this post.",
       },
@@ -235,6 +237,7 @@ export const QUESTS: Quest[] = [
         kind: "read",
         xp: 30,
         link: "https://modal.com/gpu-glossary",
+        libraryId: "modal-gpu-glossary",
         detail: "SMs, warps, occupancy, HBM, TMA, NVLink — get the vocabulary loaded before it's needed.",
       },
       {
